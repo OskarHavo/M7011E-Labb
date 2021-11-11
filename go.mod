@@ -1,4 +1,4 @@
-module maain
+module m7011e
 
 go 1.17
 
