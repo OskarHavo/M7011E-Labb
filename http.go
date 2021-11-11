@@ -3,9 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -67,10 +65,19 @@ func (network *Network) HTTPhandler(w http.ResponseWriter, r *http.Request){
 	}
 }
 
+func HelloServer(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hello, %s!", r.URL.Path[1:])
+}
+
 // Enables listening to HTTP
 func (network *Network) HTTPlisten() {
+	/*
 	r := mux.NewRouter()
 	r.HandleFunc("/objects/{hashvalue}", network.HTTPhandler).Methods("GET")
 	r.HandleFunc("/objects", network.HTTPhandler).Methods("POST")
 	log.Fatal(http.ListenAndServe(":3000", r))
+
+	 */
+	http.HandleFunc("/", HelloServer)
+	http.ListenAndServe(":4040", nil)
 }

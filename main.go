@@ -5,6 +5,7 @@ import (
 	"net"
 	"os"
 )
+
 // Entrypoint
 func main() {
 	addrs,err := net.InterfaceAddrs()
@@ -21,10 +22,13 @@ func main() {
 			}
 		}
 	}
-	network := NewNetwork(&IP, NewMessageService(false,nil))
+	network := NewNetwork()
 	fmt.Println("Network IP is  " + IP.String())
 
 	//Create Threads.
 	go network.HTTPlisten()
 
+	for {
+
+	}
 }
