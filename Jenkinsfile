@@ -10,6 +10,9 @@
 //    }
 //}
 pipeline {
+    agent {
+        docker { image 'Docker' }
+    }
     stages {
     //checkout scm
     //stage('Checkout') {
@@ -30,14 +33,7 @@ pipeline {
  
         stage('Release') {
             steps {
-            agent {
-                docker {
-                    image 'Docker'
-                    // Run the container on the node specified at the top-level of the Pipeline, in the same workspace, rather than on a new node entirely:
-                    reuseNode true
-                }
-            }
-            sh 'node --version'
+                sh 'node --version'
             }
                 //sh 'cd "/var/lib/jenkins/workspace/M7011E Github/"; nohup go run m7011e &'            
         }
