@@ -30,12 +30,15 @@ node {
     //    GO111MODULE = 'on'
     //}
     //stages {
-        stage('Compile'){
-          //  steps {
-                sh 'go build .'
-            //}
-        }
+ 
         stage('Release') {
+            agent {
+                docker {
+                    image 'Docker'
+                    // Run the container on the node specified at the top-level of the Pipeline, in the same workspace, rather than on a new node entirely:
+                    reuseNode true
+                }
+            }
             sh 'node --version'
                 //sh 'cd "/var/lib/jenkins/workspace/M7011E Github/"; nohup go run m7011e &'            
         }
