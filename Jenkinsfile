@@ -10,9 +10,7 @@
 //    }
 //}
 pipeline {
-    agent {
-        docker { image 'Docker' }
-    }
+    agent any
     stages {
     //checkout scm
     //stage('Checkout') {
