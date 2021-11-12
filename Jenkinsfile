@@ -15,9 +15,9 @@ pipeline {
         }
     }
 
-        stage('Test') {
+        stage('Deploy') {
             steps {
-                sh 'ls -la'
+                sh 'go run m7011e'
             }
         }
     }
