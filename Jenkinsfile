@@ -1,8 +1,24 @@
-node {
-    /* Requires the Docker Pipeline plugin to be installed */
-    docker.image('Docker').inside {
+pipeline {
+    agent any
+    stages {
+        stage('Checkout') {
+            steps{
+        sh """
+        git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
+        git fetch --all
+        """
+            }
+    }
+    stage('Build') { 
+        steps {
+        sh 'go build .' 
+        }
+    }
+
         stage('Test') {
-            sh 'node --version'
+            steps {
+                sh 'ls -la'
+            }
         }
     }
 }
