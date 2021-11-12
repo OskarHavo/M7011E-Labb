@@ -9,14 +9,15 @@
 //        sh 'ls /var/lib/jenkins/workspace/'
 //    }
 //}
-node {
-    checkout scm
-    stage('Checkout') {
-        sh """
-        git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
-        git fetch --all
-        """
-    }
+pipeline {
+    stages {
+    //checkout scm
+    //stage('Checkout') {
+    //    sh """
+    //    git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
+    //    git fetch --all
+    //    """
+    //}
 
     //agent any
     //tools {
@@ -38,5 +39,5 @@ node {
             sh 'node --version'
                 //sh 'cd "/var/lib/jenkins/workspace/M7011E Github/"; nohup go run m7011e &'            
         }
-    //}
+    }
 }
