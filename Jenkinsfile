@@ -17,6 +17,10 @@ node {
         git fetch --all
         """
     }
+    
+    agent {
+        docker { image 'node:14-alpine' }
+    }
 
     //agent any
     //tools {
@@ -26,16 +30,14 @@ node {
     //    GO111MODULE = 'on'
     //}
     //stages {
-        //stage('Compile'){
+        stage('Compile'){
           //  steps {
-            //    sh 'cd "/var/lib/jenkins/workspace/M7011E Github/"; go build .'
+                sh 'go build .'
             //}
-        //}
+        }
         stage('Release') {
-          
-                //sh 'cd "/var/lib/jenkins/workspace/M7011E Github/"; nohup go run m7011e &' 
-            sh 'ls'
-            
+            sh 'node --version'
+                //sh 'cd "/var/lib/jenkins/workspace/M7011E Github/"; nohup go run m7011e &'            
         }
     //}
 }
