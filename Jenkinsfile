@@ -24,10 +24,10 @@ node {
             //}
         //}
         stage('Release') {
-            steps {
+          
                 //sh 'cd "/var/lib/jenkins/workspace/M7011E Github/"; nohup go run m7011e &' 
-                sh "echo "Hello!""
-            }
+            sh "echo "Hello!""
+            
         }
     //}
 }
