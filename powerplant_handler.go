@@ -7,6 +7,7 @@ import (
 )
 
 type Powerplant struct {
+	ID int
 	EnergyType    string `json:"energytype"`
 	City string `json:"city"`
 	ConstructionYear string `json:"constructionyear"`

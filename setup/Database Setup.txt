@@ -1,0 +1,17 @@
+1) Launch MySQL Shell
+2) \sql
+3) \connect root@localhost
+
+4) CREATE DATABASE powerplant_db;
+5) USE powerplant_db;
+
+6) CREATE TABLE Powerplants (	powerplant_id int NOT NULL AUTO_INCREMENT,
+							 energytype VARCHAR(40) NOT NULL, 
+								   city VARCHAR(40) NOT NULL,
+						constructionyear VARCHAR(4) NOT NULL, 
+									PRIMARY KEY (powerplant_id) );
+7) SHOW TABLES;
+8) DESCRIBE Powerplants;
+9) INSERT INTO Powerplants (energytype, city, constructionyear) VALUES ('Coal','Luleå','1932');
+10) INSERT INTO Powerplants (energytype, city, constructionyear) VALUES ('Water','Piteå','2003');
+11) SELECT * FROM powerplants;
