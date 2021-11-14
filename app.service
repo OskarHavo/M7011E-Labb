@@ -1,0 +1,14 @@
+[Unit]
+Description=Our awesome server
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+WorkingDirectory=/var/lib/jenkins/workspace/M7011E
+ExecStart=go run m7011e
+
+[Install]
+WantedBy=default.target
