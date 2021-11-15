@@ -1,24 +1,24 @@
-pipeline {
-    agent any
-    stages {
-        stage('Checkout') {
-            steps{
+node {
+    checkout scm
+    stage('Checkout') {    
         sh """
         git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
         git fetch --all
         """
-            }
+        
     }
     stage('Build') { 
-        steps {
+        
         sh 'go build .' 
-        }
+        
     }
 
         stage('Deploy') {
-            steps {
-                sh 'go run m7011e'
-            }
+		sh 'cp -v logic.service ~/.config/systemd/user/'
+		sh 'systemctl --user daemon-reload' 
+		sh 'systemctl --user stop logic'
+                sh 'systemctl --user start logic'
+		sh 'systemctl --user status logic'
         }
-    }
+    
 }
