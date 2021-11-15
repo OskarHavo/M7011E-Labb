@@ -15,9 +15,12 @@ func main() {
 	//listenToHTTP()
 
 
-	db := startDatabase()
-	checkVersion(db)
-	readAllFromDatabase(db)
-	addToDatabase("Wind", "Boden", "2019", db)
-	readAllFromDatabase(db)
+	//db := startDatabase()
+	//checkVersion(db)
+//	readAllFromDatabase(db)
+//	addToDatabase("Wind", "Boden", "2019", db)
+//	readAllFromDatabase(db)
+
+	initializeModel()
+
 }
