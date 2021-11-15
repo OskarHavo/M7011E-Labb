@@ -14,17 +14,11 @@ node {
     }
 
         stage('Deploy') {
-           
-	    	sh 'mkdir -p  ~/.config/systemd/user/'
-		//sh 'sudo cp app.service /etc/systemd/system/'
-		sh 'cp -v app.service ~/.config/systemd/user'
-		
-		//sh 'echo "starting app..."'
-		sh 'systemctl --user stop app'
-		sh 'systemctl --user daemon-reload'
-                sh 'systemctl --user start app'
-		sh 'systemctl --user status app'
-		//sh 'echo "script finished"'	
+		sh 'cp -v dev.service ~/.config/systemd/user/'
+		sh 'systemctl --user daemon-reload' 
+		sh 'systemctl --user stop dev'
+                sh 'systemctl --user start dev'
+		sh 'systemctl --user status dev'
         }
     
 }

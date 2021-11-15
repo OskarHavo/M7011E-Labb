@@ -12,8 +12,7 @@ func main() {
 	// Infinite Loop
 	//select {}
 
-	//listenToHTTP()
-
+	listenToHTTP()
 
 	db := startDatabase()
 	checkVersion(db)
