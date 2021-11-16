@@ -19,9 +19,9 @@ func newRouter() *mux.Router{
 }
 
 // Enables listening to HTTP
-func listenToHTTP() {
+func listenToHTTP(port string) {
 	r := newRouter()
-	err:= http.ListenAndServe(":4040", r)
+	err:= http.ListenAndServe(port, r)
 
 	if err != nil {
 		panic(err.Error())

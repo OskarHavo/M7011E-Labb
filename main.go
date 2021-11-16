@@ -1,6 +1,5 @@
 package main
 
-
 // Entrypoint
 func main() {
 	// Create Network.
@@ -12,11 +11,7 @@ func main() {
 	// Infinite Loop
 	//select {}
 
-	listenToHTTP()
-
-	db := startDatabase()
-	checkVersion(db)
-	readAllFromDatabase(db)
-	addToDatabase("Wind", "Boden", "2019", db)
-	readAllFromDatabase(db)
+	listenToHTTP(":4040")
+  // 	db := startDatabase()
+//    checkVersion(db)
 }
