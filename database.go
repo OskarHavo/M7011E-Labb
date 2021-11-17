@@ -15,11 +15,11 @@ import (
 func  startDatabase() *sql.DB{
 
 	cfg := mysql.Config{
-		User:   "root",
-		Passwd: "HEMLIGT",
+		User:   "client",
+		Passwd: "",
 		Net:    "tcp",
 		Addr:   "127.0.0.1:3306",
-		DBName: "powerplant_db",
+		DBName: "M7011E",
 	}
 
 

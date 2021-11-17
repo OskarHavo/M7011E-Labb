@@ -11,7 +11,7 @@ func main() {
 	// Infinite Loop
 	//select {}
 
-	listenToHTTP(":4040")
-  // 	db := startDatabase()
-//    checkVersion(db)
+	//listenToHTTP(":4040")
+   	db := startDatabase()
+    checkVersion(db)
 }
