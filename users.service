@@ -8,7 +8,7 @@ Type=simple
 Restart=always
 RestartSec=10
 WorkingDirectory=/var/lib/jenkins/workspace/M7011E-users
-ExecStart=go run m7011e
+ExecStart=python3 python/index.py
 
 [Install]
 WantedBy=default.target

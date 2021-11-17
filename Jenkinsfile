@@ -7,18 +7,17 @@ node {
         """
         
     }
-    stage('Build') { 
-        
-        sh 'go build .' 
-        
-    }
 
-        stage('Deploy') {
-		sh 'cp -v users.service ~/.config/systemd/user/'
-		sh 'systemctl --user daemon-reload' 
-		sh 'systemctl --user stop users'
-                sh 'systemctl --user start users'
-		sh 'systemctl --user status users'
-        }
+    stage('build') {
+	sh 'pip install mysql-connector'
+    }   
+
+    stage('Deploy') {
+	sh 'cp -v users.service ~/.config/systemd/user/'
+	sh 'systemctl --user daemon-reload' 
+	sh 'systemctl --user stop users'
+        sh 'systemctl --user start users'
+	sh 'systemctl --user status users'
+    }
     
 }
