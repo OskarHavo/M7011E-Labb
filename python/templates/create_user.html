@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/static/login.css">
-    <title>Login</title>
+    <title>Signup</title>
 </head>
 <body>
-<form action="/login" method="POST">
+<form action="/create_user" method="POST">
 
     <div class="container">
         <label for="uname"><b>Username</b></label>
@@ -14,8 +14,11 @@
 
         <label for="psw"><b>Password</b></label>
         <input type="password" placeholder="Enter Password" name="password" required>
-	<p style="color:red;">{{error}}</p>
-        <button type="submit">Login</button>
+        <label for="psw-repeat"><b>Repeat Password</b></label>
+        <input type="password" placeholder="Enter Password" name="password-repeat" required>
+
+	<p style="color:red">{{error}}</p>
+        <button type="submit">Create user</button>
     </div>
 
     <div class="container" style="background-color:#f1f1f1">
