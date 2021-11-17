@@ -274,6 +274,6 @@ func isSurplus(dailyEnergyConsumption float64, dailyEnergyProduced float64) bool
 
 // Returns the net energy production.
 func calculateNetEnergyProduction(producedEnergy float64,  consumedEnergy float64) float64{
-	calculateNetEnergyProduction := producedEnergy - consumedEnergy
-	return calculateNetEnergyProduction
+	calculatedNetEnergyProduction := producedEnergy - consumedEnergy
+	return calculatedNetEnergyProduction
 }

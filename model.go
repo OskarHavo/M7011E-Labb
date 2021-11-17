@@ -107,14 +107,14 @@ func createDataPoints(datapointsForHowManyYears int) []EnergyDataPoint {
 		datapoint.EnergyPrice, datapoint.EnergySurplus = calculateDailyEnergyPrice(datapoint.ProducedEnergy, datapoint.ConsumedEnergy)
 		datapoint.NetEnergyProduction = calculateNetEnergyProduction(datapoint.ProducedEnergy, datapoint.ConsumedEnergy)
 
-	/*	fmt.Println("Date: ", datapoint.Date, " ProducedEnergy:  ",datapoint.ProducedEnergy,
+		fmt.Println("Date: ", datapoint.Date, " ProducedEnergy:  ",datapoint.ProducedEnergy,
 			" ConsumedEnergy:  ",datapoint.ConsumedEnergy , " EnergyPrice:  ",datapoint.EnergyPrice ,
 		)
-	*/
+
 
 		//	" EnergySurplus:  ",datapoint.EnergySurplus, " NetEnergyProduction:  ",datapoint.NetEnergyProduction)
 
-		fmt.Println(datapoint.Date,"Price:",calculateConsumerPrice( datapoint.ProducedEnergy ,  datapoint.ConsumedEnergy ,datapoint.EnergyPrice, datapoint.EnergySurplus))
+	//	fmt.Println(datapoint.Date,"Price:",calculateConsumerPrice( datapoint.ProducedEnergy ,  datapoint.ConsumedEnergy ,datapoint.EnergyPrice, datapoint.EnergySurplus))
 		newDatapointsList[i] = datapoint
 	}
 	return newDatapointsList
