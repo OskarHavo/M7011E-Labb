@@ -3,7 +3,6 @@ import time
 
 from dataGeneration import *
 
-
 class EnergyDataPoint:
     def __init__(self):
         Date = ""
@@ -22,22 +21,18 @@ class Household:
         EnergySellingRatio = 0  # TODO
         DataPoints = []
 
-
 datapoints = []
 households = []
 
-
-def initializeModel(startDate):
-    random.seed(random.randint(0,1000))
-    households = createHouseHolds(1, 1,startDate)
-
+def initializeModel(howManyHouseholds, datapointsForHowManyYears, startDate):
+    random.seed(random.randint(0,100000))
+    households = createHouseHolds(howManyHouseholds, datapointsForHowManyYears,startDate)
 
 def playModel():
     # TODO Load first date and load each households data for that date.
     # TODO Every 5seconds move to to next date
     # TODO for each date, add datapoint.NetEnergyProduction to Household.Buffer
     return
-
 
 def createHouseHolds(howManyHouseholds, datapointsForHowManyYears, startDate):
     numberOfYears = datapointsForHowManyYears
@@ -54,7 +49,6 @@ def createHouseHolds(howManyHouseholds, datapointsForHowManyYears, startDate):
 
         newHouseholdList.append(household)
     return newHouseholdList
-
 
 def createDataPoints(datapointsForHowManyYears, startDate):
     generatedDateRange = createDateRange(startDate, datapointsForHowManyYears)
@@ -87,7 +81,7 @@ def createDataPoints(datapointsForHowManyYears, startDate):
         # If Windmill broken, produced energy will plummet (Still a value so no infinite electricity price)
         # Otherwise take from datalist
         if daysOfOutage != 0:
-            datapoint.ProducedEnergy = 1.000000000000001
+            datapoint.ProducedEnergy = 0.0
             daysOfOutage = daysOfOutage - 1
         else:
             datapoint.ProducedEnergy = generatedEnergyProduction[i]
@@ -113,11 +107,9 @@ def updateListAfterDowntime(datapoint):
     datapoint.EnergySurplus = isSurplus(datapoint.ConsumedEnergy, datapoint.ProducedEnergy)
     datapoint.NetEnergyProduction = calculateNetEnergyProduction(datapoint.ProducedEnergy, datapoint.ConsumedEnergy)
 
-
 def getNumberOfDays(numberOfYears):
     numberOfDates = (numberOfYears * 365) + 1
     return numberOfDates
-
 
 # Calculate the Final Consumer Price Per Day.
 def calculateConsumerPrice(producedEnergy, consumedEnergy, energyPrice, isSurplus):
@@ -130,7 +122,6 @@ def calculateConsumerPrice(producedEnergy, consumedEnergy, energyPrice, isSurplu
         consumerPrice = (consumedEnergy - producedEnergy) * energyPrice
         return consumerPrice
 
-
 def isWindmillBroken():
     randomInteger = random.randint(1, 500)
 
@@ -139,7 +130,6 @@ def isWindmillBroken():
         return True
     else:
         return False
-
 
 # REST API
 def getWindSpeed(date):
@@ -168,6 +158,3 @@ def getElectricityPrice(date):
     electricityPrice = 1.0445
     return electricityPrice
 
-
-def main():
-    print("Hello world!")
