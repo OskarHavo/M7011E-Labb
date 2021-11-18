@@ -6,27 +6,36 @@ from dataGeneration import *
 class Household:
     def __init__(self):
         ID = 0
-        EnergyBuffer = 0  # TODO
-        EnergyBuyingRatio = 0  # TODO
-        EnergySellingRatio = 0  # TODO
-        DataPoints = dict() # DataPoints[date] = {producedEnergy, consumedEnergy,energyPrice,energySurplus,netEnergyProduction}
+        Finances = 0
+        EnergyBuffer = 0
+        EnergyBuyingRatio = 0
+        EnergySellingRatio = 0
+        DataPoints = dict() # DataPoints[date] = {producedEnergy, consumedEnergy,energyPrice,energySurplus,netEnergyProduction,energyBuffer}
 
 households = []
 
 def initializeModel(howManyHouseholds, datapointsForHowManyYears, startDate):
     random.seed(random.randint(0,100000))
-    households = createHouseHolds(howManyHouseholds, datapointsForHowManyYears,startDate)
+    households = createHouseHolds(howManyHouseholds, datapointsForHowManyYears, startDate)
 
     queryDate = "2023-12-31"
+    showAllData = False
+
     for household in households:
         print("\n")
         print("HOUSEHOlD: " + str(household.ID) + " at the date: " + queryDate)
-        print("Windspeed: " + str(getHouseholdWindSpeed(household, queryDate)) + " m/s")
-        print("EnergyProduction: " + str(getHouseholdEnergyProduction(household, queryDate)) + " kWh")
-        print("EnergyConsumption: " + str(getHouseholdEnergyConsumption(household, queryDate)) + " kWh")
-        print("EnergyNetProduction :" + str(getHouseholdNetEnergyProduciton(household, queryDate)) + " kWh")
-        print("EnergySurplus is: " + str(getHouseholdEnergySurplus(household, queryDate)))
-        print("EnergyPrice: " + str(getHouseholdEnergyPrice(household, queryDate)) + " kr")
+        if(showAllData):
+            print("Windspeed: " + str(getHouseholdWindSpeed(household, queryDate)) + " m/s")
+            print("EnergyProduction: " + str(getHouseholdEnergyProduction(household, queryDate)) + " kWh")
+            print("EnergyConsumption: " + str(getHouseholdEnergyConsumption(household, queryDate)) + " kWh")
+            print("EnergyNetProduction :" + str(getHouseholdNetEnergyProduciton(household, queryDate)) + " kWh")
+            print("EnergyBufferSize : " + str(getHouseholdEnergyBufferSize(household, queryDate)) + " kWh")
+            print("EnergySurplus is: " + str(getHouseholdEnergySurplus(household, queryDate)))
+            print("EnergyPrice: " + str(getHouseholdEnergyPrice(household, queryDate)) + " kr")
+            print("Finances: " + str(getHouseholdEnergyFinances(household, queryDate)) + " kr")
+        else:
+            print("EnergyBufferSize : " + str(getHouseholdEnergyBufferSize(household, queryDate)) + " kWh")
+            print("Finances: " + str(getHouseholdEnergyFinances(household, queryDate)) + " kr")
 
     #printDataPoint(households[0], "2023-12-31")
 
@@ -44,22 +53,23 @@ def createHouseHolds(howManyHouseholds, datapointsForHowManyYears, startDate):
     for i in range(0, numberOfHouseholds):
         household = Household()
         household.ID = i
+        household.Finances = 10000
         household.EnergyBuffer = 0
-        household.EnergyBuyingRatio = 0.5
-        household.EnergySellingRatio = 0.5
-        household.DataPoints = createDataPoints(numberOfYears, startDate)
+        household.EnergyBuyingRatio = 0.2
+        household.EnergySellingRatio = 0.8
+        household.DataPoints = createDataPoints(household, numberOfYears, startDate)
 
         newHouseholdList.append(household)
     return newHouseholdList
 
-def createDataPoints(datapointsForHowManyYears, startDate):
+def createDataPoints(household, datapointsForHowManyYears, startDate):
     generatedDateRange = createDateRange(startDate, datapointsForHowManyYears)
     numberOfDates = len(generatedDateRange)
 
     # Generate	Data
     # Wind is gradual and season like -> Sine Wave.HouseholdPower is consistent(seasonal variation might occur though) -> Randomfloats in range.
-    generatedEnergyProduction = generateSineWaveFloats(10.0, 20.0, numberOfDates)
-    generatedEnergyConsumption = randomizeSeasonalFloats(startDate,numberOfDates)  # generateNormalDistibutionFloats(numberOfDates, numberOfYears)
+    generatedEnergyProduction = generateSineWaveFloats(numberOfDates)
+    generatedEnergyConsumption = randomizeSeasonalFloats(startDate, numberOfDates)  # generateNormalDistibutionFloats(numberOfDates, numberOfYears)
 
     datapointsForDate = dict()
     daysOfOutage = 0
@@ -84,15 +94,33 @@ def createDataPoints(datapointsForHowManyYears, startDate):
         energyPrice, energySurplus = calculateDailyEnergyPrice(producedEnergy, consumedEnergy)
         netEnergyProduction = calculateNetEnergyProduction(producedEnergy, consumedEnergy)
 
-        print("Date:", date, "ProducedEnergy:", producedEnergy,
-              "ConsumedEnergy:", consumedEnergy, "EnergyPrice:", energyPrice)
+        # If Energy Surplus: Allocate the surplus to the buffer and sell the remainder for money
+        if netEnergyProduction > 0:
+            surplus = netEnergyProduction
+            household.EnergyBuffer += surplus * (1-household.EnergySellingRatio)
+            household.Finances += surplus * (household.EnergySellingRatio) * energyPrice
+        # If Energy Deficit: Use your energy buffer and buy the remaining power needed with money.
+        else:
+            deficit = abs(netEnergyProduction)
+            extraDeficit = 0
 
-        # " EnergySurplus:  ", datapoint.EnergySurplus, " NetEnergyProduction:  ", datapoint.NetEnergyProduction)
+            if household.EnergyBuffer >= deficit:
+                household.EnergyBuffer -= deficit * (1 - household.EnergyBuyingRatio)
+            if household.EnergyBuffer < deficit:
+                # If deficit depletes buffer, buy energy to set buffer to 0.
+                extraDeficit = household.EnergyBuffer
+                household.EnergyBuffer = 0
+            household.Finances -= (deficit+extraDeficit) * (household.EnergyBuyingRatio) * energyPrice
 
-        # fmt.Println(datapoint.Date, "Price:",calculateConsumerPrice(datapoint.ProducedEnergy, datapoint.ConsumedEnergy, datapoint.EnergyPrice,datapoint.EnergySurplus))
+
+      #  print("Finances: " + str(household.Finances))
+
+     #    print("Date:", date, "ProducedEnergy:", producedEnergy,
+     #         "ConsumedEnergy:", consumedEnergy, "EnergyPrice:", energyPrice)
+
 
         datapointsForDate[date] = {"ProducedEnergy": producedEnergy, "ConsumedEnergy": consumedEnergy, "EnergyPrice": energyPrice, "EnergySurplus": energySurplus,
-                                   "NetEnergyProduction": netEnergyProduction}
+                                   "NetEnergyProduction": netEnergyProduction, "EnergyBuffer": household.EnergyBuffer, "Finances": household.Finances}
     return datapointsForDate
 
 
@@ -119,7 +147,6 @@ def isWindmillBroken():
         return True
     else:
         return False
-
 
 def getNumberOfDays(numberOfYears):
     numberOfDates = (numberOfYears * 365) + 1
@@ -162,3 +189,13 @@ def getHouseholdEnergySurplus(household, date):
 def getHouseholdNetEnergyProduciton(household, date):
     netEnergyProduction = household.DataPoints[date]["NetEnergyProduction"]
     return netEnergyProduction
+
+# Returns the households total energybuffer size at the given day, measured in kWh
+def getHouseholdEnergyBufferSize(household, date):
+    energyBufferSize = household.DataPoints[date]["EnergyBuffer"]  #household.EnergyBuffer
+    return energyBufferSize
+
+# Returns the households total finances at the given day, measured in kr
+def getHouseholdEnergyFinances(household, date):
+    finances = household.DataPoints[date]["Finances"]  #household.Finances
+    return finances

@@ -59,13 +59,13 @@ def randomizeSeasonalFloats(startDate, days):
 
 
 # Creates and returns a list of float values. This is based on a sine wave inorder to receive gradual and smooth changes in the floats produced.
-def generateSineWaveFloats(minimumFloatValue, maximumFloatValue, numberOfFloatsToRandomize):
+def generateSineWaveFloats(numberOfFloatsToRandomize):
     listOfRandomizedFloats = []
-    # Between 5-25 kWh
 
-    A = random.randint(8, 12)  # Amplitude (Max/Min Value)
-    f = round(random.uniform(0.01, 0.04), 3)  # Frequency
-    B = random.randint(0, 10)  # Phase  (Adjust for seasons)
+    # These ranges create a healthy range of the total NetEnergyProduction.
+    A = random.randint(10, 12)  # Amplitude (Max/Min Value)
+    f = round(random.uniform(0.01, 0.1), 3)  # Frequency
+    B = random.randint(-15, 15)  # Phase  (Adjust for seasons)
 
     C = A * 1.5  # Makes sure the values are not too low and/or negative  ##Check so randomizing the afb values does it make it negative in some config
 
