@@ -159,7 +159,7 @@ func isWindmillBroken() bool{
 
 
 // REST API
-func getWindSpeed(date string) float64{
+func getHouseholdWindSpeed(date string) float64{
 	// take datapoint with date as key -> windenergy for that day as value
 	// divide value with value x to get the wind speed.
 
@@ -167,7 +167,7 @@ func getWindSpeed(date string) float64{
 	return windSpeed
 }
 
-func getElectricityConsumption(date string) float64{
+func getHouseholdEnergyConsumption(date string) float64{
 	// take datapoint with date as key -> consumption for that day as value
 
 	electricityConsumption := 1.0445
