@@ -3,8 +3,9 @@ import datetime
 import model
 
 def main():
-    startDate = datetime.datetime(2023, 1, 1, 0)
-    model.initializeModel(10, 1, startDate)
+    startDate = "2021-01-01"
+    formattedStartDate = datetime.datetime.strptime(startDate, '%Y-%m-%d').date()
+    model.initializeModel(10, 1, formattedStartDate)
     return
 
 main()
