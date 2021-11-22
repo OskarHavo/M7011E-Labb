@@ -71,11 +71,15 @@ def createDataPoints(household, datapointsForHowManyYears, startDate):
     daysOfOutage = 0
 
     date = startDate  ## Rubbes lägga till din skottår grej?
+    timeBetweenDates = 15 # Seconds between while loop loops.
     # For testing
     endDate = "2025-01-01"
     formattedEndDate = datetime.datetime.strptime(endDate, '%Y-%m-%d').date()
 
     while True:
+        start_time = time.time() # Used for waiting between calculating data for each date. (sleeping)
+        print(date)
+
         # If Windmill breaks, an outage will occur for 3-6 days.
         if daysOfOutage == 0 and isWindmillBroken():
             daysOfOutage = random.randint(3, 6)
@@ -115,6 +119,7 @@ def createDataPoints(household, datapointsForHowManyYears, startDate):
         datapointsForDate[date] = {"ProducedEnergy": producedEnergy, "ConsumedEnergy": consumedEnergy, "EnergyPrice": energyPrice, "EnergySurplus": energySurplus,
                                    "NetEnergyProduction": netEnergyProduction, "EnergyBuffer": household.EnergyBuffer, "Finances": household.Finances}
 
+        time.sleep(timeBetweenDates - (time.time() - start_time))
         date += datetime.timedelta(days=1) # Go to next date
 
         if date == formattedEndDate: break
