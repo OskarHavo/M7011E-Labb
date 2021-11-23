@@ -36,17 +36,43 @@ function removeFirst(chart) {
 	});
 
 }
+
+const request = ( url, params = {}, method = 'GET' ) => {
+	let options = {
+		method
+	};
+	if ( 'GET' === method ) {
+		url += '?' + ( new URLSearchParams( params ) ).toString();
+	} else {
+		options.body = JSON.stringify( params );
+	}
+
+	return fetch( url, options ).then( response => response.json() );
+};
+
+const post= (url, params) => request(url,params,'POST');
+
 //var repeater;
 function update(updater, chart,startx,starty,delta,bufferSize=10) {
-       	addData(chart,startx,starty);
-	if (chart.data.labels.length > bufferSize) {
-		removeFirst(chart);
-	}
-	var maximum = Math.max.apply(null,chart.data.datasets[0].data);
-	chart.options.scales.yAxes = [{ticks: {min: 0, max:maximum}}];
-       	startx ++;
-        starty += Math.floor(Math.random() * 10) -4;
-	chart.update();
-        updater = setTimeout(update,delta*1000,updater,chart,startx,starty,delta,bufferSize);
+	post('/fetch',{}).then(response=>{
+		var i = response["time"];
+		var data = response["value"];
+		addData(chart,i,data);
+		if (chart.data.labels.length > bufferSize) {
+			removeFirst(chart);
+		}
+		var maximum = Math.max.apply(null,chart.data.datasets[0].data);
+		chart.options.scales.yAxes = [{ticks: {min: 0, max:maximum}}];
+       		startx ++;
+	        starty += Math.floor(Math.random() * 10) -4;
+		chart.update();
+	        updater = setTimeout(update,delta*1000,updater,chart,startx,starty,delta,bufferSize);
+	});
+	//var response = XMLHTTPRequest();
+	//response.open('GET','/fetch');
+	//response.send();
+	//var message = response.responseText();
+	//console.log(message);
+      	
 }
 //update();

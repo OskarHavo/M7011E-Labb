@@ -1,10 +1,12 @@
-from flask import (Flask, render_template, request, redirect, session, make_response)
+from flask import (Flask, render_template, request,Response, redirect, session, make_response)
 from flask import render_template
 import mysql.connector
 import sys
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
 import json
+import time
+import random
 
 global current_error
 current_error = []
@@ -23,6 +25,8 @@ global errorDir
 errorDir = "/error"
 global createUserDir
 createUserDir = "/create_user"
+global counter
+counter = 1
 
 
 def readUserFromDatabase(user):
@@ -232,11 +236,20 @@ def logout():
     return redirect(indexDir)
 
 
-@app.route("/demo")
-def demo():
-    return render_template("dashboard.html",user="DEMO")
-
-
+@app.route("/fetch",methods=['POST', 'GET'])
+def fetch():
+    if checkSession() == None:
+        redirect(indexDir)
+    if request.method == 'POST':
+        global counter
+        data = {
+            "time": counter,
+            "value":random.randint(0,100)
+        }
+        counter = counter+1
+        return json.dumps(data)
+    else:
+        return "BAD REQUEST"
 
 if __name__ == "__main__":
     app.run(host, ssl_context='adhoc')
