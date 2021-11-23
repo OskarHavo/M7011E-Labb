@@ -14,16 +14,6 @@ def addYears(d, years):
         # If not same day, it will return other, i.e.  February 29 to March 1 etc.
         return d + (datetime.date(d.year + years, 1, 1) - datetime.date(d.year, 1, 1))
 
-# Creates and returns a list of N randomized float values within the range
-def randomizeFloats(minimumFloatValue, maximumFloatValue, numberOfFloatsToRandomize):
-    listOfRandomizedFloats = []
-
-    for i in range(listOfRandomizedFloats):
-        randomFloatValue = random.Random()
-        print(randomFloatValue)
-        listOfRandomizedFloats.append(minimumFloatValue + randomFloatValue * (maximumFloatValue - minimumFloatValue))
-    return listOfRandomizedFloats
-
 # Calculates the daily power consumption. Looks at the month to produce a value based on the season,
 def generateDailyPowerConsumption(date):
     min = [20.0, 19.5, 17.0, 16.0, 14.5, 11.0, 11.0, 12.5, 14.0, 16.0, 18.5, 20.5]
@@ -45,6 +35,7 @@ def generateDailyPowerProduction(date, startDate):
     C = A * 1.5  # Makes sure the values are not too low and/or negative  ##Check so randomizing the afb values does it make it negative in some config
 
     powerProduction = A * math.sin(2.0 * math.pi * f * np.float64(i) + B) + C #Sinuswave
+    #print(str(i) + " AND " + str(powerProduction ))
     return powerProduction
 
 
