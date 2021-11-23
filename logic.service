@@ -8,7 +8,7 @@ Type=simple
 Restart=always
 RestartSec=10
 WorkingDirectory=/var/lib/jenkins/workspace/M7011E-logic
-ExecStart=python3 python/index.py
+ExecStart=python3 main.py
 
 [Install]
 WantedBy=default.target
