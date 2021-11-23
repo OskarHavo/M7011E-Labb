@@ -40,6 +40,7 @@ def generateDailyPowerProduction(date, startDate):
 
 
 # Create a daily Energy Price based on the demand(consumed energy) and supply(produced energy)
+# Returns the price, surplus status and netenergyproduction
 def calculateDailyEnergyPrice(producedEnergy, consumedEnergy):
     # High Consumption & Low Producing -> Low Price
     # Low Consumption & High Producing -> High Price
@@ -60,16 +61,11 @@ def calculateDailyEnergyPrice(producedEnergy, consumedEnergy):
         if dailyElectrictyPrice > maxPrice:
             dailyElectrictyPrice = maxPrice
 
-    return dailyElectrictyPrice, isSurplusStatus
+    calculatedNetEnergyProduction = producedEnergy - consumedEnergy
+    return dailyElectrictyPrice, isSurplusStatus, calculatedNetEnergyProduction
 
 
 # Returns a boolean telling if there is an Energy Surplus (or Energy Deficit)
 # If over or under baseprice.
 def isSurplus(dailyEnergyConsumption, dailyEnergyProduced):
     return dailyEnergyProduced > dailyEnergyConsumption
-
-
-# Returns the net energy production.
-def calculateNetEnergyProduction(producedEnergy, consumedEnergy):
-    calculatedNetEnergyProduction = producedEnergy - consumedEnergy
-    return calculatedNetEnergyProduction

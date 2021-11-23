@@ -1,3 +1,4 @@
+import os.path
 import unittest
 
 from model import *
@@ -11,6 +12,15 @@ formattedQueryDate = datetime.datetime.strptime(queryDate, '%Y-%m-%d').date()
 testdata = getDatapoint(households[0], formattedQueryDate)
 
 class TestModel(unittest.TestCase):
+
+    def test_calculateConsumerPrice(self):
+        producedEnergy = 10.0
+        consumedEnergy = 5.0
+        energyPrice, energySurplus, netEnergyProduction = calculateDailyEnergyPrice(producedEnergy, consumedEnergy)
+
+        result = calculateConsumerPrice(isSurplus,netEnergyProduction,energyPrice, households[0])
+        expectedResult = 20.0
+        self.assertEqual(result, expectedResult, "Should be " + str(expectedResult))
 
     def test_getNumberOfDays(self):
         result = getNumberOfDays(1)
@@ -99,6 +109,14 @@ class TestModel(unittest.TestCase):
         expectedResult = 1461  # Depends on endDate
         self.assertEqual(result, expectedResult, "Should be " + str(expectedResult))
 
+    def test_saveModel(self):
+        # Check if file is created.
+        saveModel(households[0])
+        result = os.path.exists("Household_0_Data.json")
+        expectedResult = True
+        self.assertEqual(result, expectedResult, "Should be " + str(expectedResult))
+
+
 class TestDataGeneration(unittest.TestCase):
 
     def test_addYears(self):
@@ -132,38 +150,46 @@ class TestDataGeneration(unittest.TestCase):
         # Check that the price will be equal to the base price and the surplus false, if the netenergyproduction = 0
         producedEnergy = 10.0
         consumedEnergy = 10.0
-        resultPrice,resultSurplus = calculateDailyEnergyPrice(producedEnergy, consumedEnergy)
+        resultPrice, resultSurplus, resultNetProduction = calculateDailyEnergyPrice(producedEnergy, consumedEnergy)
         expectedResultPrice = basePrice
         expectedResultSurplus = False
+        expectedResultNetProduction = 0.0
         self.assertEqual(resultPrice, expectedResultPrice, "Should be " + str(expectedResultPrice))
         self.assertEqual(resultSurplus, expectedResultSurplus, "Should be " + str(expectedResultSurplus))
+        self.assertEqual(resultNetProduction, expectedResultNetProduction, "Should be " + str(expectedResultNetProduction))
 
         # Check that the price will be lower than the base price and the surplus true, if the netenergyproduction > 0
         producedEnergy = 15.0
         consumedEnergy = 10.0
-        resultPrice, resultSurplus = calculateDailyEnergyPrice(producedEnergy, consumedEnergy)
+        resultPrice, resultSurplus, resultNetProduction = calculateDailyEnergyPrice(producedEnergy, consumedEnergy)
         expectedResultPrice = 6.666666666666666
         expectedResultSurplus = True
+        expectedResultNetProduction = 5.0
         self.assertEqual(resultPrice, expectedResultPrice, "Should be " + str(expectedResultPrice))
         self.assertEqual(resultSurplus, expectedResultSurplus, "Should be " + str(expectedResultSurplus))
+        self.assertEqual(resultNetProduction, expectedResultNetProduction, "Should be " + str(expectedResultNetProduction))
 
         # Check that the price will be larger than the base price and the surplus false, if the netenergyproduction < 0
         producedEnergy = 10.0
         consumedEnergy = 15.0
-        resultPrice, resultSurplus = calculateDailyEnergyPrice(producedEnergy, consumedEnergy)
+        resultPrice, resultSurplus, resultNetProduction = calculateDailyEnergyPrice(producedEnergy, consumedEnergy)
         expectedResultPrice = 15.0
         expectedResultSurplus = False
+        expectedResultNetProduction = -5.0
         self.assertEqual(resultPrice, expectedResultPrice, "Should be " + str(expectedResultPrice))
         self.assertEqual(resultSurplus, expectedResultSurplus, "Should be " + str(expectedResultSurplus))
+        self.assertEqual(resultNetProduction, expectedResultNetProduction, "Should be " + str(expectedResultNetProduction))
 
         # Check that the price will be equal to the max price and the surplus false, if the producedenergy = 0 (windmill broken down)
         producedEnergy = 0.0
         consumedEnergy = 25.0
-        resultPrice, resultSurplus = calculateDailyEnergyPrice(producedEnergy, consumedEnergy)
+        resultPrice, resultSurplus, resultNetProduction = calculateDailyEnergyPrice(producedEnergy, consumedEnergy)
         expectedResultPrice = maxPrice
         expectedResultSurplus = False
+        expectedResultNetProduction = -25.0
         self.assertEqual(resultPrice, expectedResultPrice, "Should be " + str(expectedResultPrice))
         self.assertEqual(resultSurplus, expectedResultSurplus, "Should be " + str(expectedResultSurplus))
+        self.assertEqual(resultNetProduction, expectedResultNetProduction, "Should be " + str(expectedResultNetProduction))
 
     def test_isSurplus(self):
 
@@ -181,21 +207,7 @@ class TestDataGeneration(unittest.TestCase):
         expectedResult = False
         self.assertEqual(result, expectedResult, "Should be " + str(expectedResult))
 
-    def test_calculateNetEnergyProduction(self):
 
-        ## Check Positive Net Production
-        consumedEnergy = 10
-        producedEnergy = 15
-        result = calculateNetEnergyProduction(producedEnergy, consumedEnergy)
-        expectedResult = 5.0
-        self.assertEqual(result, expectedResult, "Should be " + str(expectedResult))
-
-        ## Check Negative Net Production
-        consumedEnergy = 15
-        producedEnergy = 10
-        result = calculateNetEnergyProduction(producedEnergy, consumedEnergy)
-        expectedResult = -5.0
-        self.assertEqual(result, expectedResult, "Should be " + str(expectedResult))
 
 if __name__ == '__main__':
     unittest.main()

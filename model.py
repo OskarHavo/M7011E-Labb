@@ -1,5 +1,5 @@
-import random
 import time
+import json
 from datetime import datetime
 
 from dataGeneration import *
@@ -46,6 +46,7 @@ def initializeModel(howManyHouseholds, startDate):
                 print("Finances: " + str(getHouseholdFinances(household, formattedQueryDate)) + " kr")
 
     #printDataPoint(households[0], "2023-12-31")
+    saveModel(households[0])
     return households
 
 def playModel():
@@ -102,26 +103,8 @@ def createDataPoints(household, startDate):
 
         consumedEnergy = generateDailyPowerConsumption(date)
 
-        energyPrice, energySurplus = calculateDailyEnergyPrice(producedEnergy, consumedEnergy)
-        netEnergyProduction = calculateNetEnergyProduction(producedEnergy, consumedEnergy)
-
-        # If Energy Surplus: Allocate the surplus to the buffer and sell the remainder for money
-        if netEnergyProduction > 0:
-            surplus = netEnergyProduction
-            household.EnergyBuffer += surplus * (1-household.EnergySellingRatio)
-            household.Finances += surplus * (household.EnergySellingRatio) * energyPrice
-        # If Energy Deficit: Use your energy buffer and buy the remaining power needed with money.
-        else:
-            deficit = abs(netEnergyProduction)
-            extraDeficit = 0
-
-            if household.EnergyBuffer >= deficit:
-                household.EnergyBuffer -= deficit * (1 - household.EnergyBuyingRatio)
-            if household.EnergyBuffer < deficit:
-                # If deficit depletes buffer, buy energy to set buffer to 0.
-                extraDeficit = household.EnergyBuffer
-                household.EnergyBuffer = 0
-            household.Finances -= (deficit+extraDeficit) * (household.EnergyBuyingRatio) * energyPrice
+        energyPrice, energySurplus, netEnergyProduction = calculateDailyEnergyPrice(producedEnergy, consumedEnergy)
+        household.Finances += calculateConsumerPrice(energySurplus,netEnergyProduction,energyPrice, household)
 
         datapoint = createDataPoint(producedEnergy, consumedEnergy, energyPrice, energySurplus, netEnergyProduction, household)
         datapointsForDate[date] = datapoint
@@ -136,17 +119,28 @@ def createDataPoints(household, startDate):
 
 
 
-## Arbeta in det i while loopen till denna.
+
 # Calculate the Final Consumer Price Per Day.
-def calculateConsumerPrice(producedEnergy, consumedEnergy, energyPrice, isSurplus):
-    # If surplus, no need to buy energy.
+def calculateConsumerPrice(isSurplus,netEnergyProduction,energyPrice, household):
+    # If Energy Surplus: Allocate the surplus to the buffer and sell the remainder for money
     if isSurplus:
-        consumerPrice = 0.0
-        return consumerPrice
+        surplus = netEnergyProduction
+        household.EnergyBuffer += surplus * (1 - household.EnergySellingRatio)
+        financesDelta = surplus * (household.EnergySellingRatio) * energyPrice
+        return financesDelta
+    # If Energy Deficit: Use your energy buffer and buy the remaining power needed with money.
     else:
-        # Calculate the energy missing and buy it for the daily price.
-        consumerPrice = (consumedEnergy - producedEnergy) * energyPrice
-        return consumerPrice
+        deficit = abs(netEnergyProduction)
+        extraDeficit = 0
+
+        if household.EnergyBuffer >= deficit:
+            household.EnergyBuffer -= deficit * (1 - household.EnergyBuyingRatio)
+        if household.EnergyBuffer < deficit:
+            # If deficit depletes buffer, buy energy to set buffer to 0.
+            extraDeficit = household.EnergyBuffer
+            household.EnergyBuffer = 0
+        financesDelta = -((deficit + extraDeficit) * (household.EnergyBuyingRatio) * energyPrice)
+        return financesDelta
 
 def isWindmillBroken():
     randomInteger = random.randint(1, 500)
@@ -170,8 +164,6 @@ def createDataPoint(producedEnergy, consumedEnergy, energyPrice, energySurplus, 
     datapoint = {"ProducedEnergy": producedEnergy, "ConsumedEnergy": consumedEnergy, "EnergyPrice": energyPrice, "EnergySurplus": energySurplus,
                                    "NetEnergyProduction": netEnergyProduction, "EnergyBuffer": household.EnergyBuffer, "Finances": household.Finances}
     return datapoint
-
-# REST API
 
 # Returns the current windspeed of the windmills providing electricity to the selected household, measured in m/s
 def getHouseholdWindSpeed(household, date):
@@ -224,3 +216,13 @@ def getHouseholdEnergyBufferSize(household, date):
 def getHouseholdFinances(household, date):
     finances = household.DataPoints[date]["Finances"]  #household.Finances
     return finances
+
+
+# Saves a households datapoints in a json file.
+def saveModel(household):
+    data = household.DataPoints
+    serialized_data = {k.isoformat(): v for k, v in data.items()}
+    filename = "Household_" + str(household.ID) + "_Data.json"
+
+    with open(filename, 'w') as fp:
+        json.dump(serialized_data, fp, indent=4)
