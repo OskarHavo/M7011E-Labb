@@ -8,25 +8,30 @@ from request_handler import *
 class Household:
     def __init__(self):
         ID = 0
+        Location = 0
         Finances = 0
+        DaysOfOutage = 0 ## not in dict
         EnergyBuffer = 0
         EnergyBuyingRatio = 0
         EnergySellingRatio = 0
         DataPoints = dict() # DataPoints[date] = {producedEnergy, consumedEnergy,energyPrice,energySurplus,netEnergyProduction,energyBuffer, finances}
 
-households = []
 
 def initializeModel(howManyHouseholds, startDate):
     random.seed(random.randint(0,100000))
-    households = createHouseHolds(howManyHouseholds, startDate)
+    households = createHouseHolds(howManyHouseholds)
 
     queryDate = "2022-12-31"
     formattedQueryDate = datetime.datetime.strptime(queryDate, '%Y-%m-%d').date()
     showAllData = False
-    printData = False
+    printData = True
 
   #  testdata = getDatapoint(households[0], formattedQueryDate)
   #  POST(testdata)
+
+    #####################
+    playModel(startDate, households)
+    #####################
 
     if printData:
         for household in households:
@@ -49,75 +54,71 @@ def initializeModel(howManyHouseholds, startDate):
     saveModel(households[0])
     return households
 
-def playModel():
-    # TODO Load first date and load each households data for that date.
-    # TODO Every 5seconds move to to next date
-    # TODO for each date, add datapoint.NetEnergyProduction to Household.Buffer
-    return
 
-def createHouseHolds(howManyHouseholds, startDate):
+def playModel(startDate,households):
+
+    date = startDate  ## Rubbes lägga till din skottår grej?
+    timeBetweenDates = 15  # Seconds between while loop loops.
+
+    # For testing
+    endDate = "2025-01-01"
+    formattedEndDate = datetime.datetime.strptime(endDate, '%Y-%m-%d').date()
+
+    playMode = False  # If the 15 second simulation delay is to be applied or not.
+
+    while True:
+        start_time = time.time()  # Used for waiting between calculating data for each date. (sleeping)
+
+        ## dubbekolla sen så denna funkar som det är tänkt.
+        windmillStatus, windmillAreaCode = isWindmillBroken()
+
+        for household in households:
+
+            # If Windmill breaks, an outage will occur for 3-6 days.
+            if household.DaysOfOutage == 0 and windmillStatus == True and household.Location == windmillAreaCode:
+                household.DaysOfOutage = random.randint(3, 6)
+
+            # If Windmill broken, produced energy will plummet (Still a value so no infinite electricity price)
+            # Otherwise take calculate the produced energy.
+            if household.DaysOfOutage != 0:
+                producedEnergy = 0.0
+                household.DaysOfOutage = household.DaysOfOutage - 1
+            else:
+                producedEnergy = generateDailyPowerProduction(date, startDate, household.Location)
+
+            consumedEnergy = generateDailyPowerConsumption(date)
+
+            energyPrice, energySurplus, netEnergyProduction = calculateDailyEnergyPrice(producedEnergy, consumedEnergy)
+            household.Finances += calculateConsumerPrice(energySurplus, netEnergyProduction, energyPrice, household)
+
+            datapoint = createDataPoint(producedEnergy, consumedEnergy, energyPrice, energySurplus, netEnergyProduction, household.EnergyBuffer, household.Finances)
+            household.DataPoints[date] = datapoint
+
+        if playMode:
+            time.sleep(timeBetweenDates - (time.time() - start_time))
+        date += datetime.timedelta(days=1)  # Go to next date
+
+        if date == formattedEndDate: break
+
+
+
+def createHouseHolds(howManyHouseholds):
     numberOfHouseholds = howManyHouseholds
     newHouseholdList = []
 
     for i in range(0, numberOfHouseholds):
         household = Household()
         household.ID = i
+        household.Location = generateAreaCode(i)
+        household.DaysOfOutage = 0
         household.Finances = 10000
         household.EnergyBuffer = 0
         household.EnergyBuyingRatio = 0.2
         household.EnergySellingRatio = 0.8
-        household.DataPoints = createDataPoints(household, startDate)
+        household.DataPoints = dict()
 
         newHouseholdList.append(household)
     return newHouseholdList
-
-
-def createDataPoints(household, startDate):
-
-    datapointsForDate = dict()
-    daysOfOutage = 0
-
-    date = startDate  ## Rubbes lägga till din skottår grej?
-    timeBetweenDates = 15 # Seconds between while loop loops.
-    # For testing
-    endDate = "2025-01-01"
-    formattedEndDate = datetime.datetime.strptime(endDate, '%Y-%m-%d').date()
-
-    playMode = False # If the 15 second simulation delay is to be applied or not.
-
-    while True:
-        start_time = time.time() # Used for waiting between calculating data for each date. (sleeping)
-        #print(date)
-
-        # If Windmill breaks, an outage will occur for 3-6 days.
-        if daysOfOutage == 0 and isWindmillBroken():
-            daysOfOutage = random.randint(3, 6)
-
-        # If Windmill broken, produced energy will plummet (Still a value so no infinite electricity price)
-        # Otherwise take calculate the produced energy.
-        if daysOfOutage != 0:
-            producedEnergy = 0.0
-            daysOfOutage = daysOfOutage - 1
-        else:
-            producedEnergy =  generateDailyPowerProduction(date, startDate)
-
-        consumedEnergy = generateDailyPowerConsumption(date)
-
-        energyPrice, energySurplus, netEnergyProduction = calculateDailyEnergyPrice(producedEnergy, consumedEnergy)
-        household.Finances += calculateConsumerPrice(energySurplus,netEnergyProduction,energyPrice, household)
-
-        datapoint = createDataPoint(producedEnergy, consumedEnergy, energyPrice, energySurplus, netEnergyProduction, household)
-        datapointsForDate[date] = datapoint
-
-        if playMode:
-            time.sleep(timeBetweenDates - (time.time() - start_time))
-        date += datetime.timedelta(days=1) # Go to next date
-
-        if date == formattedEndDate: break
-
-    return datapointsForDate
-
-
 
 
 # Calculate the Final Consumer Price Per Day.
@@ -143,13 +144,14 @@ def calculateConsumerPrice(isSurplus,netEnergyProduction,energyPrice, household)
         return financesDelta
 
 def isWindmillBroken():
-    randomInteger = random.randint(1, 500)
+    randomInteger = random.randint(1, 300)
+    affectedAreaCode = random.randint(0,9)
 
-    # 1/500 Chance for Windmill to break.
+    # 1/200 Chance for Windmill to break.
     if randomInteger == 42:
-        return True
+        return True, affectedAreaCode
     else:
-        return False
+        return False, affectedAreaCode
 
 def getNumberOfDays(numberOfYears):
     numberOfDates = (numberOfYears * 365) + 1
@@ -160,9 +162,9 @@ def printDataPoint(household, date):
     print("Data for " + date + ": " + str(household.DataPoints[date]))
 
 
-def createDataPoint(producedEnergy, consumedEnergy, energyPrice, energySurplus, netEnergyProduction, household):
+def createDataPoint(producedEnergy, consumedEnergy, energyPrice, energySurplus, netEnergyProduction, energyBuffer, finances):
     datapoint = {"ProducedEnergy": producedEnergy, "ConsumedEnergy": consumedEnergy, "EnergyPrice": energyPrice, "EnergySurplus": energySurplus,
-                                   "NetEnergyProduction": netEnergyProduction, "EnergyBuffer": household.EnergyBuffer, "Finances": household.Finances}
+                                   "NetEnergyProduction": netEnergyProduction, "EnergyBuffer": energyBuffer, "Finances": finances}
     return datapoint
 
 # Returns the current windspeed of the windmills providing electricity to the selected household, measured in m/s

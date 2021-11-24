@@ -77,36 +77,9 @@ class TestModel(unittest.TestCase):
         formattedStartDate = datetime.datetime.strptime(startDate, '%Y-%m-%d').date()
 
         ## Check that the amount of households created are as expected.
-        lengthOfOutputlist = len(createHouseHolds(1,formattedStartDate))
+        lengthOfOutputlist = len(createHouseHolds(1))
         result = lengthOfOutputlist
         expectedResult = 1
-        self.assertEqual(result, expectedResult, "Should be " + str(expectedResult))
-
-    def test_initializeModel(self):
-        startDate = "2021-01-01"
-        formattedStartDate = datetime.datetime.strptime(startDate, '%Y-%m-%d').date()
-
-        ## Check that the amount of households created are as expected.
-        lengthOfOutputlist = len(initializeModel(1,formattedStartDate))
-        result = lengthOfOutputlist
-        expectedResult = 1
-        self.assertEqual(result, expectedResult, "Should be " + str(expectedResult))
-
-    def test_createDataPoints(self):
-        startDate = "2021-01-01"
-        formattedStartDate = datetime.datetime.strptime(startDate, '%Y-%m-%d').date()
-
-        household = Household()
-        household.ID = 0
-        household.Finances = 10000
-        household.EnergyBuffer = 0
-        household.EnergyBuyingRatio = 0.2
-        household.EnergySellingRatio = 0.8
-
-        ## Check that the amount of datapoints created are as expected.
-        lengthOfOutputlist = len(createDataPoints(household,formattedStartDate))
-        result = lengthOfOutputlist
-        expectedResult = 1461  # Depends on endDate
         self.assertEqual(result, expectedResult, "Should be " + str(expectedResult))
 
     def test_saveModel(self):
@@ -134,10 +107,11 @@ class TestDataGeneration(unittest.TestCase):
     def test_generateDailyPowerProduction(self):
 
         formattedTestDate = formattedStartDate + datetime.timedelta(days=100) # Go to next date
+        areaCode = 0
 
         # If the sinewave works correctly the same value should be gotten every 100 iterations
-        result1 = generateDailyPowerProduction(formattedStartDate, formattedStartDate)
-        result2 = generateDailyPowerProduction(formattedTestDate, formattedStartDate)
+        result1 = generateDailyPowerProduction(formattedStartDate, formattedStartDate, areaCode)
+        result2 = generateDailyPowerProduction(formattedTestDate, formattedStartDate, areaCode)
         result1 = round(result1, 2)
         result2 = round(result2, 2)
 
@@ -207,7 +181,18 @@ class TestDataGeneration(unittest.TestCase):
         expectedResult = False
         self.assertEqual(result, expectedResult, "Should be " + str(expectedResult))
 
+    def test_generateAreaCode(self):
 
+        ## Check that the modulo operation works as intended.
+        houseID = 1
+        result = generateAreaCode(houseID)
+        expectedResult = 1
+        self.assertEqual(result, expectedResult, "Should be " + str(expectedResult))
+
+        houseID = 11
+        result = generateAreaCode(houseID)
+        expectedResult = 1
+        self.assertEqual(result, expectedResult, "Should be " + str(expectedResult))
 
 if __name__ == '__main__':
     unittest.main()
