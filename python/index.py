@@ -33,6 +33,8 @@ global counter
 counter = 1
 
 
+localHost = True
+
 def readUserFromDatabase(user):
     global current_error
     try:
@@ -289,11 +291,14 @@ def settings():
 
 @app.route(oskarDir,methods=['POST', 'GET'])
 def oskar():
-    user = checkSession()
-    if user:
-        return render_template("oskar.html",user=user.name)
+    if (localHost):
+        return render_template("oskar.html")
     else:
-        return redirect(indexDir)
+        user = checkSession()
+        if user:
+            return render_template("oskar.html", user=user.name)
+        else:
+            return redirect(indexDir)
 
 
 
@@ -314,4 +319,7 @@ def fetch():
         return "BAD REQUEST"
 
 if __name__ == "__main__":
-    app.run(host, ssl_context='adhoc')
+    if(localHost):
+        app.run(host)
+    else:
+        app.run(host, ssl_context='adhoc')
