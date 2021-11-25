@@ -33,7 +33,7 @@ global counter
 counter = 1
 
 
-localHost = True
+localHost = False
 
 def readUserFromDatabase(user):
     global current_error
