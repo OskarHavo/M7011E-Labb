@@ -25,6 +25,8 @@ global errorDir
 errorDir = "/error"
 global createUserDir
 createUserDir = "/create_user"
+global settingsDir
+settingsDir = "/settings"
 global counter
 counter = 1
 
@@ -70,6 +72,28 @@ def writeUserToDatabase(user, password):
         return False
     return True
 
+def alterUserInDatabase(newUser,oldUser,newPassword):
+    global current_error
+    try:
+        if newUser == "" or oldUser == "":
+            return False
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user="Client",
+            password="",
+            database="M7011E")
+        cursor = mydb.cursor(buffered=True)
+        current_error.append(newUser)
+        sql = "UPDATE M7011E.User SET User='{}', Password='{}' WHERE User='{}'".format(newUser,newPassword,oldUser)
+        val = (newUser,oldUser)
+        cursor.execute(sql)
+        mydb.commit()
+        cursor.close()
+    except Exception as e:
+        current_error.append(str(e))
+        return False
+    return True
+
 
 class User:
     def __init__(self, username, password=None):
@@ -92,6 +116,7 @@ class User:
 
     def validate(self):
         if self.validated:
+            session["user"] = self.toJSON()
             return True
         user = readUserFromDatabase(self.name)
         if user and check_password_hash(user[1], self.password):
@@ -235,6 +260,30 @@ def logout():
         current_error.append(str(e))
     return redirect(indexDir)
 
+@app.route(settingsDir,methods=['POST', 'GET'])
+def settings():
+    user = checkSession()
+    if user:
+        if request.method == "POST":
+            username = request.form.get("username")
+            password = request.form.get("password")
+            flag = False
+            if username and username != "":
+                #user.name = username
+                if alterUserInDatabase(username,user.name):
+                    user.name = username
+                    flag = True
+                    #user.validate()
+            if password and password != "":
+                user.password = password
+
+                    #return redirect(dashboardDir)
+                #else:
+                #    return render_template("settings.html",user=user.name)
+        else:
+            return render_template("settings.html",user=user.name)
+    else:
+        return redirect(indexDir)
 
 @app.route("/fetch",methods=['POST', 'GET'])
 def fetch():
