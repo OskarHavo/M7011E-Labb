@@ -288,7 +288,7 @@ def settings():
         return redirect(indexDir)
 
 @app.route(oskarDir,methods=['POST', 'GET'])
-def settings():
+def oskar():
     user = checkSession()
     if user:
         return render_template("oskar.html",user=user.name)
