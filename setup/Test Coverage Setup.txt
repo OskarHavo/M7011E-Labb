@@ -1,0 +1,3 @@
+1)  coverage run -m logic_tests
+2)  coverage report -m
+3   (coverage html)

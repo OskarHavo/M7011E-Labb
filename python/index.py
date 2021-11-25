@@ -27,6 +27,8 @@ global createUserDir
 createUserDir = "/create_user"
 global settingsDir
 settingsDir = "/settings"
+global oskarDir
+oskarDir = "/oskar"
 global counter
 counter = 1
 
@@ -284,6 +286,17 @@ def settings():
             return render_template("settings.html",user=user.name)
     else:
         return redirect(indexDir)
+
+@app.route(oskarDir,methods=['POST', 'GET'])
+def settings():
+    user = checkSession()
+    if user:
+        return render_template("oskar.html",user=user.name)
+    else:
+        return redirect(indexDir)
+
+
+
 
 @app.route("/fetch",methods=['POST', 'GET'])
 def fetch():
