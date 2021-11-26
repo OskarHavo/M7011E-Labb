@@ -10,9 +10,7 @@
 <body>
 
 <div class="topbar">
-    <h1>HEADER</h1>
-    <p>Topbar</p>
-
+    <h1>Simulator</h1>
 </div>
 
 <div class="navbar">
@@ -22,10 +20,38 @@
 
 </div>
 
-<div class="timelinediv">
-       <p>TimeLine</p>
+<div class="timelinecontainer">
+
+    <div class =  "timelinedate">
+        <h1>2021/01/01</h1>
+    </div>
+
+
+    <div class = "timelinebuttoncontainer">
+
+
+
+    <div class = "timelinebuttondiv playbutton">
+          <button class="timelinebutton" onclick="play()">
+            <img src="static/assets/playbuttonicon.jpg" width="100%" height = 100%>
+          </button>
 
     </div>
+    <div class = "timelinebuttondiv pausebutton">
+         <button class="timelinebutton" onclick="pause()">
+             <img src="static/assets/pausebuttonicon.jpg" width="100%" height = 100%>
+         </button>
+    </div>
+    <div class = "timelinebuttondiv stopbutton">
+          <button class="timelinebutton" onclick="stop()">
+              <img src="static/assets/stopbuttonicon.jpg" width="100%" height = 100%>
+          </button>
+    </div>
+</div>
+
+    </div>
+
+
 
 <div class ="container">
 
@@ -49,5 +75,21 @@
 
 </div>
 
+
+
+<script>
+function play() {
+
+}
+function pause() {
+
+}
+function stop() {
+
+}
+</script>
 </body>
+
+
+
 </html>
