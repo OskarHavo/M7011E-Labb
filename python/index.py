@@ -27,13 +27,11 @@ global createUserDir
 createUserDir = "/create_user"
 global settingsDir
 settingsDir = "/settings"
-global oskarDir
-oskarDir = "/oskar"
 global counter
 counter = 1
 
 
-localHost = False #True
+localHost = False
 
 def readUserFromDatabase(user):
     global current_error
@@ -248,11 +246,14 @@ def signup():
 
 @app.route(dashboardDir)
 def dash():
-    user = checkSession()
-    if user:
-        return render_template("dashboard.html",user=user.name)
+    if (localHost):
+        return render_template("dashboard.html")
     else:
-        return redirect(indexDir)
+        user = checkSession()
+        if user:
+            return render_template("dashboard.html",user=user.name)
+        else:
+            return redirect(indexDir)
 
 
 @app.route(logoutDir)
@@ -288,20 +289,6 @@ def settings():
             return render_template("settings.html",user=user.name)
     else:
         return redirect(indexDir)
-
-@app.route(oskarDir,methods=['POST', 'GET'])
-def oskar():
-    if (localHost):
-        return render_template("oskar.html")
-    else:
-        user = checkSession()
-        if user:
-            return render_template("oskar.html", user=user.name)
-        else:
-            return redirect(indexDir)
-
-
-
 
 @app.route("/fetch",methods=['POST', 'GET'])
 def fetch():
