@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Dashboard</title>
+	<script src="https://kit.fontawesome.com/bd50140c14.js" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+	<script src="/static/time_chart.js"></script>
+	<link rel="stylesheet" href="/static/user_dashboard.css">
+
+</head>
+<body>
+	<div class="topnav">
+		<a class="active" href="#home">Home</a>
+		<a href="#about">About</a>
+		<a href="#contact">Contact</a>
+		<div class="login-container">
+			<a>{{user}}</a>
+			<a href="/settings"><i class="fas fa-cog"></i></a>
+			<a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+		</div>
+	</div>
+
+
+
+
+
+
+	<div class="timelinecontainer">
+
+		<div class =  "timelinedate">
+        	<h1>2021/01/01</h1>
+   		</div>
+
+<!--
+    	<div class = "timelinebuttoncontainer">
+
+
+
+    		<div class = "timelinebuttondiv playbutton">
+            	<button class="timelinebutton" onclick="play()">
+            			<img src="static/assets/playbuttonicon.jpg" width="100%" height = 100%>
+          		</button>
+    		</div>
+
+    		<div class = "timelinebuttondiv pausebutton">
+         		<button class="timelinebutton" onclick="pause()">
+             		<img src="static/assets/pausebuttonicon.jpg" width="100%" height = 100%>
+         		</button>
+    		</div>
+
+    		<div class = "timelinebuttondiv stopbutton">
+          		<button class="timelinebutton" onclick="stop()">
+          	  <img src="static/assets/stopbuttonicon.jpg" width="100%" height = 100%>
+          		</button>
+    		</div>
+
+		</div>
+-->
+    </div>
+
+
+
+	<div class ="contentcontainer">
+
+		<div class="contentdiv left">
+			<h1>Social Panel</h1>
+
+			<div class = "friendlistdiv">
+				<h2>Friends List</h2>
+
+				<!-- scrollbar -->
+			</div>
+
+			<div class = "chatcontainer">
+				<h2>Chat</h2>
+
+				<div class = "chatdiv highprio">
+					<h3>High Priority</h3>
+					<!-- scrollbar -->
+					<div class = "messagediv">
+						<p> lorem ipsum</p>
+						<!-- load from message system -->
+
+					</div>
+
+				</div>
+
+				<div class = "chatdiv mediumprio">
+					<h3>Medium Priority</h3>
+					<!-- scrollbar -->
+					<div class = "messagediv">
+						<p> lorem ipsum</p>
+						<!-- load from message system -->
+
+					</div>
+				</div>
+
+				<div class = "chatdiv lowprio">
+					<h3>Low Priority</h3>
+					<!-- scrollbar -->
+					<div class = "messagediv">
+						<p> lorem ipsum</p>
+						<!-- load from message system -->
+
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+
+
+		<div class="contentdiv middle">
+			<h1>Household Panel</h1>
+
+			<div class = "houseimagecontainer">
+					<img src="static/assets/uploadedPictures/houseexample.jpg" width="100%" height = 100%>
+
+			</div>
+			<div class ="houseinformationcontainer">
+				<h2>Household Name</h2>
+				<p>D HUSET</p>
+
+				<h2>Post Code</h2>
+				<p>976 33</p>
+
+				<div class="uploadhousephotobuttoncontainer">
+					<button class="uploadbutton" onclick="upload()">Upload New House Photo</button>
+
+				</div>
+
+			</div>
+
+			<div class ="graphcontainer">
+				<h2>Graphs</h2>
+
+			</div>
+
+
+		</div>
+
+		<div class="contentdiv right">
+			<h1>Monitoring Panel</h1>
+
+			<div class="gaugecontainer">
+
+				<div draggable="true" class="gauge">
+					<p>FINANCES</p>
+					<p>1000kr</p>
+
+				</div>
+
+				<div draggable="true" class="gauge">
+					<p>ENERGYBUFFER</p>
+					<p>10kwH</p>
+				</div>
+
+				<div draggable="true" class="gauge">
+					<p>CONSUMPTION </p>
+					<meter class="gaugemeter" value="2" min="0" max="10"></meter>
+				</div>
+
+				<div draggable="true" class="gauge">
+					<p>PRODUCTION</p>
+					<meter class="gaugemeter" value="2" min="0" max="10"></meter>
+
+				</div>
+
+				<div draggable="true" class="gauge">
+					<p>WINDMETER</p>
+					<meter class="gaugemeter" value="2" min="0" max="10"></meter>
+				</div>
+
+			<div class="slidercontainer">
+
+				<p>Buying Ratio Slider</p>
+				<input type="range" min="1" max="100" value="50" class="slider" id="buyingRatio">
+				<p>Selling Ratio Slider</p>
+				<input type="range" min="1" max="100" value="50" class="slider" id="sellingRatio">
+
+			</div>
+
+
+			</div>
+
+		</div>
+
+
+
+	</div>
+
+
+
+	<!-- <div id="charts" style="width:100%;max-width:800px;margin:auto;margin-top:20px;padding:10px;box-shadow:0 0 10px;border-radius:10px">
+		<canvas id="windspeed" style="width:100%;height:256px"></canvas>
+		<canvas id="production" style="width:100%"></canvas>
+		<canvas id="consumption" style="width:100%"></canvas>
+		<canvas id="net" style="width:100%"></canvas>
+		<canvas id="buffer" style="width:100%"></canvas>
+	</div>
+	-->
+<!--
+	<script>
+
+
+		var wind = genTimeChart("windspeed",0,40);
+		var windUpdater;
+		update(windUpdater,wind,1,20,2,10);
+
+		var prod = genTimeChart("production",0,100);
+		var prodUpdater;
+		update(prodUpdater,prod,1,50,4,20);
+
+		var con = genTimeChart("consumption",0,200);
+		var conUpdater;
+		update(conUpdater,con,1,100,4,20);
+	</script>
+	-->
+
+	<!--  https://web.dev/drag-and-drop/ -->
+	<script>
+
+	document.addEventListener('DOMContentLoaded', (event) => {
+
+	  var dragSrcEl = null;
+
+	  function handleDragStart(e) {
+		this.style.opacity = '0.4';
+
+		dragSrcEl = this;
+
+		e.dataTransfer.effectAllowed = 'move';
+		e.dataTransfer.setData('text/html', this.innerHTML);
+	  }
+
+	  function handleDragOver(e) {
+		if (e.preventDefault) {
+		  e.preventDefault();
+		}
+
+		e.dataTransfer.dropEffect = 'move';
+
+		return false;
+	  }
+
+	  function handleDragEnter(e) {
+		this.classList.add('over');
+	  }
+
+	  function handleDragLeave(e) {
+		this.classList.remove('over');
+	  }
+
+	  function handleDrop(e) {
+		if (e.stopPropagation) {
+		  e.stopPropagation(); // stops the browser from redirecting.
+		}
+
+		if (dragSrcEl != this) {
+		  dragSrcEl.innerHTML = this.innerHTML;
+		  this.innerHTML = e.dataTransfer.getData('text/html');
+		}
+
+		return false;
+	  }
+
+	  function handleDragEnd(e) {
+		this.style.opacity = '1';
+
+		items.forEach(function (item) {
+		  item.classList.remove('over');
+		});
+	  }
+
+
+	  let items = document.querySelectorAll('.gaugecontainer .gauge');
+	  items.forEach(function(item) {
+		item.addEventListener('dragstart', handleDragStart, false);
+		item.addEventListener('dragenter', handleDragEnter, false);
+		item.addEventListener('dragover', handleDragOver, false);
+		item.addEventListener('dragleave', handleDragLeave, false);
+		item.addEventListener('drop', handleDrop, false);
+		item.addEventListener('dragend', handleDragEnd, false);
+	  });
+	});
+
+	</script>
+
+</body>
+</html>

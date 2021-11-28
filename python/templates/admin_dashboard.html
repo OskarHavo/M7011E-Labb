@@ -5,7 +5,7 @@
 	<script src="https://kit.fontawesome.com/bd50140c14.js" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 	<script src="/static/time_chart.js"></script>
-	<link rel="stylesheet" href="/static/index.css">
+	<link rel="stylesheet" href="/static/admin_dashboard.css">
 
 </head>
 <body>
@@ -31,31 +31,8 @@
         	<h1>2021/01/01</h1>
    		</div>
 
-<!--
-    	<div class = "timelinebuttoncontainer">
 
 
-
-    		<div class = "timelinebuttondiv playbutton">
-            	<button class="timelinebutton" onclick="play()">
-            			<img src="static/assets/playbuttonicon.jpg" width="100%" height = 100%>
-          		</button>
-    		</div>
-
-    		<div class = "timelinebuttondiv pausebutton">
-         		<button class="timelinebutton" onclick="pause()">
-             		<img src="static/assets/pausebuttonicon.jpg" width="100%" height = 100%>
-         		</button>
-    		</div>
-
-    		<div class = "timelinebuttondiv stopbutton">
-          		<button class="timelinebutton" onclick="stop()">
-          	  <img src="static/assets/stopbuttonicon.jpg" width="100%" height = 100%>
-          		</button>
-    		</div>
-
-		</div>
--->
     </div>
 
 
@@ -65,46 +42,77 @@
 		<div class="contentdiv left">
 			<h1>Social Panel</h1>
 
-			<div class = "friendlistdiv">
-				<h2>Friends List</h2>
+			<div class = "userlistdiv">
+				<h2>Prosumer List</h2>
 
-				<!-- scrollbar -->
+				<table class="usertable">
+					<tr>
+						<th>User</th>
+						<th>Status</th>
+						<th>GoTo</th>
+						<th>Block</th>
+					</tr>
+
+					<tr>
+						<td>1</td>
+						<td>Online</td>
+						<td>knapp</td>
+						<td>knapp</td>
+					</tr>
+
+					<tr>
+						<td>2</td>
+						<td>Offline</td>
+						<td>knapps</td>
+						<td>knapp</td>
+					</tr>
+
+				</table>
+
 			</div>
 
 			<div class = "chatcontainer">
-				<h2>Chat</h2>
+				<h2>Message Center</h2>
 
-				<div class = "chatdiv highprio">
-					<h3>High Priority</h3>
-					<!-- scrollbar -->
+				<div class = "messagecenterdiv">
+					<h3>Select Priority</h3>
 					<div class = "messagediv">
-						<p> lorem ipsum</p>
-						<!-- load from message system -->
+						 <form action="/action_page.php" id="messageform">
+
+							 <label for="user">Choose a User:</label>
+							 <br>
+							<select id="user" name="userlist" form="messageform">
+							  <option value="User1">User1</option>
+							  <option value="User2">User2</option>
+							  <option value="User3">User3</option>
+							  <--! Ladda in dynamisk namnen på användare? -->
+							</select>
+
+							 <br>
+
+							  <label for="prio">Choose the Priority:</label>
+							 <br>
+							  <select id="prio" name="priolist" form="messageform">
+							  <option value="high">High</option>
+							  <option value="medium">Medium</option>
+							  <option value="low">Low</option>
+							</select>
+
+							 <br>
+
+							 <textarea class="messageinput" rows="4" cols="18" name="message" form="messageform"></textarea>
+
+							 <br>
+							  <input class="messagecenterbutton" value="Send Message"type="submit">
+						 </form>
+
+							<br>
+
 
 					</div>
 
 				</div>
 
-				<div class = "chatdiv mediumprio">
-					<h3>Medium Priority</h3>
-					<!-- scrollbar -->
-					<div class = "messagediv">
-						<p> lorem ipsum</p>
-						<!-- load from message system -->
-
-					</div>
-				</div>
-
-				<div class = "chatdiv lowprio">
-					<h3>Low Priority</h3>
-					<!-- scrollbar -->
-					<div class = "messagediv">
-						<p> lorem ipsum</p>
-						<!-- load from message system -->
-
-					</div>
-
-				</div>
 
 			</div>
 
@@ -112,7 +120,7 @@
 
 
 		<div class="contentdiv middle">
-			<h1>Household Panel</h1>
+			<h1>Admin Panel</h1>
 
 			<div class = "houseimagecontainer">
 					<img src="static/assets/uploadedPictures/houseexample.jpg" width="100%" height = 100%>
@@ -143,18 +151,29 @@
 		<div class="contentdiv right">
 			<h1>Monitoring Panel</h1>
 
+			<h3>Select Powerplant</h3>
+					<div class = "powerplantformcontainer">
+						 <form action="/action_page.php" id="powerplantform">
+
+							 <label for="powerplant">Select a Powerplant:</label>
+							 <br>
+							<select id="powerplant" name="powerplantlist" form="powerplantform">
+							  <option value="Powerplant1">Powerplant1</option>
+							  <option value="Powerplant1">Powerplant2</option>
+							  <option value="Powerplant1">Powerplant3</option>
+							  <--! Ladda in dynamisk namnen på powerplants? -->
+							</select>
+
+
+							 <br>
+							  <input class="powerplantformbutton" value="Select Powerplant"type="submit">
+						 </form>
+
+
+
+
 			<div class="gaugecontainer">
 
-				<div draggable="true" class="gauge">
-					<p>FINANCES</p>
-					<p>1000kr</p>
-
-				</div>
-
-				<div draggable="true" class="gauge">
-					<p>ENERGYBUFFER</p>
-					<p>10kwH</p>
-				</div>
 
 				<div draggable="true" class="gauge">
 					<p>CONSUMPTION </p>

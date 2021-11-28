@@ -17,8 +17,10 @@ global loginDir
 loginDir = "/login"
 global userDir
 userDir = "/user"
-global dashboardDir
-dashboardDir = "/dashboard"
+global userDashboardDir
+userDashboardDir = "/user_dashboard"
+global adminDashboardDir
+adminDashboardDir = "/admin_dashboard"
 global logoutDir
 logoutDir = "/logout"
 global errorDir
@@ -181,14 +183,14 @@ def error():
 @app.route(indexDir)
 def index():
     if checkSession():
-        return redirect(dashboardDir)
+        return redirect(userDashboardDir)
     return render_template("index.html")
 
 
 @app.route(loginDir, methods=['POST', 'GET'])
 def login():
     if checkSession():
-        return redirect(dashboardDir)
+        return redirect(userDashboardDir)
 
     global current_error
     if request.method == 'POST':
@@ -198,7 +200,7 @@ def login():
             currentUser = User(username, password)
             if currentUser.validate():
                 # login successful
-                return redirect(dashboardDir)
+                return redirect(userDashboardDir)
             else:
                 return render_template("login.html", error="Invalid username or password")
         except Exception as e:
@@ -226,7 +228,7 @@ def data():
 @app.route(createUserDir, methods=['POST', 'GET'])
 def signup():
     if checkSession():
-        return redirect(dashboardDir)
+        return redirect(userDashboardDir)
     err = ""
     if request.method == 'POST':
         user = User(request.form.get("username"), request.form.get("password"))
@@ -235,7 +237,7 @@ def signup():
             err = "Passwords don't match"
         elif writeUserToDatabase(user.name, generate_password_hash(user.password)):
             if user.validate():
-                return redirect(dashboardDir)  ## Successful signup!!
+                return redirect(userDashboardDir)  ## Successful signup!!
             else:
                 err = "Server error: Created but could not validate new user :("
         else:
@@ -244,16 +246,28 @@ def signup():
     return render_template("create_user.html", error=err)
 
 
-@app.route(dashboardDir)
-def dash():
+@app.route(userDashboardDir)
+def userDash():
     if (localHost):
-        return render_template("dashboard.html")
+        return render_template("user_dashboard.html")
     else:
         user = checkSession()
         if user:
-            return render_template("dashboard.html",user=user.name)
+            return render_template("user_dashboard.html",user=user.name)
         else:
             return redirect(indexDir)
+
+@app.route(adminDashboardDir)
+def adminDash():
+    if (localHost):
+        return render_template("admin_dashboard.html")
+    else:
+        user = checkSession()
+        if user:
+            return render_template("admin_dashboard.html",user=user.name)
+        else:
+            return redirect(indexDir)
+
 
 
 @app.route(logoutDir)
