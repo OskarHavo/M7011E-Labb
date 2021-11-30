@@ -68,45 +68,96 @@
 			<div class = "friendlistdiv">
 				<h2>Friends List</h2>
 
+					<table class="usertable">
+						<tr>
+							<th>UserID</th>
+							<th>Status</th>
+							<th>Zip Code</th>
+						</tr>
+
+						<tr>
+							<td>42</td>
+							<td>Offline</td>
+							<td>Go To</td>
+						</tr>
+
+						<tr>
+							<td>111</td>
+							<td>Offline</td>
+							<td>Go To</td>
+						</tr>
+
+						<tr>
+							<td>453</td>
+							<td>Online</td>
+							<td>Go To</td>
+						</tr>
+
+						<tr>
+							<td>13</td>
+							<td>BLACKOUT</td>
+							<td>Go To</td>
+						</tr>
+
+						<tr>
+							<td>87</td>
+							<td>Online</td>
+							<td>Go To</td>
+						</tr>
+
+					</table>
 				<!-- scrollbar -->
 			</div>
 
-			<div class = "chatcontainer">
-				<h2>Chat</h2>
 
-				<div class = "chatdiv highprio">
-					<h3>High Priority</h3>
-					<!-- scrollbar -->
+			<div class = "messagecentercontainer">
+				<h2>Message Center</h2>
+
+				<div class = "messagecenterdiv">
 					<div class = "messagediv">
-						<p> lorem ipsum</p>
-						<!-- load from message system -->
+						 <form action="/action_page.php" id="messageform">
+
+							 <label for="user">Choose a User:</label>
+							 <br>
+							<select id="user" name="userlist" form="messageform">
+							  <option value="User1">User1</option>
+							  <option value="User2">User2</option>
+							  <option value="User3">User3</option>
+							  <--! Ladda in dynamisk namnen på användare? -->
+							</select>
+
+							 <br>
+
+							 <textarea class="messageinput" rows="4" cols="18" name="message" form="messageform"></textarea>
+
+							 <br>
+							  <input class="messagecenterbutton" value="Send Message"type="submit">
+						 </form>
+
+							<br>
+
 
 					</div>
 
 				</div>
 
-				<div class = "chatdiv mediumprio">
-					<h3>Medium Priority</h3>
-					<!-- scrollbar -->
-					<div class = "messagediv">
-						<p> lorem ipsum</p>
-						<!-- load from message system -->
 
-					</div>
-				</div>
+			</div>
 
-				<div class = "chatdiv lowprio">
-					<h3>Low Priority</h3>
-					<!-- scrollbar -->
-					<div class = "messagediv">
-						<p> lorem ipsum</p>
-						<!-- load from message system -->
 
-					</div>
+			<div class = "notificationcentercontainer">
+				<h2>Notification Center</h2>
+
+				<div class = "notificationcenterdiv">
+					<h3>User Messages</h3>
+						<textarea class="messageoutput" rows="4" cols="18" name="message" form="messageform"></textarea>
+					   <input class="messagecenterbutton" value="Ack Message"type="submit">
+
 
 				</div>
 
 			</div>
+
 
 		</div>
 
@@ -115,20 +166,29 @@
 			<h1>Household Panel</h1>
 
 			<div class = "houseimagecontainer">
-					<img src="static/assets/uploadedPictures/houseexample.jpg" width="100%" height = 100%>
+					<img src="static/assets/uploadedPictures/houses/houseexample.jpg" width="100%" height = 100%>
 
 			</div>
 			<div class ="houseinformationcontainer">
-				<h2>Household Name</h2>
+				<h3>Household Name</h3>
 				<p>D HUSET</p>
 
-				<h2>Post Code</h2>
+				<h3>Zip Code</h3>
 				<p>976 33</p>
+
+				<h3>Household Finances</h3>
+				<p>24020 kr</p>
+
 
 				<div class="uploadhousephotobuttoncontainer">
 					<button class="uploadbutton" onclick="upload()">Upload New House Photo</button>
 
 				</div>
+
+			</div>
+
+			<div class ="simulatorcontainer">
+				<h2>Simulator Data</h2>
 
 			</div>
 
@@ -138,6 +198,7 @@
 			</div>
 
 
+
 		</div>
 
 		<div class="contentdiv right">
@@ -145,38 +206,46 @@
 
 			<div class="gaugecontainer">
 
-				<div draggable="true" class="gauge">
-					<p>FINANCES</p>
-					<p>1000kr</p>
-
-				</div>
-
-				<div draggable="true" class="gauge">
-					<p>ENERGYBUFFER</p>
-					<p>10kwH</p>
-				</div>
 
 				<div draggable="true" class="gauge">
 					<p>CONSUMPTION </p>
-					<meter class="gaugemeter" value="2" min="0" max="10"></meter>
+					<meter class="gaugemeter" value="9" min="0" max="10"></meter>
 				</div>
 
 				<div draggable="true" class="gauge">
 					<p>PRODUCTION</p>
-					<meter class="gaugemeter" value="2" min="0" max="10"></meter>
+					<meter class="gaugemeter" value="5" min="0" max="10"></meter>
 
 				</div>
 
 				<div draggable="true" class="gauge">
 					<p>WINDMETER</p>
-					<meter class="gaugemeter" value="2" min="0" max="10"></meter>
+					<meter class="gaugemeter" value="6" min="0" max="10"></meter>
 				</div>
+
+				<div draggable="true" class="gauge">
+					<p>NET PRODUCTION</p>
+					<p>1000kr</p>
+
+				</div>
+
+				<div draggable="true" class="gauge">
+					<p>ENERGY BUFFER SIZE</p>
+					<meter class="gaugemeter" value="3" min="0" max="10"></meter>
+				</div>
+
+				<div draggable="true" class="gauge">
+					<p>CURRENT ELECTRICITY PRICE</p>
+					<p>10kr</p>
+				</div>
+
+
 
 			<div class="slidercontainer">
 
-				<p>Buying Ratio Slider</p>
+				<p>Buying/Buffer Ratio Slider</p>
 				<input type="range" min="1" max="100" value="50" class="slider" id="buyingRatio">
-				<p>Selling Ratio Slider</p>
+				<p>Selling/Buffer Ratio Slider</p>
 				<input type="range" min="1" max="100" value="50" class="slider" id="sellingRatio">
 
 			</div>

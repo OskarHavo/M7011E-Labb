@@ -223,7 +223,7 @@
 .contentdiv {
   float: left;
   padding: 10px;
-  height: 970px;
+  height: 1170px; /* SIDE HEIGHT*/
   text-align: center;
   background-color: green;
   margin-bottom: 50px;
@@ -236,6 +236,8 @@
     padding-bottom: value;
     border-bottom-style: solid;
 }
+
+
 
 /* The left content div*/
 .contentdiv.left {
@@ -268,7 +270,7 @@
     float left;
     width 96%;
     margin: 2%;
-    height: 200px;
+    height: 280px;
 
     border: 3px solid #666;
     border-radius: .5em;
@@ -281,26 +283,56 @@
    font-size 20px;
 }
 
+
+/* User List H2 */
+.userlistdiv h2{
+   text-align: center;
+   font-size 20px;
+}
+
+/* Table displaying Prosumer Data*/
+.usertable{
+    display: grid;
+    max-width: 100%;
+    background-color: #f1f1f1;
+     border: 3px solid #666;
+    border-radius: .5em;
+     border-collapse: collapse;
+    padding: 10px;
+
+     margin: auto;
+    display: flex;
+    justify-content: center
+
+}
+th,td{
+border: 3px solid #666;
+    border-radius: .5em;
+}
+
+
+
 /* Big Chat List div */
-.chatcontainer{
+.messagecentercontainer{
     background-color: #D8D8D8;
     float left;
+    margin-top: 3%;
     width 100%;
-    height: 645px;
+    height: 325px;
 
     border: 3px solid #666;
     border-radius: .5em;
 
 }
 /* Class for each of the chat priority divs */
-.chatdiv{
+.messagecenterdiv{
    background-color: #979797;
     float left;
     width 100%;
-    height: 180px;
+    height: 240px;
     margin-left: 5%;
     margin-right: 5%;
-    margin-bottom: 10px;
+
 
     border: 3px solid #666;
     border-radius: .5em;
@@ -312,9 +344,10 @@
     background-color: #f1f1f1;
     float left;
     width 100%;
-    height: 100px;
+    height: 60px;
     margin-left: 5%;
     margin-right: 5%;
+        margin-top: 2%;
 
 
     border: 3px solid #666;
@@ -322,6 +355,71 @@
 
 
 }
+.messageinput{
+
+    float left;
+    width 100%;
+    height: 100px;
+    margin-top: 10%;
+    resize: none;
+
+    border: 3px solid #666;
+    border-radius: .5em;
+
+
+}
+.messagecenterbutton{
+    height: 40px;
+    border: 3px solid #666;
+    border-radius: .5em;
+
+    margin-top: 1%;
+}
+
+
+/* Big Notifcation Center div */
+.notificationcentercontainer{
+    background-color: #D8D8D8;
+    float left;
+    width 100%;
+    height: 430px;
+    margin-top: 3%;
+
+    border: 3px solid #666;
+    border-radius: .5em;
+
+}
+/* Class for each of the chat priority divs */
+.notificationcenterdiv{
+   background-color: #979797;
+    float left;
+    width 100%;
+    height: 330px;
+    margin-left: 5%;
+    margin-right: 5%;
+    margin-bottom: 10px;
+
+    border: 3px solid #666;
+    border-radius: .5em;
+
+}
+
+
+.messageoutput{
+
+    float left;
+    width 100%;
+    height: 200px;
+
+
+    border: 3px solid #666;
+    border-radius: .5em;
+    resize: none;
+
+}
+
+
+
 
 /********************************** RIGHT **********************************/
 
@@ -330,7 +428,7 @@
 
     float left;
     width 100%;
-    height: 400px;
+    height: 650px;
     display: grid;
     grid-template-columns: repeat(1, 5fr);
     gap: 10px;
@@ -362,7 +460,7 @@
 /* The container containing all the sliders. */
 .slidercontainer{
 
-    margin-top: 10%;
+    margin-top: 3%;
     float: left;
     width: 100%;
     height: 190px;
@@ -398,6 +496,7 @@
     width: 30%;
     height: 400px;
     background-color: #979797;
+    line-height: 8pt;
 
      border: 3px solid #666;
     border-radius: .5em;
@@ -407,7 +506,7 @@
 
 /* Container for button used for uploading a new house picture for your house. */
 .uploadhousephotobuttoncontainer{
-    padding-top: 100px;
+    padding-top: 80px;
     margin: auto;
     display: flex;
     justify-content: center
@@ -433,12 +532,15 @@
 
 }
 
-/* Container for all the graphs. */
-.graphcontainer{
+
+
+/* Container for all the raw simulator data. */
+.simulatorcontainer{
     margin-top: 3%;
+    margin-left: 1%;
     float: left;
-    width: 100%;
-    height: 410px;
+    width: 48.5%;
+    height: 620px;
     background-color: #979797;
 
     border: 3px solid #666;
@@ -446,6 +548,33 @@
     padding: 10px;
 
 }
+
+/* Underline across div */
+.simulatorcontainer h2{
+    padding-bottom: value;
+    border-bottom-style: solid;
+}
+
+/* Container for all the graphs. */
+.graphcontainer{
+    margin-top: 3%;
+    margin-left: 1%;
+    float: left;
+    width: 48.5%;
+    height: 620px;
+    background-color: #979797;
+
+    border: 3px solid #666;
+    border-radius: .5em;
+    padding: 10px;
+
+}
+/* Underline across div */
+.graphcontainer h2{
+    padding-bottom: value;
+    border-bottom-style: solid;
+}
+
 
 
 

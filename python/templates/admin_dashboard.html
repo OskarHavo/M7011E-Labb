@@ -42,40 +42,12 @@
 		<div class="contentdiv left">
 			<h1>Social Panel</h1>
 
-			<div class = "userlistdiv">
-				<h2>Prosumer List</h2>
 
-				<table class="usertable">
-					<tr>
-						<th>User</th>
-						<th>Status</th>
-						<th>GoTo</th>
-						<th>Block</th>
-					</tr>
 
-					<tr>
-						<td>1</td>
-						<td>Online</td>
-						<td>knapp</td>
-						<td>knapp</td>
-					</tr>
-
-					<tr>
-						<td>2</td>
-						<td>Offline</td>
-						<td>knapps</td>
-						<td>knapp</td>
-					</tr>
-
-				</table>
-
-			</div>
-
-			<div class = "chatcontainer">
+			<div class = "messagecentercontainer">
 				<h2>Message Center</h2>
 
 				<div class = "messagecenterdiv">
-					<h3>Select Priority</h3>
 					<div class = "messagediv">
 						 <form action="/action_page.php" id="messageform">
 
@@ -116,32 +88,130 @@
 
 			</div>
 
-		</div>
 
+			<div class = "notificationcentercontainer">
+				<h2>Notification Center</h2>
 
-		<div class="contentdiv middle">
-			<h1>Admin Panel</h1>
+				<div class = "notificationcenterdiv">
+					<h3>User Messages</h3>
+						<textarea class="messageoutput" rows="4" cols="18" name="message" form="messageform"></textarea>
+					   <input class="messagecenterbutton" value="Ack Message"type="submit">
 
-			<div class = "houseimagecontainer">
-					<img src="static/assets/uploadedPictures/houseexample.jpg" width="100%" height = 100%>
-
-			</div>
-			<div class ="houseinformationcontainer">
-				<h2>Household Name</h2>
-				<p>D HUSET</p>
-
-				<h2>Post Code</h2>
-				<p>976 33</p>
-
-				<div class="uploadhousephotobuttoncontainer">
-					<button class="uploadbutton" onclick="upload()">Upload New House Photo</button>
 
 				</div>
 
 			</div>
 
-			<div class ="graphcontainer">
-				<h2>Graphs</h2>
+		</div>
+
+
+		<div class="contentdiv middle">
+			<h1>Profile Page</h1>
+
+			<div class = "adminboxcontainer">
+				<div class = "adminphotocontainer">
+						<img src="static/assets/uploadedPictures/adminphotos/images.PNG" width="100%" height = 100%>
+
+				</div>
+				<div class ="admininformationcontainer">
+					<h2>Admin Name</h2>
+					<p>Mr Admin</p>
+
+					<h2>Admin of the Year</h2>
+					<p>10 times</p>
+
+					<div class="uploadadminphotobuttoncontainer">
+						<button class="uploadbutton" onclick="upload()">Upload New Admin Photo</button>
+
+					</div>
+
+				</div>
+
+			</div>
+
+			<div class = "userlistdiv">
+				<h2>Prosumer List</h2>
+
+				<table class="usertable">
+					<tr>
+						<th>UserID</th>
+						<th>Status</th>
+						<th>Go To User's Page</th>
+						<th>Block for selling</th>
+						<th>Update Credentials</th>
+						<th>Delete Account</th>
+						<th>   </th>
+						<th>IP</th>
+						<th>PORT</th>
+						<th>Last Logged in</th>
+					</tr>
+
+					<tr>
+						<td>42</td>
+						<td>Offline</td>
+						<td>Go To</td>
+						<td>Block</td>
+						<td>Update</td>
+						<td>Delete</td>
+						<td>   </td>
+						<td>192.168.1.1</td>
+						<td>5050</td>
+						<td>2021/11/11 13:54:21</td>
+					</tr>
+
+					<tr>
+						<td>111</td>
+						<td>Offline</td>
+						<td>Go To</td>
+						<td>Block</td>
+						<td>Update</td>
+						<td>Delete</td>
+						<td></td>
+						<td>192.168.1.1</td>
+						<td>5050</td>
+						<td>2021/11/11 13:54:21</td>
+					</tr>
+
+					<tr>
+						<td>453</td>
+						<td>Online</td>
+						<td>Go To</td>
+						<td>Block</td>
+						<td>Update</td>
+						<td>Delete</td>
+						<td></td>
+						<td>192.168.1.1</td>
+						<td>5050</td>
+						<td>2021/11/11 13:54:21</td>
+					</tr>
+
+					<tr>
+						<td>13</td>
+						<td>BLACKOUT</td>
+						<td>Go To</td>
+						<td>Block</td>
+						<td>Update</td>
+						<td>Delete</td>
+						<td></td>
+						<td>192.168.1.1</td>
+						<td>5050</td>
+						<td>2021/11/11 13:54:21</td>
+					</tr>
+
+					<tr>
+						<td>87</td>
+						<td>Online</td>
+						<td>Go To</td>
+						<td>Block</td>
+						<td>Update</td>
+						<td>Delete</td>
+						<td></td>
+						<td>192.168.1.1</td>
+						<td>5050</td>
+						<td>2021/11/11 13:54:21</td>
+					</tr>
+
+				</table>
 
 			</div>
 
@@ -151,23 +221,22 @@
 		<div class="contentdiv right">
 			<h1>Monitoring Panel</h1>
 
-			<h3>Select Powerplant</h3>
-					<div class = "powerplantformcontainer">
-						 <form action="/action_page.php" id="powerplantform">
+				<div class = "powerplantformcontainer">
+					<form action="/action_page.php" id="powerplantform">
 
-							 <label for="powerplant">Select a Powerplant:</label>
-							 <br>
-							<select id="powerplant" name="powerplantlist" form="powerplantform">
-							  <option value="Powerplant1">Powerplant1</option>
-							  <option value="Powerplant1">Powerplant2</option>
-							  <option value="Powerplant1">Powerplant3</option>
+						<label for="powerplant">Select a Powerplant:</label>
+						<br>
+						<select id="powerplant" name="powerplantlist" form="powerplantform">
+							<option value="Powerplant1">Powerplant1</option>
+							<option value="Powerplant1">Powerplant2</option>
+							<option value="Powerplant1">Powerplant3</option>
 							  <--! Ladda in dynamisk namnen på powerplants? -->
-							</select>
+						</select>
 
 
-							 <br>
-							  <input class="powerplantformbutton" value="Select Powerplant"type="submit">
-						 </form>
+							<br>
+						<input class="powerplantformbutton" value="Select Powerplant"type="submit">
+					</form>
 
 
 
@@ -175,28 +244,45 @@
 			<div class="gaugecontainer">
 
 
+
+
 				<div draggable="true" class="gauge">
-					<p>CONSUMPTION </p>
+					<p>Power Plant Production </p>
 					<meter class="gaugemeter" value="2" min="0" max="10"></meter>
 				</div>
 
+
+
 				<div draggable="true" class="gauge">
-					<p>PRODUCTION</p>
-					<meter class="gaugemeter" value="2" min="0" max="10"></meter>
+					<p>Power Plant Status</p>
+					<p id="statustext"> ONLINE/RUNNING/STOPPED </p>
+				</div>
+
+
+				<div draggable="true" class="gauge">
+					<p>MARKET DEMAND</p>
+					<meter class="gaugemeter" value="8" min="0" max="10"></meter>
 
 				</div>
 
 				<div draggable="true" class="gauge">
-					<p>WINDMETER</p>
-					<meter class="gaugemeter" value="2" min="0" max="10"></meter>
+					<p>MODELLED ELECTRICITY PRICE</p>
+					100kr
+
+				</div>
+				<div draggable="true" class="gauge">
+					<p>CURRENT ELECTRICITY PRICE</p>
+					101kr
+
 				</div>
 
 			<div class="slidercontainer">
-
-				<p>Buying Ratio Slider</p>
+				<p>Current Electricity Price Slider</p>
+				<input type="range" min="1" max="100" value="50" class="slider" id="currentelectricityprice">
+				<p>Power Plant Production  Slider</p>
+				<input type="range" min="1" max="100" value="50" class="slider" id="powerplantproduction">
+				<p>Market/Buffer Slider</p>
 				<input type="range" min="1" max="100" value="50" class="slider" id="buyingRatio">
-				<p>Selling Ratio Slider</p>
-				<input type="range" min="1" max="100" value="50" class="slider" id="sellingRatio">
 
 			</div>
 
