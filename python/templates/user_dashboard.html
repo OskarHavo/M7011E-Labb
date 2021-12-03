@@ -194,7 +194,9 @@
 
 			<div class ="graphcontainer">
 				<h2>Graphs</h2>
-
+	                <div id="charts" style="width:100%;max-width:800px;margin:auto;margin-top:20px;background-color:white;padding:10px;box-shadow:0 0 10px;border-radius:10px">
+                        <canvas id="consumption" style="width:100%"></canvas>
+	                </div>
 			</div>
 
 
@@ -259,33 +261,11 @@
 
 	</div>
 
-
-
-	<!-- <div id="charts" style="width:100%;max-width:800px;margin:auto;margin-top:20px;padding:10px;box-shadow:0 0 10px;border-radius:10px">
-		<canvas id="windspeed" style="width:100%;height:256px"></canvas>
-		<canvas id="production" style="width:100%"></canvas>
-		<canvas id="consumption" style="width:100%"></canvas>
-		<canvas id="net" style="width:100%"></canvas>
-		<canvas id="buffer" style="width:100%"></canvas>
-	</div>
-	-->
-<!--
 	<script>
-
-
-		var wind = genTimeChart("windspeed",0,40);
-		var windUpdater;
-		update(windUpdater,wind,1,20,2,10);
-
-		var prod = genTimeChart("production",0,100);
-		var prodUpdater;
-		update(prodUpdater,prod,1,50,4,20);
-
 		var con = genTimeChart("consumption",0,200);
 		var conUpdater;
 		update(conUpdater,con,1,100,4,20);
 	</script>
-	-->
 
 	<!--  https://web.dev/drag-and-drop/ -->
 	<script>

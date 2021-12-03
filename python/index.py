@@ -1,12 +1,9 @@
-from flask import (Flask, render_template, request,Response, redirect, session, make_response)
+from flask import (Flask, render_template, request, Response, redirect, session, make_response, jsonify)
 from flask import render_template
 import mysql.connector
-import sys
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
-import json
-import time
-import random
+from simulator import *
 
 global current_error
 current_error = []
@@ -33,7 +30,35 @@ global counter
 counter = 1
 
 
-localHost = False
+localHost = True
+
+
+def fetchKey():
+    global current_error
+    try:
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user="Client",
+            password="",
+            database="M7011E")
+        cursor = mydb.cursor(buffered=True)
+        cursor.execute("SELECT Secret FROM SessionSecret WHERE ServerName='Flask'")
+        cursor.close()
+        return str(cursor.fetchone())
+    except Exception as e:
+        current_error.append(str(e))
+        return "supersecretpassword"
+
+host = "0.0.0.0"
+app = Flask(__name__)
+app.secret_key = fetchKey()
+app.permanent_session_lifetime = timedelta(minutes=10)
+
+global temporaryDatabase
+temporaryDatabase = Database()
+
+global manager
+manager = SimulationManager(10,temporaryDatabase)
 
 def readUserFromDatabase(user):
     global current_error
@@ -134,21 +159,7 @@ class User:
         return {"user": self.name, "password": self.password, "valid": self.validated}
 
 
-def fetchKey():
-    global current_error
-    try:
-        mydb = mysql.connector.connect(
-            host="localhost",
-            user="Client",
-            password="",
-            database="M7011E")
-        cursor = mydb.cursor(buffered=True)
-        cursor.execute("SELECT Secret FROM SessionSecret WHERE ServerName='Flask'")
-        cursor.close()
-        return str(cursor.fetchone())
-    except Exception as e:
-        current_error.append(str(e))
-        return "supersecretpassword"
+
 
 
 def getUser():
@@ -166,13 +177,6 @@ def checkSession():
         return user
     else:
         return None
-
-
-host = "0.0.0.0"
-app = Flask(__name__)
-app.secret_key = fetchKey()
-app.permanent_session_lifetime = timedelta(minutes=10)
-
 
 @app.route(errorDir)
 def error():
@@ -304,11 +308,39 @@ def settings():
     else:
         return redirect(indexDir)
 
+# TODO User verification
+@app.route("/fetch",methods = ['POST', 'GET','PUT'])
+def test():
+    if request.method == "POST":
+        username = request.values.get('username')
+        postalCode = request.values.get("postalCode")
+        function = request.values.get("function")
+        if function == "create":
+            if username != "" and postalCode != "":
+                temporaryDatabase.new(username)
+                manager.startNode(username,int(postalCode),[-5,5],[-5,5])
+        elif function == "delete":
+            if username != "" and postalCode != "":
+                temporaryDatabase.remove(username)
+        return jsonify({"data":request.args.get("username")})
+    elif request.method == "GET":
+        username = "robyn"
+        #username = request.args.get('username')
+        return jsonify(temporaryDatabase.get(username)[-1])
+    elif request.method == "PUT":
+        username = request.values.get("username")
+        valueName = request.values.get("valueName")
+        data = request.values.get("data")
+        manager.alterNode(username,valueName,data)
+        return "{}"
+    else:
+        return jsonify({"data":"goodbye"})
+"""
 @app.route("/fetch",methods=['POST', 'GET'])
 def fetch():
     if checkSession() == None:
         redirect(indexDir)
-    if request.method == 'POST':
+    if request.method == 'GET':
         global counter
         data = {
             "time": counter,
@@ -318,9 +350,20 @@ def fetch():
         return json.dumps(data)
     else:
         return "BAD REQUEST"
+"""
+
+
+def th():
+    while True:
+        sleep(10)
+
 
 if __name__ == "__main__":
+    #manager.bus.POST({"username": "robyn", "postalCode": 97753, "function": "create"})
+    temporaryDatabase.new("robyn")
+    manager.startNode("robyn", int(97753), [-5, 5], [-5, 5])
+    #app.run(host, ssl_context='adhoc')
     if(localHost):
         app.run(host)
     else:
-        app.run(host, ssl_context='adhoc')
+        app.run(host)#, ssl_context='adhoc')

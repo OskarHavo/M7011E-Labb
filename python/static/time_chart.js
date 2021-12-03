@@ -50,17 +50,19 @@ const request = ( url, params = {}, method = 'GET' ) => {
 	return fetch( url, options ).then( response => response.json() );
 };
 
-const post= (url, params) => request(url,params,'POST');
-
+const post= (url, params) => request(url,params,'GET');
+var k = 0
 //var repeater;
 function update(updater, chart,startx,starty,delta,bufferSize=10) {
 	post('/fetch',{}).then(response=>{
-		var i = response["time"];
-		var data = response["value"];
+		var i = k;
+		k = k + 1;
+		var data = response["consumption"];
 		addData(chart,i,data);
 		if (chart.data.labels.length > bufferSize) {
 			removeFirst(chart);
 		}
+		console.log(response)
 		var maximum = Math.max.apply(null,chart.data.datasets[0].data);
 		chart.options.scales.yAxes = [{ticks: {min: 0, max:maximum}}];
        		startx ++;
