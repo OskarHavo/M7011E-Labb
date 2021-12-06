@@ -14,7 +14,7 @@
 		<a href="#about">About</a>
 		<a href="#contact">Contact</a>
 		<div class="login-container">
-			<a>{{user}}</a>
+			<a id="currentUser">{{user}}</a>
 			<a href="/settings"><i class="fas fa-cog"></i></a>
 			<a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
 		</div>
@@ -189,7 +189,7 @@
 
 			<div class ="simulatorcontainer">
 				<h2>Simulator Data</h2>
-
+                <p id="data"></p>
 			</div>
 
 			<div class ="graphcontainer">
@@ -264,7 +264,7 @@
 	<script>
 		var con = genTimeChart("consumption",0,200);
 		var conUpdater;
-		update(conUpdater,con,1,100,4,20);
+		updateAll(conUpdater,con,1,100,3,20);
 	</script>
 
 	<!--  https://web.dev/drag-and-drop/ -->

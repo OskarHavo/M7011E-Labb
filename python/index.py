@@ -144,6 +144,8 @@ class User:
         return self.validated
 
     def validate(self):
+        if localHost:
+            self.validated = True
         if self.validated:
             session["user"] = self.toJSON()
             return True
@@ -172,11 +174,15 @@ def getUser():
 
 
 def checkSession():
-    user = getUser()
-    if user != None and user.isValid():
+    if localHost:
+        user = User("Demo","Null")
         return user
     else:
-        return None
+        user = getUser()
+        if user != None and user.isValid():
+            return user
+        else:
+            return None
 
 @app.route(errorDir)
 def error():
@@ -252,25 +258,19 @@ def signup():
 
 @app.route(userDashboardDir)
 def userDash():
-    if (localHost):
-        return render_template("user_dashboard.html")
+    user = checkSession()
+    if user:
+        return render_template("user_dashboard.html",user=user.name)
     else:
-        user = checkSession()
-        if user:
-            return render_template("user_dashboard.html",user=user.name)
-        else:
-            return redirect(indexDir)
+        return redirect(indexDir)
 
 @app.route(adminDashboardDir)
 def adminDash():
-    if (localHost):
-        return render_template("admin_dashboard.html")
+    user = checkSession()
+    if user:
+        return render_template("admin_dashboard.html",user=user.name)
     else:
-        user = checkSession()
-        if user:
-            return render_template("admin_dashboard.html",user=user.name)
-        else:
-            return redirect(indexDir)
+        return redirect(indexDir)
 
 
 
@@ -328,10 +328,11 @@ def test():
         #username = request.args.get('username')
         return jsonify(temporaryDatabase.get(username)[-1])
     elif request.method == "PUT":
-        username = request.values.get("username")
+        user = checkSession()
+        #username = request.values.get("username")
         valueName = request.values.get("valueName")
         data = request.values.get("data")
-        manager.alterNode(username,valueName,data)
+        manager.alterNode(user.name,valueName,data)
         return "{}"
     else:
         return jsonify({"data":"goodbye"})
@@ -362,6 +363,8 @@ if __name__ == "__main__":
     #manager.bus.POST({"username": "robyn", "postalCode": 97753, "function": "create"})
     temporaryDatabase.new("robyn")
     manager.startNode("robyn", int(97753), [-5, 5], [-5, 5])
+    temporaryDatabase.new("Demo")
+    manager.startNode("Demo", int(97753), [-5, 5], [-5, 5])
     #app.run(host, ssl_context='adhoc')
     if(localHost):
         app.run(host)

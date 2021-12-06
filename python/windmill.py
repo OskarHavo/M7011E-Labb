@@ -31,6 +31,8 @@ class ProductionNode:
             elif valueName == "sellRatio":
                 self.chain.sellRatio.setRatio(float(value))
                 return
+            else:
+                print("Received some weird value ", valueName, value)
 
     def __del__(self):
         self.powerplant.detach()
@@ -70,10 +72,6 @@ class ProductionNode:
             buySurplus = str(buySurplus)
             sellValue = str(sellValue)
             buffer = str(buffer)
-            year = str(self.date.year)
-            month = str(self.date.month)
-            day = str(self.date.day)
-            hour = str(self.date.hour)
-            minute = str(self.date.minute)
-            second = str(self.date.second)
-            return {"production": bruttoProd, "consumption": consumption, "powerToBuy": buySurplus, "powerToSell": sellValue, "buffer": buffer, "year":year,"month":month,"day":day,"hour":hour,"minute":minute,"second":second}
+            buy = str(self.chain.buyCalc.ratio)
+            sell = str(self.chain.sellRatio.sellRatio)
+            return {"production": bruttoProd, "consumption": consumption, "powerToBuy": buySurplus, "powerToSell": sellValue, "buffer": buffer,"buyRatio":buy,"sellRatio":sell,"timestamp": str(self.date)}#, "year":year,"month":month,"day":day,"hour":hour,"minute":minute,"second":second}
