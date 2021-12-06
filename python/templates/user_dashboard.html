@@ -189,7 +189,12 @@
 
 			<div class ="simulatorcontainer">
 				<h2>Simulator Data</h2>
-                <p id="data"></p>
+				<div class = "rawdataoutputdiv">
+                	<h4 id="rawDataOutput_DATE"></h4>
+					<p id="rawDataOutput_OUTPUT1"></p>
+					<p id="rawDataOutput_OUTPUT2"></p>
+					<p id="rawDataOutput_OUTPUT3"></p>
+				</div>
 			</div>
 
 			<div class ="graphcontainer">
@@ -261,6 +266,7 @@
 
 	</div>
 
+	<!--  Simulator Updater-->
 	<script>
 		var con = genTimeChart("consumption",0,200);
 		var conUpdater;

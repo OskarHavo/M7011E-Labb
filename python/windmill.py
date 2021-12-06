@@ -10,7 +10,7 @@ class ProductionNode:
         self.outOfOrder = False
         self.user = user
         self.powerplant = powerplant
-        self.syncMutext = threading.Lock()
+        self.syncMutex = threading.Lock()
         powerplant.attach()
 
         productionProducer = dataGeneration.DataProducer(
@@ -24,7 +24,7 @@ class ProductionNode:
         self.chain = dataGeneration.ConsumptionChain(consumptionProducer, productionProducer, self.powerplant, 0.5, 0.5)
 
     def setValue(self, valueName, value):
-        with self.syncMutext:
+        with self.syncMutex:
             if valueName == "buyRatio":
                 self.chain.buyCalc.setRatio(float(value))
                 return
@@ -50,7 +50,9 @@ class ProductionNode:
         return self.currentConsumption
 
     def updateTime(self):
-        self.date = datetime.datetime.now()
+        date = datetime.datetime.now()
+        formattedDate = date - datetime.timedelta(microseconds=date.microsecond) # Ensures only 2 digits for seconds
+        self.date = formattedDate
 
     def updateOutOfOrder(self, rand):
         if self.outOfOrder:
@@ -64,14 +66,14 @@ class ProductionNode:
         return self.outOfOrder
 
     def tick(self):
-        with self.syncMutext:
+        with self.syncMutex:
             self.updateTime()
-            bruttoProd, consumption, buySurplus, sellValue, buffer = self.chain.tick(self.date)
-            bruttoProd = str(bruttoProd)
+            grossProduction, consumption, powerToBuy, powerToSell, buffer = self.chain.tick(self.date)
+            grossProduction = str(grossProduction)
             consumption = str(consumption)
-            buySurplus = str(buySurplus)
-            sellValue = str(sellValue)
+            powerToBuy = str(powerToBuy)
+            powerToSell = str(powerToSell)
             buffer = str(buffer)
             buy = str(self.chain.buyCalc.ratio)
             sell = str(self.chain.sellRatio.sellRatio)
-            return {"production": bruttoProd, "consumption": consumption, "powerToBuy": buySurplus, "powerToSell": sellValue, "buffer": buffer,"buyRatio":buy,"sellRatio":sell,"timestamp": str(self.date)}#, "year":year,"month":month,"day":day,"hour":hour,"minute":minute,"second":second}
+            return {"production": grossProduction, "consumption": consumption, "powerToBuy": powerToBuy, "powerToSell": powerToSell, "buffer": buffer,"buyRatio":buy,"sellRatio":sell,"timestamp": str(self.date)}#, "year":year,"month":month,"day":day,"hour":hour,"minute":minute,"second":second}

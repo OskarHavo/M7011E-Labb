@@ -99,7 +99,40 @@ function uploadData(valuename, param) {
 }
 
 function updateText() {
-	document.getElementById("data").innerHTML = JSON.stringify(simData[simData.length-1],null,4);
+    var simulatorData = simData[simData.length-1];
+
+    if (simulatorData  == null){
+        dateoutput = "No Data";
+        output1 = "";
+        output2 = "";
+        output3 = "";
+    }else{
+        timeoutput = "Date: " + simulatorData.timestamp;
+        productionoutput = "Production: " + simulatorData.production.substring(0,4) +"kWh" ;
+        consumptionoutput = "Consumption: " + simulatorData.consumption.substring(0,4) +"kWh";
+        powertoselloutput = "PowerToSell: " + simulatorData.powerToSell.substring(0,4) +"kWh";
+        powertobuyoutput = "PowerToBuy: " + simulatorData.powerToBuy.substring(0,4) +"kWh";
+        bufferoutput  = "Buffer: "+  simulatorData.buffer.substring(0,4) +"kWh";
+        buyoutput  = "Buy Ratio: " +  simulatorData.buyRatio.substring(0,4);
+        selloutput  = "Sell Ratio: " +  simulatorData.sellRatio.substring(0,4);
+
+        dateoutput = String(timeoutput);
+        output1 = String(productionoutput + " " +  consumptionoutput);
+        output2 = String(powertoselloutput + " " + powertobuyoutput + " " + bufferoutput);
+        output3 = String(buyoutput + " " + selloutput);
+
+    }
+    document.getElementById("rawDataOutput_DATE").innerHTML = dateoutput; //JSON.stringify(output,null,4);
+	document.getElementById("rawDataOutput_OUTPUT1").innerHTML = output1;
+	document.getElementById("rawDataOutput_OUTPUT2").innerHTML = output2;
+	document.getElementById("rawDataOutput_OUTPUT3").innerHTML = output3;
+
+    // Om man vill göra ett flöde med alla timestamps, funkar ej dock.
+  /*  div = document.getElementById('rawdataoutputdiv');
+    div.insertAdjacentHTML('afterbegin', '<div>' + dateoutput + '<hr></div>');
+    div.insertAdjacentHTML('afterbegin', '<div>' + output1 + '<hr></div>');
+    div.insertAdjacentHTML('afterbegin', '<div>' + output2 + '<hr></div>');
+    div.insertAdjacentHTML('afterbegin', '<div>' + output3 + '<hr></div>');*/
 }
 
 function updateAll(updater, chart, startx, starty, delta, bufferSize=10) {
