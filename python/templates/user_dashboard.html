@@ -4,7 +4,8 @@
 	<title>Dashboard</title>
 	<script src="https://kit.fontawesome.com/bd50140c14.js" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
-	<script src="/static/time_chart.js"></script>
+	<script src="/static/user_api.js"></script>
+	<script src="/static/dragablegauges.js"></script>
 	<link rel="stylesheet" href="/static/user_dashboard.css">
 
 </head>
@@ -31,31 +32,6 @@
         	<h1>2021/01/01</h1>
    		</div>
 
-<!--
-    	<div class = "timelinebuttoncontainer">
-
-
-
-    		<div class = "timelinebuttondiv playbutton">
-            	<button class="timelinebutton" onclick="play()">
-            			<img src="static/assets/playbuttonicon.jpg" width="100%" height = 100%>
-          		</button>
-    		</div>
-
-    		<div class = "timelinebuttondiv pausebutton">
-         		<button class="timelinebutton" onclick="pause()">
-             		<img src="static/assets/pausebuttonicon.jpg" width="100%" height = 100%>
-         		</button>
-    		</div>
-
-    		<div class = "timelinebuttondiv stopbutton">
-          		<button class="timelinebutton" onclick="stop()">
-          	  <img src="static/assets/stopbuttonicon.jpg" width="100%" height = 100%>
-          		</button>
-    		</div>
-
-		</div>
--->
     </div>
 
 
@@ -216,34 +192,52 @@
 
 				<div draggable="true" class="gauge">
 					<p>CONSUMPTION </p>
-					<meter class="gaugemeter" value="9" min="0" max="10"></meter>
+					<div class ="gaugemeterfull">
+						<div class="gaugemeter" id="usergauge_consumption"></div>
+					</div>
+					<p id="usergauge_consumption_text"></p>
 				</div>
 
 				<div draggable="true" class="gauge">
 					<p>PRODUCTION</p>
-					<meter class="gaugemeter" value="5" min="0" max="10"></meter>
+					<div class ="gaugemeterfull">
+						<div class="gaugemeter" id="usergauge_production"></div>
+					</div>
+					<p id="usergauge_production_text"></p>
 
 				</div>
 
 				<div draggable="true" class="gauge">
-					<p>WINDMETER</p>
-					<meter class="gaugemeter" value="6" min="0" max="10"></meter>
+					<p>WIND SPEED</p>
+					<div class ="gaugemeterfull">
+						<div class="gaugemeter" id="usergauge_windspeed"></div>
+					</div>
+					<p id="usergauge_windspeed_text"></p>
 				</div>
 
 				<div draggable="true" class="gauge">
 					<p>NET PRODUCTION</p>
-					<p>1000kr</p>
+<					<div class ="gaugemeterfull">
+						<div class="gaugemeter" id="usergauge_netproduction"></div>
+					</div>
+					<p id="usergauge_netproduction_text"></p>
 
 				</div>
 
 				<div draggable="true" class="gauge">
 					<p>ENERGY BUFFER SIZE</p>
-					<meter class="gaugemeter" value="3" min="0" max="10"></meter>
+					<div class ="gaugemeterfull">
+						<div class="gaugemeter" id="usergauge_buffer"></div>
+					</div>
+					<p id="usergauge_buffer_text"></p>
 				</div>
 
 				<div draggable="true" class="gauge">
 					<p>CURRENT ELECTRICITY PRICE</p>
-					<p>10kr</p>
+					<div class ="gaugemeterfull">
+						<div class="gaugemeter" id="usergauge_price"></div>
+					</div>
+					<p id="usergauge_price_text"></p>
 				</div>
 
 
@@ -252,8 +246,11 @@
 
 				<p>Buying/Buffer Ratio Slider</p>
 				<input type="range" min="1" max="100" value="50" class="slider" id="buyingRatio">
+				<p id="buyingRatioText"></p>
+
 				<p>Selling/Buffer Ratio Slider</p>
 				<input type="range" min="1" max="100" value="50" class="slider" id="sellingRatio">
+				<p id="sellingRatioText"></p>
 
 			</div>
 
@@ -273,74 +270,6 @@
 		updateAll(conUpdater,con,1,100,3,20);
 	</script>
 
-	<!--  https://web.dev/drag-and-drop/ -->
-	<script>
-
-	document.addEventListener('DOMContentLoaded', (event) => {
-
-	  var dragSrcEl = null;
-
-	  function handleDragStart(e) {
-		this.style.opacity = '0.4';
-
-		dragSrcEl = this;
-
-		e.dataTransfer.effectAllowed = 'move';
-		e.dataTransfer.setData('text/html', this.innerHTML);
-	  }
-
-	  function handleDragOver(e) {
-		if (e.preventDefault) {
-		  e.preventDefault();
-		}
-
-		e.dataTransfer.dropEffect = 'move';
-
-		return false;
-	  }
-
-	  function handleDragEnter(e) {
-		this.classList.add('over');
-	  }
-
-	  function handleDragLeave(e) {
-		this.classList.remove('over');
-	  }
-
-	  function handleDrop(e) {
-		if (e.stopPropagation) {
-		  e.stopPropagation(); // stops the browser from redirecting.
-		}
-
-		if (dragSrcEl != this) {
-		  dragSrcEl.innerHTML = this.innerHTML;
-		  this.innerHTML = e.dataTransfer.getData('text/html');
-		}
-
-		return false;
-	  }
-
-	  function handleDragEnd(e) {
-		this.style.opacity = '1';
-
-		items.forEach(function (item) {
-		  item.classList.remove('over');
-		});
-	  }
-
-
-	  let items = document.querySelectorAll('.gaugecontainer .gauge');
-	  items.forEach(function(item) {
-		item.addEventListener('dragstart', handleDragStart, false);
-		item.addEventListener('dragenter', handleDragEnter, false);
-		item.addEventListener('dragover', handleDragOver, false);
-		item.addEventListener('dragleave', handleDragLeave, false);
-		item.addEventListener('drop', handleDrop, false);
-		item.addEventListener('dragend', handleDragEnd, false);
-	  });
-	});
-
-	</script>
 
 </body>
 </html>
