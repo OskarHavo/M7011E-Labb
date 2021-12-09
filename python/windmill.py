@@ -1,4 +1,5 @@
 import datetime
+import random
 import threading
 import dataGeneration
 
@@ -11,14 +12,17 @@ class ProductionNode:
         self.user = user
         self.powerplant = powerplant
         self.syncMutex = threading.Lock()
-        powerplant.attach()
+        self.powerID = powerplant.attach(self)
+        self.currentPurchase = 0
+        self.energyBuffer = 0
+        self.currentProduction = 0
 
         productionProducer = dataGeneration.DataProducer(
-            dataGeneration.RandomState(postalCode, productionRandomRange),
+            dataGeneration.RandomState(postalCode+random.random(), productionRandomRange),
             dataGeneration.PowerProduction(datetime.datetime(1970, 1, 1), postalCode)
         )
         consumptionProducer = dataGeneration.DataProducer(
-            dataGeneration.RandomState(postalCode, productionRandomRange),
+            dataGeneration.RandomState(postalCode+random.random(), productionRandomRange),
             dataGeneration.PowerConsumption()
         )
         self.chain = dataGeneration.ConsumptionChain(consumptionProducer, productionProducer, self.powerplant, 0.5, 0.5)
@@ -35,19 +39,23 @@ class ProductionNode:
                 print("Received some weird value ", valueName, value)
 
     def __del__(self):
-        self.powerplant.detach()
+        self.powerplant.detach(self)
 
     def getName(self):
-        return self.user
+        with self.syncMutex:
+            return self.user
 
     def getBuffer(self):
-        return self.energyBuffer
+        with self.syncMutex:
+            return self.energyBuffer
 
     def getProduction(self):
-        return self.currentProduction
+        with self.syncMutex:
+            return self.currentProduction
 
-    def getConsumption(self):
-        return self.currentConsumption
+    def getPurchaseVolume(self):
+        with self.syncMutex:
+            return self.currentPurchase
 
     def updateTime(self):
         date = datetime.datetime.now()
@@ -68,12 +76,15 @@ class ProductionNode:
     def tick(self):
         with self.syncMutex:
             self.updateTime()
-            grossProduction, consumption, powerToBuy, powerToSell, buffer = self.chain.tick(self.date)
-            grossProduction = str(grossProduction)
-            consumption = str(consumption)
-            powerToBuy = str(powerToBuy)
-            powerToSell = str(powerToSell)
-            buffer = str(buffer)
-            buy = str(self.chain.buyCalc.ratio)
-            sell = str(self.chain.sellRatio.sellRatio)
-            return {"production": grossProduction, "consumption": consumption, "powerToBuy": powerToBuy, "powerToSell": powerToSell, "buffer": buffer,"buyRatio":buy,"sellRatio":sell,"timestamp": str(self.date)}#, "year":year,"month":month,"day":day,"hour":hour,"minute":minute,"second":second}
+            self.currentProduction, consumption, self.currentPurchase, powerToSell, buffer = self.chain.tick(self.date)
+            return {
+                "production": str(self.currentProduction),
+                "consumption": str(consumption),
+                "powerToBuy": str(self.currentPurchase),
+                "powerToSell": str(powerToSell),
+                "buffer": str(buffer),
+                "buyRatio":str(self.chain.buyCalc.ratio),
+                "sellRatio":str(self.chain.sellRatio.sellRatio),
+                "timestamp": str(self.date),
+                "windspeed": str(self.currentProduction/3.0),
+                "electricityPrice": str(dataGeneration.calculateDailyEnergyPrice(self.currentProduction,consumption))}

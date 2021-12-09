@@ -3,6 +3,8 @@ from flask import render_template
 import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
+
+import simulator
 from simulator import *
 
 global current_error
@@ -28,10 +30,6 @@ global settingsDir
 settingsDir = "/settings"
 global counter
 counter = 1
-
-
-localHost = False
-
 
 def fetchKey():
     global current_error
@@ -69,7 +67,7 @@ def readUserFromDatabase(user):
             password="",
             database="M7011E")
         cursor = mydb.cursor(buffered=True)
-        cursor.execute("SELECT User,Password FROM User WHERE User='%s'" % (user))
+        cursor.execute("SELECT User,Password,Postalcode FROM User WHERE User='%s'" % (user)) ## TODO ADD POSTAL CODE TO THE SERVER
         row = cursor.fetchone()
         cursor.close()
         if row is not None:
@@ -125,27 +123,29 @@ def alterUserInDatabase(newUser,oldUser,newPassword):
 
 
 class User:
-    def __init__(self, username, password=None):
+    def __init__(self, username,postalcode=None, password=None):
         if password == None:
             try:
                 self.name = username["user"]
                 self.password = username["password"]
                 self.validated = username["valid"]
+                self.postalcode = username["postalcode"]
             except:
                 self.name = ""
                 self.password = ""
+                self.postalcode = ""
                 self.validated = False
             return
         self.name = username
         self.password = password
+        self.postalcode = postalcode
+
         self.validated = False
 
     def isValid(self):
         return self.validated
 
     def validate(self):
-        if localHost:
-            self.validated = True
         if self.validated:
             session["user"] = self.toJSON()
             return True
@@ -158,7 +158,7 @@ class User:
             return False
 
     def toJSON(self):
-        return {"user": self.name, "password": self.password, "valid": self.validated}
+        return {"user": self.name, "password": self.password, "valid": self.validated,"postalcode":self.postalcode}
 
 
 
@@ -174,15 +174,11 @@ def getUser():
 
 
 def checkSession():
-    if localHost:
-        user = User("Demo","Null")
+    user = getUser()
+    if user != None and user.isValid():
         return user
     else:
-        user = getUser()
-        if user != None and user.isValid():
-            return user
-        else:
-            return None
+        return None
 
 @app.route(errorDir)
 def error():
@@ -241,7 +237,7 @@ def signup():
         return redirect(userDashboardDir)
     err = ""
     if request.method == 'POST':
-        user = User(request.form.get("username"), request.form.get("password"))
+        user = User(request.form.get("username"),request.form.get("postalcode"), request.form.get("password"))
 
         if user.password != request.form.get("password-repeat"):
             err = "Passwords don't match"
@@ -264,9 +260,28 @@ def userDash():
     else:
         return redirect(indexDir)
 
+@app.route("/user_dashboard/<username>")
+def userDash2(username):
+    user = User(username,"")
+    user.postalcode = "97753"
+    user.validated = True
+    session["user"] = user.toJSON()
+    if user:
+        return render_template("user_dashboard.html",user=user.name)
+    else:
+        return redirect(indexDir)
+
 @app.route(adminDashboardDir)
 def adminDash():
     user = checkSession()
+    if user:
+        return render_template("admin_dashboard.html",user=user.name)
+    else:
+        return redirect(indexDir)
+
+@app.route("/admin_dashboard/<username>")
+def adminDash2(username):
+    user = User(username,"")
     if user:
         return render_template("admin_dashboard.html",user=user.name)
     else:
@@ -310,32 +325,56 @@ def settings():
 
 # TODO User verification
 @app.route("/fetch",methods = ['POST', 'GET','PUT'])
-def test():
+def fetch():
     if request.method == "POST":
-        username = request.values.get('username')
-        postalCode = request.values.get("postalCode")
-        function = request.values.get("function")
+        user = checkSession()
+        if not user:
+            return "{}"
+        #postalCode = request.values.json["postalCode"]
+        function = request.values.json["function"]
         if function == "create":
-            if username != "" and postalCode != "":
-                temporaryDatabase.new(username)
-                manager.startNode(username,int(postalCode),[-5,5],[-5,5])
+            if user.name != "" and user.postalcode != "":
+                temporaryDatabase.new(user.name)
+                manager.startNode(user.name,int(user.postalcode),[-5,5],[-5,5])
         elif function == "delete":
-            if username != "" and postalCode != "":
-                temporaryDatabase.remove(username)
+            if user:
+                temporaryDatabase.remove(user.name)
         return jsonify({"data":request.args.get("username")})
     elif request.method == "GET":
-        username = "robyn"
-        #username = request.args.get('username')
-        return jsonify(temporaryDatabase.get(username)[-1])
+        user = checkSession()
+        if user:
+            if not temporaryDatabase.get(user.name):
+                temporaryDatabase.new(user.name)
+                manager.startNode(user.name, int(user.postalcode), [-1, 1], [-1, 1])
+            return jsonify(temporaryDatabase.get(user.name)[-1])
+        else:
+            print("Invalid user!!!")
+            return "{}"
     elif request.method == "PUT":
         user = checkSession()
+        if user:
         #username = request.values.get("username")
-        valueName = request.values.get("valueName")
-        data = request.values.get("data")
-        manager.alterNode(user.name,valueName,data)
+            valueName = request.json["valueName"]
+            data = request.json["data"]
+            manager.alterNode(user.name,valueName,data)
+            return "{}"
+    return "{}"
+
+@app.route("/fetch_admin",methods = ['GET','PUT'])
+def fetch_admin():
+    if request.method == "GET":
+        user = checkSession()   ## TODO set to admin user instead
+        if user:
+            return jsonify(manager.powerplant.getCurrentData())
+    elif request.method == "PUT":
+        user = checkSession()   ## TODO set to admin user instead
+        #username = request.values.get("username")
+        valueName = request.json["valueName"]
+        data = request.json["data"]
+        manager.powerplant.setValue(valueName,data)
         return "{}"
     else:
-        return jsonify({"data":"goodbye"})
+        return "{}"
 """
 @app.route("/fetch",methods=['POST', 'GET'])
 def fetch():
@@ -361,12 +400,8 @@ def th():
 
 if __name__ == "__main__":
     #manager.bus.POST({"username": "robyn", "postalCode": 97753, "function": "create"})
-    temporaryDatabase.new("robyn")
-    manager.startNode("robyn", int(97753), [-5, 5], [-5, 5])
-    temporaryDatabase.new("Demo")
-    manager.startNode("Demo", int(97753), [-5, 5], [-5, 5])
-    #app.run(host, ssl_context='adhoc')
-    if(localHost):
-        app.run(host)
-    else:
-        app.run(host)#, ssl_context='adhoc')
+    #temporaryDatabase.new("robyn")
+    #manager.startNode("robyn", int(97753), [-1, 1], [-1, 1])
+    #temporaryDatabase.new("Demo")
+    #manager.startNode("Demo", int(97753), [-1, 1], [-1, 1])
+    app.run(host)#, ssl_context='adhoc')

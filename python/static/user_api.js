@@ -40,8 +40,9 @@ function removeFirst(chart) {
 const request = ( url, params = {}, method = 'GET' ) => {
 	let options = {
 		method,
-		headers:{'Accept': 'application/json',
-         'Content-Type': 'application/json'}
+		headers: {
+			'Content-Type': 'application/json'
+		},
 	};
 	if ( 'GET' === method ) {
 		url += '?' + ( new URLSearchParams( params ) ).toString();
@@ -53,16 +54,17 @@ const request = ( url, params = {}, method = 'GET' ) => {
 };
 
 var simData = [];
-var trailLength = 2;
+var trailLength = 10;
 
 function fetchDataCycle() {
-	post('/fetch', {}).then(response => {
+	return post('/fetch', {}).then(response => {
 		if (simData.length== 0 || simData[simData.length - 1]["timestamp"] != response["timestamp"]) {
 			simData.push(response)
 			if (simData.length > trailLength) {
 				simData.slice(1, simData.length)
 			}
 			console.log(simData[simData.length - 1])
+		return simData[simData.length-1]
 		}
 	});
 }
@@ -100,32 +102,32 @@ function uploadData(valuename, param) {
 
 function updateRawSimulatorDataOutput(simulatorData) {
 
-    if (simulatorData  == null){
-        dateoutput = "No Data";
-        output1 = "";
-        output2 = "";
-        output3 = "";
-    }else{
-        timeoutput = "Date: " + simulatorData.timestamp;
-        productionoutput = "Production: " + simulatorData.production.substring(0,4) +"kWh" ;
-        consumptionoutput = "Consumption: " + simulatorData.consumption.substring(0,4) +"kWh";
-        powertoselloutput = "PowerToSell: " + simulatorData.powerToSell.substring(0,4) +"kWh";
-        powertobuyoutput = "PowerToBuy: " + simulatorData.powerToBuy.substring(0,4) +"kWh";
-        bufferoutput  = "Buffer: "+  simulatorData.buffer.substring(0,4) +"kWh";
-        buyoutput  = "Buy Ratio: " +  simulatorData.buyRatio.substring(0,4);
-        selloutput  = "Sell Ratio: " +  simulatorData.sellRatio.substring(0,4);
+	try {
+		timeoutput = "Date: " + simulatorData.timestamp;
+		productionoutput = "Production: " + simulatorData.production.substring(0, 4) + "kWh";
+		consumptionoutput = "Consumption: " + simulatorData.consumption.substring(0, 4) + "kWh";
+		powertoselloutput = "PowerToSell: " + simulatorData.powerToSell.substring(0, 4) + "kWh";
+		powertobuyoutput = "PowerToBuy: " + simulatorData.powerToBuy.substring(0, 4) + "kWh";
+		bufferoutput = "Buffer: " + simulatorData.buffer.substring(0, 4) + "kWh";
+		buyoutput = "Buy Ratio: " + simulatorData.buyRatio.substring(0, 4);
+		selloutput = "Sell Ratio: " + simulatorData.sellRatio.substring(0, 4);
+		windspeed = "Wind speed: " + simulatorData.windspeed.substring(0, 4) + "m/s";
 
-        dateoutput = String(timeoutput);
-        output1 = String(productionoutput + " " +  consumptionoutput);
-        output2 = String(powertoselloutput + " " + powertobuyoutput + " " + bufferoutput);
-        output3 = String(buyoutput + " " + selloutput);
-
-    }
+		dateoutput = String(timeoutput);
+		output1 = String(productionoutput + " " + consumptionoutput);
+		output2 = String(powertoselloutput + " " + powertobuyoutput + " " + bufferoutput);
+		output3 = String(buyoutput + " " + selloutput);
+	}catch(error) {
+		dateoutput = "No Data";
+		output1 = "";
+		output2 = "";
+		output3 = "";
+		output4 = "";
+	}
     document.getElementById("rawDataOutput_DATE").innerHTML = dateoutput; //JSON.stringify(output,null,4);
 	document.getElementById("rawDataOutput_OUTPUT1").innerHTML = output1;
 	document.getElementById("rawDataOutput_OUTPUT2").innerHTML = output2;
 	document.getElementById("rawDataOutput_OUTPUT3").innerHTML = output3;
-
     // Om man vill göra ett flöde med alla timestamps, funkar ej dock.
   /*  div = document.getElementById('rawdataoutputdiv');
     div.insertAdjacentHTML('afterbegin', '<div>' + dateoutput + '<hr></div>');
@@ -135,87 +137,85 @@ function updateRawSimulatorDataOutput(simulatorData) {
 }
 
 
-
 function updateUserGauges(simulatorData) {
 
-// Max Value of gauges
-var maxValue =  20.0;
-var maxValueWindSpeed = 6.0;
-var maxValueNetProduction = 3.0;
-var MaxValueBuffer = 15.0;
+	// Max Value of gauges
+	var maxValue = 25.0;
+	var maxValueWindSpeed = 10.0;
+	var maxValueNetProduction = 30.0;
+	var MaxValueBuffer = 30.0;
 
-// First epoch
- if (simulatorData  == null){
-        consumption = "0.0";
-        consumptionoutput = "5.0";
-        production = "0.0";
-        productionoutput = "5.0";
-        windspeed = "0.0";
-        windspeedoutput = "5.0";
-        netproduction = "0.0";
-        netproductionoutput = "2.0";
-        buffer = "0.0";
-        bufferoutput = "0.0";
-        currentelectrictyprice = "0.0";
-        currentelectrictypriceoutput = "0.0";
- }else {
-    // First Value is a string showing the formatted value. Used for the string showing the value.
-    // Second Value is a string showing the percentage of the total value that the current value is. Used for the gauge.
-    consumption = simulatorData.consumption.substring(0,5);
-    consumptionoutput = String((consumption/ maxValue)*100.0 );
 
-    production = simulatorData.production.substring(0,5);
-    productionoutput = String((production/ maxValue)*100.0 );
+	try {
+		// First Value is a string showing the formatted value. Used for the string showing the value.
+		// Second Value is a string showing the percentage of the total value that the current value is. Used for the gauge.
+		consumption = simulatorData.consumption.substring(0, 5);
+		consumptionoutput = String((consumption / maxValue) * 100.0);
 
-    windspeedFactor = 5.0; // Production/Windspeedfactor = Windspeed
-    windspeed = String ( parseFloat(simulatorData.production / windspeedFactor)).substring(0,5);
-    windspeedoutput = String((windspeed/ maxValueWindSpeed)*100.0 );
+		production = simulatorData.production.substring(0, 5);
+		productionoutput = String((production / maxValue) * 100.0);
 
-    netproduction = String(parseFloat(production)-parseFloat(consumption)).substring(0,4);
-    netproductionoutput = String(( Math.abs(netproduction) / maxValueNetProduction)*100.0 ).substring(0,4);
+		windspeed = String(parseFloat(simulatorData.windspeed)).substring(0, 5);
+		windspeedoutput = String((windspeed / maxValueWindSpeed) * 100.0);
 
-    buffer = simulatorData.buffer.substring(0,5);
-    bufferoutput = String((buffer/ MaxValueBuffer)*100.0 );
+		netproduction = String(parseFloat(production) - parseFloat(consumption)).substring(0, 4);
+		netproductionoutput = String((Math.abs(netproduction) / maxValueNetProduction) * 100.0).substring(0, 4);
 
-    currentelectrictyprice = simulatorData.consumption.substring(0,5); // Ladda upp pris ruben.
-    currentelectrictypriceoutput = String((consumption/ maxValue)*100.0 );
+		buffer = simulatorData.buffer.substring(0, 5);
+		bufferoutput = String((buffer / MaxValueBuffer) * 100.0);
 
-    document.getElementById("usergauge_consumption").style.width = consumptionoutput+"%";
-    document.getElementById("usergauge_consumption_text").innerHTML = String(consumption)+"kWh";
+		currentelectrictyprice = simulatorData.electricityPrice.substring(0, 5);
+		currentelectrictypriceoutput = String((currentelectrictyprice / maxValue) * 100.0);
 
-    document.getElementById("usergauge_production").style.width = productionoutput+"%";
-    document.getElementById("usergauge_production_text").innerHTML = production+"kWh";
+		document.getElementById("usergauge_consumption").style.width = consumptionoutput + "%";
+		document.getElementById("usergauge_consumption_text").innerHTML = String(consumption) + "kWh";
 
-    document.getElementById("usergauge_windspeed").style.width = windspeedoutput+"%";
-    document.getElementById("usergauge_windspeed_text").innerHTML = windspeed+"m/s";
+		document.getElementById("usergauge_production").style.width = productionoutput + "%";
+		document.getElementById("usergauge_production_text").innerHTML = production + "kWh";
 
-    document.getElementById("usergauge_netproduction").style.width = netproductionoutput+"%";
-    document.getElementById("usergauge_netproduction_text").innerHTML = netproduction+"kWh";
+		document.getElementById("usergauge_windspeed").style.width = windspeedoutput + "%";
+		document.getElementById("usergauge_windspeed_text").innerHTML = windspeed + "m/s";
 
-    document.getElementById("usergauge_buffer").style.width = bufferoutput+"%";
-    document.getElementById("usergauge_buffer_text").innerHTML = buffer+"kWh";
+		document.getElementById("usergauge_netproduction").style.width = netproductionoutput + "%";
+		document.getElementById("usergauge_netproduction_text").innerHTML = netproduction + "kWh";
 
-    document.getElementById("usergauge_price").style.width = currentelectrictypriceoutput+"%";
-    document.getElementById("usergauge_price_text").innerHTML = currentelectrictyprice+"kr";
+		document.getElementById("usergauge_buffer").style.width = bufferoutput + "%";
+		document.getElementById("usergauge_buffer_text").innerHTML = buffer + "kWh";
 
-    // Set color to red if negative.
-    if(parseFloat(netproduction) < 0.0){
-        document.getElementById("usergauge_netproduction").style.backgroundColor = '#c70000';
-    }else{
-        document.getElementById("usergauge_netproduction").style.backgroundColor = '#007300' ;
-    }
+		document.getElementById("usergauge_price").style.width = currentelectrictypriceoutput + "%";
+		document.getElementById("usergauge_price_text").innerHTML = currentelectrictyprice + "kr";
 
-    }
-
+		// Set color to red if negative.
+		if (parseFloat(netproduction) < 0.0) {
+			document.getElementById("usergauge_netproduction").style.backgroundColor = '#c70000';
+		} else {
+			document.getElementById("usergauge_netproduction").style.backgroundColor = '#007300';
+		}
+	} catch(error) {
+		consumption = "0.0";
+		consumptionoutput = "5.0";
+		production = "0.0";
+		productionoutput = "5.0";
+		windspeed = "0.0";
+		windspeedoutput = "5.0";
+		netproduction = "0.0";
+		netproductionoutput = "2.0";
+		buffer = "0.0";
+		bufferoutput = "0.0";
+		currentelectrictyprice = "0.0";
+		currentelectrictypriceoutput = "0.0";
+	}
 }
 
 // Only Updates once each tick.
-function updateUserSliders(simulatorData) {
+function updateUserSliders() {
 
     var buyRatio = document.getElementById("buyingRatio").value;
+	uploadData("buyRatio",parseFloat(buyRatio)/100);
     document.getElementById("buyingRatioText").innerHTML = buyRatio;
 
     var sellRatio = document.getElementById("sellingRatio").value;
+	uploadData("sellRatio",parseFloat(sellRatio)/100);
     document.getElementById("sellingRatioText").innerHTML = sellRatio;
 
 
@@ -236,15 +236,13 @@ function updateAdminSliders(simulatorData) {
 }
 
 function updateAll(updater, chart, startx, starty, delta, bufferSize=10) {
-	fetchDataCycle();
-	updateGraph(chart, startx, starty, bufferSize=10);
 
-	var simulatorData = simData[simData.length-1];
-	updateRawSimulatorDataOutput(simulatorData);
-	updateUserGauges(simulatorData);
-	updateUserSliders(simulatorData);
-	//updateAdminSliders(simulatorData);
-
-	//uploadData("buyRatio",buyRatio);
-	updater = setTimeout(updateAll, delta * 1000, updater, chart, startx, starty, delta, bufferSize);
+	fetchDataCycle().then(value => {
+		updateGraph(chart, startx, starty, bufferSize = 10);
+		//var simulatorData = value;
+		updateRawSimulatorDataOutput(value);
+		updateUserGauges(value);
+		updateUserSliders();
+		updater = setTimeout(updateAll, delta * 1000, updater, chart, startx, starty, delta, bufferSize);
+	});
 }

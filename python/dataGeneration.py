@@ -21,7 +21,7 @@ class PowerProduction:
         i = deltaDate.days
 
         # These ranges create a healthy range of the total NetEnergyProduction. (Kan inte randomiza för varje call, man får nog randomiza 1 gång per hus och föra in det som inparameter)
-        A = 10  # random.randint(10, 12)  # Amplitude (Max/Min Value)
+        A = 20  # random.randint(10, 12)  # Amplitude (Max/Min Value)
         f = 0.01  # Frequency
         B = self.areaCode  # Phase  (Adjust for location)
         C = A * 1.5  # Makes sure the values are not too low and/or negative  ##Check so randomizing the afb values does it make it negative in some config
@@ -132,7 +132,7 @@ class ConsumptionChain:
         buySurplus = self.buyCalc.tick()
         sellValue = self.sellRatio.tick()
         buffer = self.buffer.tick()
-        return bruttoProd,bruttoProd+buySurplus,buySurplus,sellValue,buffer
+        return bruttoProd,bruttoProd+buySurplus,np.clip(buySurplus,0,None),sellValue,buffer
 
 
 class RandomState:
@@ -159,11 +159,12 @@ class RandomState:
 
     ## Produce a random number that is unique to this instance. Also save the result locally
     def tick(self):
+        state = random.getstate()
         self.setRandomState()
-        value = random.random()
+        self.currentStateResult = random.random()
         self.saveRandomState()
-        self.currentStateResult = value
-        return value
+        random.setstate(state)
+        return self.currentStateResult
 
     # Warp a sample based on the current state result
     def warpSample(self, sample):
@@ -201,12 +202,12 @@ def addYears(d, years):
 
 
 # Calculates the daily power consumption. Looks at the month to produce a value based on the season,
-def generateDailyPowerConsumption(date):
+def generateDailyPowerConsumption(date,rand):
     min = [20.0, 19.5, 17.0, 16.0, 14.5, 11.0, 11.0, 12.5, 14.0, 16.0, 18.5, 20.5]
     max = [24.0, 23.5, 20.0, 18.0, 16.0, 13.5, 13.5, 14.5, 15.5, 18.5, 19.5, 23.5]
 
     currentMonth = date.month - 1  # -1 so January = [0]
-    powerConsumption = (min[currentMonth] + random.random() * (max[currentMonth] - min[currentMonth]))
+    powerConsumption = (min[currentMonth] + rand * (max[currentMonth] - min[currentMonth]))
 
     return powerConsumption
 
@@ -218,7 +219,7 @@ def generateDailyPowerProduction(date, startDate, areaCode):
     i = deltaDate.days
 
     # These ranges create a healthy range of the total NetEnergyProduction. (Kan inte randomiza för varje call, man får nog randomiza 1 gång per hus och föra in det som inparameter)
-    A = 10  # random.randint(10, 12)  # Amplitude (Max/Min Value)
+    A = 14  # random.randint(10, 12)  # Amplitude (Max/Min Value)
     f = 0.01  # Frequency
     B = areaCode  # Phase  (Adjust for location)
     C = A * 1.5  # Makes sure the values are not too low and/or negative  ##Check so randomizing the afb values does it make it negative in some config
@@ -240,18 +241,15 @@ def calculateDailyEnergyPrice(producedEnergy, consumedEnergy):
     # Introduce price cap to combat infinite energy prices when windmills break.
     if (producedEnergy == 0):
         dailyElectrictyPrice = maxPrice
-        isSurplusStatus = isSurplus(consumedEnergy, producedEnergy)
+
     else:
         demandSupplyFactor = consumedEnergy / producedEnergy
 
-        isSurplusStatus = isSurplus(consumedEnergy, producedEnergy)
         dailyElectrictyPrice = basePrice * demandSupplyFactor
 
         if dailyElectrictyPrice > maxPrice:
             dailyElectrictyPrice = maxPrice
-
-    calculatedNetEnergyProduction = producedEnergy - consumedEnergy
-    return dailyElectrictyPrice, isSurplusStatus, calculatedNetEnergyProduction
+    return dailyElectrictyPrice
 
 
 # Calculate how much energy will be taken from or stored in the buffer. Updated values are returned

@@ -29,7 +29,7 @@ class Database:
             if username in self.database:
                 return self.database[username]
             else:
-                return [{}]
+                return None
 
 
 
@@ -89,19 +89,21 @@ class NodeManager:
 
 
 class SimulationManager:
-    def __init__(self,globalDelta,database):
+    def __init__(self,globalDelta,database,availableEnergy = 2):
         self.productionNodes = {}   # Username, thread
         self.delta = globalDelta
         self.bus = MessageBus("http://localhost:4242")
         self.mutex = threading.Lock()
-        self.powerplants = {}
+        self.powerplant = EnergyCentral(availableEnergy,self.delta)
+        thread = threading.Thread(target=EnergyCentral.run,args=(self.powerplant,))
+        thread.start()
         self.database = database
+
+    def __del__(self, instance):
+        self.powerplant.stop()
     def startNode(self,ID,*var):
         with self.mutex:
-            powerID = var[0]%100//10
-            if not str(powerID) in self.powerplants:
-                self.powerplants[str(powerID)] = EnergyCentral(1)
-            self.productionNodes[ID] = NodeManager(self.bus,self.delta,ID,var,self.powerplants[str(powerID)],self.database)
+            self.productionNodes[ID] = NodeManager(self.bus,self.delta,ID,var,self.powerplant,self.database)
             thread = threading.Thread(target=NodeManager.run,args=(self.productionNodes[ID],))
             thread.start()
     def alterNode(self,username,valueName,data):
