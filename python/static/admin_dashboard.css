@@ -133,6 +133,12 @@
 
 
 
+/* ////////////////////////////////////////////////////////////////////////// */
+
+
+
+
+
 /* Container for the entire timeline bar */
 .timelinecontainer {
   float: left;
@@ -141,7 +147,7 @@
   margin-right: 10%;
   margin-top: 1%;
   margin-bottom: 1%;
-  height: 170px;
+  height: 120px;
   padding: 5px;
   text-align: center;
   background-color: #f1f1f1;
@@ -150,57 +156,14 @@
   border-radius: .5em;
 
 }
-/* Container for the buttons only */
-.timelinebuttoncontainer{
-    margin: auto;
-    display: flex;
-    justify-content: center
-    background-color: green;
-    width: 20%
 
-}
 
-/* Div containing the buttons */
-.timelinebuttondiv{
-    float: left;
-    width: 100%; /* fixa resize*/
-    height: 90px;
-}
-/* The Playbutton */
-.timelinebuttondiv.playbutton{
- margin-right: 1%;
-}
-/* The Pausebutton */
-.timelinebuttondiv.pausebutton{
- margin-right: 1%;
-}
-/* The button class used for the buttons in the timeline. */
-.timelinebutton{
-     display: block;
-     width: 100%;
-     height: 100%;
-     padding: 0;
-     border: none;
-     background-color: #f1f1f1;
-}
-/* The button class used for the buttons in the timeline. HOVER */
-.timelinebutton:hover{
-    background-color: #f1f1f1;
-    cursor: pointer;
-
-}
-/* The button class used for the buttons in the timeline. IMAGE */
-.timelinebutton img{
-    display: block;
-     width: 100%;
-     height: 100%;
-}
 /* The div showing the current date. */
 .timelinedate{
-    font-size: 30px;
+    font-size: 60px;
     text-align: center;
-    height: 50%;
-    width: 20%;
+    width: 100%;
+    padding-top: 15px;
 
     /* Center content*/
     margin: auto;
@@ -223,7 +186,7 @@
 .contentdiv {
   float: left;
   padding: 10px;
-  height: 1120px;
+  height: 1240px;
   text-align: center;
   background-color: green;
   margin-bottom: 50px;
@@ -424,16 +387,34 @@
   padding: 10px;
   cursor: move;
   width: 100%;
-  height: 100px;
+  height: 140px;
 }
 /* Dragable Gauges  OVER*/
 .gauge.over {
   border: 3px dotted #666;
 }
-/* The Gauges themselves */
-.gaugemeter{
+/* The full gauge MAX WIDTH */
+.gaugemeterfull{
     width: 100%;
     height: 30px;
+    background-color: #003300;
+    border-radius: 25px;
+    border: 2px solid black;
+
+}
+/* The current gauge value CURRENT WIDTH*/
+.gaugemeter{
+    width: 50%;
+    height: 26px;
+    background-color: #007300;
+    border-radius: 25px;
+
+    -webkit-transition: all 0.5s ease-in-out;
+    transition: all 0.5s ease-in-out;
+}
+#admingauge_productionstatus_text{
+
+    font-size: 30px;
 }
 
 
@@ -444,14 +425,20 @@
     margin-top: 10%;
     float: left;
     width: 100%;
-    height: 280px;
+    height: 200px;
     background-color: #D8D8D8;
 
     border: 3px solid #666;
     border-radius: .5em;
     padding: 10px;
 
+     line-height: 0.3;
+
+
 }
+
+
+
 #statustext{
 
     color: green;
@@ -480,7 +467,7 @@
 
     margin-left: 10%;
     float: left;
-    width: 30%;
+    width: 50%;
     height: 300px;
     background-color: #f1f1f1;
 
@@ -493,7 +480,7 @@
 
     margin-right: 10%;
     float: left;
-    width: 20%;
+    width: 30%;
     height: 300px;
     background-color: #979797;
 

@@ -128,6 +128,11 @@ function updateRawSimulatorDataOutput(simulatorData) {
 	document.getElementById("rawDataOutput_OUTPUT1").innerHTML = output1;
 	document.getElementById("rawDataOutput_OUTPUT2").innerHTML = output2;
 	document.getElementById("rawDataOutput_OUTPUT3").innerHTML = output3;
+
+	// Set the text in the top bar
+	document.getElementById("datetext").innerHTML = simulatorData.timestamp;
+
+
     // Om man vill göra ett flöde med alla timestamps, funkar ej dock.
   /*  div = document.getElementById('rawdataoutputdiv');
     div.insertAdjacentHTML('afterbegin', '<div>' + dateoutput + '<hr></div>');
@@ -143,7 +148,7 @@ function updateUserGauges(simulatorData) {
 	var maxValue = 25.0;
 	var maxValueWindSpeed = 10.0;
 	var maxValueNetProduction = 30.0;
-	var MaxValueBuffer = 30.0;
+	var MaxValueBuffer = 300.0;
 
 
 	try {
@@ -221,25 +226,11 @@ function updateUserSliders() {
 
 }
 
-// Only Updates once each tick.
-function updateAdminSliders(simulatorData) {
-/*
-    var price = document.getElementById("currentelectricityprice").value;
-    document.getElementById("currentelectricitypriceText").innerHTML = price;
-
-    var prod = document.getElementById("powerplantproduction").value;
-    document.getElementById("powerplantproductionText").innerHTML = prod;
-
-    var marketRatio = document.getElementById("marketRatio").value;
-    document.getElementById("marketRatioText").innerHTML = marketRatio;
-*/
-}
 
 function updateAll(updater, chart, startx, starty, delta, bufferSize=10) {
 
 	fetchDataCycle().then(value => {
 		updateGraph(chart, startx, starty, bufferSize = 10);
-		//var simulatorData = value;
 		updateRawSimulatorDataOutput(value);
 		updateUserGauges(value);
 		updateUserSliders();

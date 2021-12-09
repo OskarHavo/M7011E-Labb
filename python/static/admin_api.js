@@ -35,30 +35,69 @@ const put = (url,params) => request(url,params,"PUT");
 
 function updateRawSimulatorDataOutput(simulatorData) {
 
-	try {
-		productionoutput = "Production: " + simulatorData.production.substring(0, 4) + "kWh";
-		consumptionoutput = "Consumption: " + simulatorData.consumption.substring(0, 4) + "kWh";
-		bufferoutput = "Buffer: " + simulatorData.buffer.substring(0, 4) + "kWh";
-		demand = "Customer demand: " + simulatorData.demand.substring(0, 4);
+	// Set the text in the top bar
+	document.getElementById("datetext").innerHTML = simulatorData.timestamp;
 
-		dateoutput = String(timeoutput);
-		output1 = String(productionoutput + " " + consumptionoutput);
-		output2 = String(bufferoutput);
-		output3 = String(demand);
-	}catch(error) {
-		dateoutput = "No Data";
-		output1 = "";
-		output2 = "";
-		output3 = "";
-		output4 = "";
-	}
-
-	//TODO Gör vad du vill med värdena. Just nu ska dom skrivas ut i loggen.
-    //document.getElementById("rawDataOutput_DATE").innerHTML = dateoutput; //JSON.stringify(output,null,4);
-	//document.getElementById("rawDataOutput_OUTPUT1").innerHTML = output1;
-	//document.getElementById("rawDataOutput_OUTPUT2").innerHTML = output2;
-	//document.getElementById("rawDataOutput_OUTPUT3").innerHTML = output3;
 }
+
+function updateAdminGauges(simulatorData) {
+
+	// Max Value of gauges
+	var maxValue = 25.0;
+	var maxValuePrice = 300.0;
+	var MaxValueDemand = 100.0;
+
+
+	try {
+		// First Value is a string showing the formatted value. Used for the string showing the value.
+		// Second Value is a string showing the percentage of the total value that the current value is. Used for the gauge.
+
+		production = simulatorData.production.substring(0, 5);
+		productionoutput = String((production / maxValue) * 100.0);
+
+		productionstatus = simulatorData.running.substring(0, 5);
+
+		marketdemand = simulatorData.demand.substring(0, 5);
+		marketdemandoutput = String((marketdemand / MaxValueDemand) * 100.0);
+
+		modelledelectrictyprice = simulatorData.price.substring(0, 5);
+		modelledelectrictypriceoutput = String((modelledelectrictyprice / maxValuePrice) * 100.0);
+
+		document.getElementById("admingauge_production").style.width = productionoutput + "%";
+		document.getElementById("admingauge_production_text").innerHTML = production + "kWh";
+
+        document.getElementById("admingauge_productionstatus_text").innerHTML = productionstatus;
+
+		document.getElementById("admingauge_marketdemand").style.width = marketdemandoutput + "%";
+		document.getElementById("admingauge_marketdemand_text").innerHTML = marketdemand + "%";
+
+		document.getElementById("admingauge_modelledprice").style.width = modelledelectrictypriceoutput + "%";
+		document.getElementById("admingauge_modelledprice_text").innerHTML = modelledelectrictyprice + "kr";
+
+		// Set color to red if stopped.
+		if (productionstatus = false) {
+			document.getElementById("admingauge_productionstatus_text").style.color = '#c70000';
+		} else {
+			document.getElementById("admingauge_productionstatus_text").style.color = '#007300';
+		}
+
+	} catch(error) {
+	    console.log(error);
+		production = "";
+		productionoutput = "";
+
+		productionstatus = "";
+
+		marketdemand = "";
+		marketdemandoutput = "";
+
+		modelledelectrictyprice = "";
+		modelledelectrictypriceoutput = "";
+
+	}
+}
+
+
 
 // Only Updates once each tick.
 function updateAdminSliders(simulatorData) {
@@ -78,6 +117,7 @@ function updateAll(updater, delta, bufferSize=10) {
 	fetchDataCycle().then(value => {
 		//var simulatorData = simData[simData.length - 1];
 		updateRawSimulatorDataOutput(value);
+		updateAdminGauges(value);
 		updateAdminSliders(value);
 
 		//uploadData("buyRatio",buyRatio);

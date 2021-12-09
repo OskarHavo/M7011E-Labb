@@ -28,8 +28,8 @@
 
 	<div class="timelinecontainer">
 
-		<div class =  "timelinedate">
-        	<h1>2021/01/01</h1>
+		<div class =  "timelinedate" id="datetext">
+        	<h1>error</h1>
    		</div>
 
 
@@ -248,46 +248,53 @@
 
 
 				<div draggable="true" class="gauge">
-					<p>Power Plant Production </p>
-					<meter class="gaugemeter" value="2" min="0" max="10"></meter>
+					<p>POWER PLANT PRODUCTION</p>
+					<div class ="gaugemeterfull">
+						<div class="gaugemeter" id="admingauge_production"></div>
+					</div>
+					<p id="admingauge_production_text"></p>
 				</div>
 
 
 
 				<div draggable="true" class="gauge">
-					<p>Power Plant Status</p>
-					<p id="statustext"> ONLINE/RUNNING/STOPPED </p>
+					<p>POWER PLANT STATUS</p>
+					<p id="admingauge_productionstatus_text"></p>
 				</div>
 
 
 				<div draggable="true" class="gauge">
 					<p>MARKET DEMAND</p>
-					<meter class="gaugemeter" value="8" min="0" max="10"></meter>
+					<div class ="gaugemeterfull">
+						<div class="gaugemeter" id="admingauge_marketdemand"></div>
+					</div>
+					<p id="admingauge_marketdemand_text"></p>
 
 				</div>
 
 				<div draggable="true" class="gauge">
 					<p>MODELLED ELECTRICITY PRICE</p>
-					100kr
+					<div class ="gaugemeterfull">
+						<div class="gaugemeter" id="admingauge_modelledprice"></div>
+					</div>
+					<p id="admingauge_modelledprice_text"></p>
 
 				</div>
-				<div draggable="true" class="gauge">
+				<div draggable="true" class="gauge" >
 					<p>CURRENT ELECTRICITY PRICE</p>
-					101kr
+					<input type="range" min="1" max="300" value="100" class="slider" id="currentelectricityprice">
+					<p id="currentelectricitypriceText">2</p>
 
 				</div>
 
 			<div class="slidercontainer">
-				<p>Current Electricity Price Slider</p>
-				<input type="range" min="1" max="100" value="50" class="slider" id="currentelectricityprice">
-				<p id="currentelectricitypriceText">2</p>
 
 				<p>Power Plant Production  Slider</p>
-				<input type="range" min="1" max="100" value="50" class="slider" id="powerplantproduction">
+				<input type="range" min="0" max="100" value="100" class="slider" id="powerplantproduction">
 				<p id="powerplantproductionText">1</p>
 
 				<p>Market/Buffer Slider</p>
-				<input type="range" min="1" max="100" value="50" class="slider" id="marketRatio">
+				<input type="range" min="0" max="100" value="50" class="slider" id="marketRatio">
 				<p id="marketRatioText">2</p>
 
 			</div>

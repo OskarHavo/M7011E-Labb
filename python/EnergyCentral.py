@@ -1,6 +1,8 @@
 import threading
 from time import sleep
 import dataGeneration
+import datetime
+
 class EnergyCentral:
     def __init__(self, maxCapacity,delta):
         self.currentCapacity = maxCapacity
@@ -12,6 +14,7 @@ class EnergyCentral:
         self.buffer = 0
         self.marketDemand = 0
         self.electricityPrice = 0
+        self.date = datetime.datetime.now()
         self.mutex = threading.Lock()
         self.delta = delta
     def getAvailableEnergy(self):
@@ -54,6 +57,11 @@ class EnergyCentral:
             elif valueName == "price":
                 self.electricityPrice = value
 
+    def updateTime(self):
+        date = datetime.datetime.now()
+        formattedDate = date - datetime.timedelta(microseconds=date.microsecond) # Ensures only 2 digits for seconds
+        self.date = formattedDate
+
     def getCurrentData(self):
         with self.mutex:
             return {
@@ -62,9 +70,12 @@ class EnergyCentral:
                 "sellRatio":str(self.sellRatio),
                 "running":str(self.running),
                 "buffer":str(self.buffer),
+                "price":str(self.electricityPrice),
+                "timestamp":str(self.date),
                 "demand":str(self.marketDemand)}
 
     def tick(self):
+        self.updateTime()
         if not self.running:
             self.currentCapacity = 0
         self.currentConsumption = 0
