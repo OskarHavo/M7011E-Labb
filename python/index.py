@@ -281,7 +281,10 @@ def adminDash():
 
 @app.route("/admin_dashboard/<username>")
 def adminDash2(username):
-    user = User(username,"")
+    user = User(username, "")
+    user.postalcode = "97753"
+    user.validated = True
+    session["user"] = user.toJSON()
     if user:
         return render_template("admin_dashboard.html",user=user.name)
     else:
