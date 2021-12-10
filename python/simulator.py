@@ -89,7 +89,7 @@ class NodeManager:
 
 
 class SimulationManager:
-    def __init__(self,globalDelta,database,availableEnergy = 2):
+    def __init__(self,globalDelta,database,availableEnergy = 10):
         self.productionNodes = {}   # Username, thread
         self.delta = globalDelta
         self.bus = MessageBus("http://localhost:4242")

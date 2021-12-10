@@ -83,7 +83,7 @@ class EnergyCentral:
             self.currentConsumption = self.currentConsumption + client.getPurchaseVolume()
 
         if self.running:
-            self.marketDemand = self.currentConsumption / self.currentCapacity
+            self.marketDemand = (self.currentConsumption / self.currentCapacity)*100.0
         else:
             self.marketDemand = 1
         self.buffer = self.buffer + self.maxCapacity - self.currentConsumption

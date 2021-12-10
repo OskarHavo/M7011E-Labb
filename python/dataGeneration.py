@@ -221,7 +221,7 @@ def generateDailyPowerProduction(date, startDate, areaCode):
     # These ranges create a healthy range of the total NetEnergyProduction. (Kan inte randomiza för varje call, man får nog randomiza 1 gång per hus och föra in det som inparameter)
     A = 14  # random.randint(10, 12)  # Amplitude (Max/Min Value)
     f = 0.01  # Frequency
-    B = areaCode  # Phase  (Adjust for location)
+    B = areaCode/10  # Phase  (Adjust for location)
     C = A * 1.5  # Makes sure the values are not too low and/or negative  ##Check so randomizing the afb values does it make it negative in some config
 
     powerProduction = A * math.sin(2.0 * math.pi * f * np.float64(i) + B) + C  # Sinuswave
@@ -236,7 +236,7 @@ def calculateDailyEnergyPrice(producedEnergy, consumedEnergy):
     # Low Consumption & High Producing -> High Price
 
     basePrice = 10.0
-    maxPrice = 300.0
+    maxPrice = 50.0
 
     # Introduce price cap to combat infinite energy prices when windmills break.
     if (producedEnergy == 0):
