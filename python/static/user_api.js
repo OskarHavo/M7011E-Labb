@@ -146,9 +146,10 @@ function updateUserGauges(simulatorData) {
 
 	// Max Value of gauges
 	var maxValue = 25.0;
+	var maxPriceValue = 50.0;
 	var maxValueWindSpeed = 10.0;
 	var maxValueNetProduction = 30.0;
-	var MaxValueBuffer = 300.0;
+	var MaxValueBuffer = 100.0;
 
 
 	try {
@@ -170,7 +171,7 @@ function updateUserGauges(simulatorData) {
 		bufferoutput = String((buffer / MaxValueBuffer) * 100.0);
 
 		currentelectrictyprice = simulatorData.electricityPrice.substring(0, 5);
-		currentelectrictypriceoutput = String((currentelectrictyprice / maxValue) * 100.0);
+		currentelectrictypriceoutput = String((currentelectrictyprice / maxPriceValue) * 100.0);
 
 		document.getElementById("usergauge_consumption").style.width = consumptionoutput + "%";
 		document.getElementById("usergauge_consumption_text").innerHTML = String(consumption) + "kWh";
@@ -217,11 +218,11 @@ function updateUserSliders() {
 
     var buyRatio = document.getElementById("buyingRatio").value;
 	uploadData("buyRatio",parseFloat(buyRatio)/100);
-    document.getElementById("buyingRatioText").innerHTML = buyRatio;
+    document.getElementById("buyingRatioText").innerHTML = buyRatio+"%";
 
     var sellRatio = document.getElementById("sellingRatio").value;
 	uploadData("sellRatio",parseFloat(sellRatio)/100);
-    document.getElementById("sellingRatioText").innerHTML = sellRatio;
+    document.getElementById("sellingRatioText").innerHTML = sellRatio+"%";
 
 
 }

@@ -9,7 +9,7 @@ class EnergyCentral:
         self.maxCapacity = maxCapacity
         self.currentConsumption = 0
         self.clients = []
-        self.running = True
+        self.running = 10 # 0 = Stopped 1-9 = Starting 10 = Running
         self.sellRatio = 1
         self.buffer = 0
         self.marketDemand = 0
@@ -51,9 +51,9 @@ class EnergyCentral:
             if valueName == "sellRatio":
                 self.sellRatio = value;
             elif valueName == "stop":
-                self.running = False
+                self.running = 0
             elif valueName == "start":
-                self.running = True
+                self.running = 1
             elif valueName == "price":
                 self.electricityPrice = value
 
@@ -95,11 +95,12 @@ class EnergyCentral:
 
     def stop(self):
         with self.mutex:
-            self.running = False
+            self.running = 0
 
     def run(self):
         with self.mutex:
-            self.running = True
+            self.running = 10
+            # Fixa så den stegar upp osv :)
         while True:
             with self.mutex:
                 if not self.running:

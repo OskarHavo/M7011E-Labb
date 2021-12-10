@@ -107,7 +107,7 @@
 
 
 		<div class="contentdiv middle">
-			<h1>Profile Page</h1>
+			<h1>Admin Page</h1>
 
 			<div class = "adminboxcontainer">
 				<div class = "adminphotocontainer">
@@ -118,8 +118,7 @@
 					<h2>Admin Name</h2>
 					<p>Mr Admin</p>
 
-					<h2>Admin of the Year</h2>
-					<p>10 times</p>
+
 
 					<div class="uploadadminphotobuttoncontainer">
 						<button class="uploadbutton" onclick="upload()">Upload New Admin Photo</button>
@@ -222,26 +221,6 @@
 		<div class="contentdiv right">
 			<h1>Monitoring Panel</h1>
 
-				<div class = "powerplantformcontainer">
-					<form action="/action_page.php" id="powerplantform">
-
-						<label for="powerplant">Select a Powerplant:</label>
-						<br>
-						<select id="powerplant" name="powerplantlist" form="powerplantform">
-							<option value="Powerplant1">Powerplant1</option>
-							<option value="Powerplant1">Powerplant2</option>
-							<option value="Powerplant1">Powerplant3</option>
-							  <--! Ladda in dynamisk namnen på powerplants? -->
-						</select>
-
-
-							<br>
-						<input class="powerplantformbutton" value="Select Powerplant"type="submit">
-					</form>
-
-
-
-
 			<div class="gaugecontainer">
 
 
@@ -282,7 +261,7 @@
 				</div>
 				<div draggable="true" class="gauge" >
 					<p>CURRENT ELECTRICITY PRICE</p>
-					<input type="range" min="1" max="300" value="100" class="slider" id="currentelectricityprice">
+					<input type="range" min="1" max="50" value="10" class="slider" id="currentelectricityprice">
 					<p id="currentelectricitypriceText">2</p>
 
 				</div>

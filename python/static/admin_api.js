@@ -43,8 +43,8 @@ function updateRawSimulatorDataOutput(simulatorData) {
 function updateAdminGauges(simulatorData) {
 
 	// Max Value of gauges
-	var maxValue = 25.0;
-	var maxValuePrice = 300.0;
+	var maxValue = 30.0;
+	var maxValuePrice = 50.0;
 	var MaxValueDemand = 100.0;
 
 
@@ -55,7 +55,7 @@ function updateAdminGauges(simulatorData) {
 		production = simulatorData.production.substring(0, 5);
 		productionoutput = String((production / maxValue) * 100.0);
 
-		productionstatus = simulatorData.running.substring(0, 5);
+		productionstatus = simulatorData.running.substring(0, 3);
 
 		marketdemand = simulatorData.demand.substring(0, 5);
 		marketdemandoutput = String((marketdemand / MaxValueDemand) * 100.0);
@@ -66,7 +66,7 @@ function updateAdminGauges(simulatorData) {
 		document.getElementById("admingauge_production").style.width = productionoutput + "%";
 		document.getElementById("admingauge_production_text").innerHTML = production + "kWh";
 
-        document.getElementById("admingauge_productionstatus_text").innerHTML = productionstatus;
+
 
 		document.getElementById("admingauge_marketdemand").style.width = marketdemandoutput + "%";
 		document.getElementById("admingauge_marketdemand_text").innerHTML = marketdemand + "%";
@@ -74,12 +74,20 @@ function updateAdminGauges(simulatorData) {
 		document.getElementById("admingauge_modelledprice").style.width = modelledelectrictypriceoutput + "%";
 		document.getElementById("admingauge_modelledprice_text").innerHTML = modelledelectrictyprice + "kr";
 
-		// Set color to red if stopped.
-		if (productionstatus = false) {
+		// Set color to red if stopped. Yellow if starting. Green if Running.
+		if (parseInt(productionstatus) == 0) {
 			document.getElementById("admingauge_productionstatus_text").style.color = '#c70000';
-		} else {
+			productionstatusoutput = "Stopped";
+		} else if(parseInt(productionstatus) == 10) {
 			document.getElementById("admingauge_productionstatus_text").style.color = '#007300';
+			productionstatusoutput = "Running";
+		}else{
+		    document.getElementById("admingauge_productionstatus_text").style.color = '#FFD400';
+			productionstatusoutput = "Starting";
 		}
+
+
+		 document.getElementById("admingauge_productionstatus_text").innerHTML = productionstatusoutput;
 
 	} catch(error) {
 	    console.log(error);
@@ -103,13 +111,13 @@ function updateAdminGauges(simulatorData) {
 function updateAdminSliders(simulatorData) {
 
     var price = document.getElementById("currentelectricityprice").value;
-    document.getElementById("currentelectricitypriceText").innerHTML = price;
+    document.getElementById("currentelectricitypriceText").innerHTML = price+"kr";
 
     var prod = document.getElementById("powerplantproduction").value;
-    document.getElementById("powerplantproductionText").innerHTML = prod;
+    document.getElementById("powerplantproductionText").innerHTML = prod+"%";
 
     var marketRatio = document.getElementById("marketRatio").value;
-    document.getElementById("marketRatioText").innerHTML = marketRatio;
+    document.getElementById("marketRatioText").innerHTML = marketRatio+"%";
 
 }
 
