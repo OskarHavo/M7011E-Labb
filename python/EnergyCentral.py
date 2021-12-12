@@ -9,7 +9,7 @@ class EnergyCentral:
         self.maxCapacity = maxCapacity
         self.currentConsumption = 0
         self.clients = []
-        self.running = 10 # 0 = Stopped 1-9 = Starting 10 = Running
+        self.running = 0 # 0 = Stopped 1-9 = Starting 10 = Running
         self.sellRatio = 1
         self.buffer = 0
         self.marketDemand = 0
@@ -18,7 +18,7 @@ class EnergyCentral:
         self.mutex = threading.Lock()
         self.delta = delta
     def getAvailableEnergy(self):
-        if not self.running:
+        if self.running == 0:
             if len(self.clients) == 0:
                 return self.buffer
             return self.buffer/float(len(self.clients))
@@ -76,16 +76,21 @@ class EnergyCentral:
 
     def tick(self):
         self.updateTime()
-        if not self.running:
-            self.currentCapacity = 0
         self.currentConsumption = 0
         for client in self.clients:
             self.currentConsumption = self.currentConsumption + client.getPurchaseVolume()
 
-        if self.running:
+        self.currentCapacity = self.sellRatio*self.maxCapacity
+        if self.running < 10:
+            self.currentCapacity = self.buffer
+            if self.running > 0:
+                self.running = self.running + 1
+
+        self.marketDemand = 1
+        if self.currentCapacity > 0:
             self.marketDemand = (self.currentConsumption / self.currentCapacity)*100.0
-        else:
-            self.marketDemand = 1
+
+
         self.buffer = self.buffer + self.maxCapacity - self.currentConsumption
         print(self.currentConsumption, "   ", self.marketDemand)
         self.electricityPrice = dataGeneration.calculateDailyEnergyPrice(self.currentCapacity,self.currentConsumption)
@@ -99,11 +104,10 @@ class EnergyCentral:
 
     def run(self):
         with self.mutex:
-            self.running = 10
-            # Fixa så den stegar upp osv :)
+            self.running = 1
         while True:
             with self.mutex:
-                if not self.running:
+                if self.running == 0:
                     break
                 self.tick()
             sleep(self.delta)
