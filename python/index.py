@@ -255,10 +255,10 @@ def signup():
 @app.route(userDashboardDir)
 def userDash():
     user = checkSession()
-    if user:
-        return render_template("user_dashboard.html",user=user.name)
-    else:
-        return redirect(indexDir)
+    ##if user:
+    return render_template("user_dashboard.html",user="demo")
+    ##else:
+    ##    return redirect(indexDir)
 
 @app.route("/user_dashboard/<username>")
 def userDash2(username):
