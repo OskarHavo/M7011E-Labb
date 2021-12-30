@@ -18,7 +18,7 @@ class EnergyCentral:
         self.mutex = threading.Lock()
         self.delta = delta
     def getAvailableEnergy(self):
-        if self.running == 0:
+        if self.running < 10:
             if len(self.clients) == 0:
                 return self.buffer
             return self.buffer/float(len(self.clients))
@@ -85,18 +85,20 @@ class EnergyCentral:
             self.currentCapacity = self.buffer
             if self.running > 0:
                 self.running = self.running + 1
+            self.buffer = self.buffer - self.currentConsumption
+        else:
+            self.buffer = self.buffer + self.maxCapacity - self.currentConsumption
 
+        print(self.currentConsumption, "   ", self.marketDemand, "   ", self.currentCapacity, "   ", self.running)
         self.marketDemand = 1
         if self.currentCapacity > 0:
             self.marketDemand = (self.currentConsumption / self.currentCapacity)*100.0
 
 
-        self.buffer = self.buffer + self.maxCapacity - self.currentConsumption
-        print(self.currentConsumption, "   ", self.marketDemand)
+
+
         self.electricityPrice = dataGeneration.calculateDailyEnergyPrice(self.currentCapacity,self.currentConsumption)
 
-        # Update current capacity for the next tick
-        self.currentCapacity = self.maxCapacity * self.sellRatio
 
     def stop(self):
         with self.mutex:

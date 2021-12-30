@@ -461,7 +461,7 @@ border: 3px solid #666;
 /********************************** MIDDLE **********************************/
 
 /* The div containing the house image.*/
-.houseimagecontainer{
+#houseimagecontainer{
 
     margin-left: 10%;
     float: left;

@@ -4,16 +4,30 @@ function genTimeChart(chartName,minimum,maximum) {
 		data: {
 			labels: [],
 			datasets: [{
+				label: "Consumption",
 				fill: false,
 				backgroundColor: "rgb(0,0,255,1.0)",
 				borderColor: "rgb(200,192,80)",
 				pointBackgroundColor: 'rgba(180,172,60,0.3)',
 				tension:0.2,
 				data: []
+			},
+			{
+				label:"Production",
+				fill: false,
+				backgroundColor: "rgb(0,0,255,1.0)",
+				borderColor: "rgb(20,30,100)",
+				pointBackgroundColor: 'rgba(30,50,120,0.3)',
+				tension:0.2,
+				data: []
 			}]
 		},
 		options: {
-			legend: {display: false},
+			plugins: {
+				legend: {
+					position: 'top',
+				},
+			},
 			scales: {
 				yAxes: [{ticks: {min: 0, max:maximum}}],
 			}
@@ -24,8 +38,11 @@ function genTimeChart(chartName,minimum,maximum) {
 //var chart = genTimeChart("mychart",-20,20);
 function addData(chart, label, data) {
 	chart.data.labels.push(label);
+	var i = 0;
 	chart.data.datasets.forEach((dataset) => {
-		dataset.data.push(data);
+		console.log(data["Consumption"]);
+		dataset.data.push(data[i]);
+		i ++;
 	});
 
 }
@@ -78,12 +95,22 @@ function updateGraph(chart,startx,starty,bufferSize=10) {
 	if (simData.length > 0) {
 		var i = k;
 		k = k + 1;
-		var data = simData[simData.length - 1]["consumption"];
-		addData(chart, i, data);
+		var data = simData[simData.length - 1];
+
+		var d = new Date(data.timestamp+"Z");
+		chart.data.labels.push(d.getUTCHours()+":"+d.getUTCMinutes()+":"+d.getUTCSeconds());
+		chart.data.datasets[0].data.push(data["consumption"]);
+		chart.data.datasets[1].data.push(data["production"]);
+		//addData(chart, i, data);
 		if (chart.data.labels.length > bufferSize) {
 			removeFirst(chart);
 		}
 		var maximum = Math.max.apply(null, chart.data.datasets[0].data);
+		var prodMax = Math.max.apply(null, chart.data.datasets[1].data);
+		if (prodMax > maximum) {
+			maximum = prodMax;
+		}
+
 		chart.options.scales.yAxes = [{ticks: {min: 0, max: maximum}}];
 		startx++;
 		starty += Math.floor(Math.random() * 10) - 4;
@@ -214,27 +241,30 @@ function updateUserGauges(simulatorData) {
 }
 
 // Only Updates once each tick.
-function updateUserSliders() {
+function updateUserSliders(simulatorData) {
 
-    var buyRatio = document.getElementById("buyingRatio").value;
-	uploadData("buyRatio",parseFloat(buyRatio)/100);
+    var buyRatio = parseFloat(simulatorData.buyRatio)*100;
     document.getElementById("buyingRatioText").innerHTML = buyRatio+"%";
+	document.getElementById("buyRatio").value = buyRatio;
 
-    var sellRatio = document.getElementById("sellingRatio").value;
-	uploadData("sellRatio",parseFloat(sellRatio)/100);
+    var sellRatio = parseFloat(simulatorData.sellRatio)*100;
+	document.getElementById("sellRatio").value = sellRatio;
     document.getElementById("sellingRatioText").innerHTML = sellRatio+"%";
-
-
 }
 
 
-function updateAll(updater, chart, startx, starty, delta, bufferSize=10) {
+function startStreaming(socket, chart, startx, starty, delta, bufferSize=10) {
+	socket.emit('start stream', {data: 'I\'m connected!'}, (data) => {
+		console.log("started stream ack");
+	});
 
-	fetchDataCycle().then(value => {
+	socket.on("stream partition", function (value, callback) {
+		simData.push(value);
+		console.log(value);
 		updateGraph(chart, startx, starty, bufferSize = 10);
 		updateRawSimulatorDataOutput(value);
 		updateUserGauges(value);
-		updateUserSliders();
-		updater = setTimeout(updateAll, delta * 1000, updater, chart, startx, starty, delta, bufferSize);
+		updateUserSliders(value);
+		setTimeout(callback, 10000);
 	});
 }

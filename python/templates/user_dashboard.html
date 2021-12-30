@@ -6,6 +6,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 	<script src="/static/user_api.js"></script>
 	<script src="/static/dragablegauges.js"></script>
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
 	<link rel="stylesheet" href="/static/user_dashboard.css">
 
 </head>
@@ -141,9 +142,16 @@
 		<div class="contentdiv middle">
 			<h1>Household Panel</h1>
 
-			<div class = "houseimagecontainer">
+			<div id="houseimagecontainer">
 					<img src="/static/assets/uploadedPictures/houses/houseexample.jpg" width="100%" height = 100%>
-
+                <script>
+                    /*
+                    post('/fetch', {}).then(response => {
+                        console.log(response);
+                        document.getElementById("houseimagecontainer").src = response["image"];
+                    });
+*/
+                </script>
 			</div>
 			<div class ="houseinformationcontainer">
 				<h3>Household Name</h3>
@@ -241,11 +249,11 @@
 			<div class="slidercontainer">
 
 				<p>Buying/Buffer Ratio Slider</p>
-				<input type="range" min="0" max="100" value="50" class="slider" id="buyingRatio">
+				<input type="range" min="0" max="100" value="50" class="slider" id="buyRatio">
 				<p id="buyingRatioText"></p>
 
 				<p>Selling/Buffer Ratio Slider</p>
-				<input type="range" min="0" max="100" value="50" class="slider" id="sellingRatio">
+				<input type="range" min="0" max="100" value="50" class="slider" id="sellRatio">
 				<p id="sellingRatioText"></p>
 
 			</div>
@@ -262,9 +270,27 @@
 	<!--  Simulator Updater-->
 	<script>
 		var con = genTimeChart("consumption",0,200);
-		var conUpdater;
-		updateAll(conUpdater,con,1,100,10,20);
-	</script>
+        //var conUpdater;
+        var socket = io();
+
+        socket.on('connect', function() {
+            startStreaming(socket,con,1,100,10,20);
+        });
+/*
+        socket.on("stream partition",function (data,callback){
+            console.log(data);
+            setTimeout(callback,5000);
+            //callback();
+        })
+ */
+/*
+        socket.on("server response", function (msg) {
+            console.log("received server ack!")
+            //console.log(msg);
+        });
+
+ */
+    </script>
 
 
 </body>

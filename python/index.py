@@ -3,6 +3,7 @@ from flask import render_template
 import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
+from flask_socketio import SocketIO
 
 import simulator
 from simulator import *
@@ -50,7 +51,8 @@ def fetchKey():
 host = "0.0.0.0"
 app = Flask(__name__)
 app.secret_key = fetchKey()
-app.permanent_session_lifetime = timedelta(minutes=10)
+app.permanent_session_lifetime = timedelta(minutes=999)
+socketio = SocketIO(app)
 
 global temporaryDatabase
 temporaryDatabase = Database()
@@ -67,7 +69,7 @@ def readUserFromDatabase(user):
             password="",
             database="M7011E")
         cursor = mydb.cursor(buffered=True)
-        cursor.execute("SELECT User,Password,Postalcode FROM User WHERE User='%s'" % (user)) ## TODO ADD POSTAL CODE TO THE SERVER
+        cursor.execute("SELECT User,Password,Postalcode FROM User WHERE User='%s'" % (user))
         row = cursor.fetchone()
         cursor.close()
         if row is not None:
@@ -77,6 +79,24 @@ def readUserFromDatabase(user):
         current_error.append(str(e))
         return None
 
+def fetchUserImage(username):
+    global current_error
+    try:
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user="Client",
+            password="",
+            database="M7011E")
+        cursor = mydb.cursor(buffered=True)
+        cursor.execute(
+            "SELECT Image FROM User WHERE User='%s'" % (username))
+        row = cursor.fetchone()
+        cursor.close()
+        if row is not None:
+            return row
+        return None
+    except Exception as e:
+        current_error.append(str(e))
 
 def writeUserToDatabase(user, password):
     global current_error
@@ -123,7 +143,7 @@ def alterUserInDatabase(newUser,oldUser,newPassword):
 
 
 class User:
-    def __init__(self, username,postalcode=None, password=None):
+    def __init__(self, username,password=None,postalcode=97753):
         if password == None:
             try:
                 self.name = username["user"]
@@ -131,7 +151,7 @@ class User:
                 self.validated = username["valid"]
                 self.postalcode = username["postalcode"]
             except:
-                self.name = ""
+                self.name = username
                 self.password = ""
                 self.postalcode = ""
                 self.validated = False
@@ -329,8 +349,8 @@ def settings():
 # TODO User verification
 @app.route("/fetch",methods = ['POST', 'GET','PUT'])
 def fetch():
+    user = checkSession()
     if request.method == "POST":
-        user = checkSession()
         if not user:
             return "{}"
         #postalCode = request.values.json["postalCode"]
@@ -344,17 +364,18 @@ def fetch():
                 temporaryDatabase.remove(user.name)
         return jsonify({"data":request.args.get("username")})
     elif request.method == "GET":
-        user = checkSession()
         if user:
-            if not temporaryDatabase.get(user.name):
-                temporaryDatabase.new(user.name)
-                manager.startNode(user.name, int(user.postalcode), [-1, 1], [-1, 1])
-            return jsonify(temporaryDatabase.get(user.name)[-1])
+            data = fetchUserImage(user.name)
+            if data:
+                return jsonify({"image":data[0]})
+            #if not temporaryDatabase.get(user.name):
+            #    temporaryDatabase.new(user.name)
+            #    manager.startNode(user.name, int(user.postalcode), [-1, 1], [-1, 1])
+            #return jsonify(temporaryDatabase.get(user.name)[-1])
         else:
             print("Invalid user!!!")
             return "{}"
     elif request.method == "PUT":
-        user = checkSession()
         if user:
         #username = request.values.get("username")
             valueName = request.json["valueName"]
@@ -378,33 +399,36 @@ def fetch_admin():
         return "{}"
     else:
         return "{}"
-"""
-@app.route("/fetch",methods=['POST', 'GET'])
-def fetch():
-    if checkSession() == None:
-        redirect(indexDir)
-    if request.method == 'GET':
-        global counter
-        data = {
-            "time": counter,
-            "value":random.randint(0,100)
-        }
-        counter = counter+1
-        return json.dumps(data)
+
+def stream_data():
+    user = checkSession()
+    if user:
+        if not temporaryDatabase.get(user.name):
+            temporaryDatabase.new(user.name)
+            manager.startNode(user.name, int(user.postalcode), [-1, 1], [-1, 1])
+        socketio.emit("stream partition", temporaryDatabase.get(user.name)[-1], callback=stream_data)
     else:
-        return "BAD REQUEST"
-"""
+        print("User",user.name,"tried to be sneaky and stream data!")
 
 
-def th():
-    while True:
-        sleep(10)
+@socketio.on("start stream")
+def start_stream(data):
+    stream_data()
+
+@socketio.on('connect')
+def socket_connect():
+    user = checkSession()
+    if user:
+        print("client", user.name, "connected :)")
+        #socketio.emit("server response",callback=ack)
+
+
+@socketio.on('disconnect')
+def socket_disconnect():
+    user = checkSession()
+    if user:
+        print("client",user.name,"disconnected :(")
 
 
 if __name__ == "__main__":
-    #manager.bus.POST({"username": "robyn", "postalCode": 97753, "function": "create"})
-    #temporaryDatabase.new("robyn")
-    #manager.startNode("robyn", int(97753), [-1, 1], [-1, 1])
-    #temporaryDatabase.new("Demo")
-    #manager.startNode("Demo", int(97753), [-1, 1], [-1, 1])
-    app.run(host)#, ssl_context='adhoc')
+    socketio.run(app,host=host)#, ssl_context='adhoc')
