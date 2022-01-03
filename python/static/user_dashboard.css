@@ -199,6 +199,8 @@
 
   border: 3px solid #666;
   border-radius: .5em;
+
+
 }
 /* Horizontal line under each title of each content div. */
 .contentdiv h1{
@@ -208,183 +210,21 @@
 
 
 
-/* The left content div*/
-.contentdiv.left {
-  width: 19%;
-  margin-left: 1%;
-   background-color: #f1f1f1;
-}
+
 
 /* The middle content div*/
 .contentdiv.middle {
-  width: 58%;
-  margin-left: 1%;
-  margin-right: 1%;
+  width: 59%;
+  margin-left: 10%;
   background-color: #D8D8D8;
 }
 
 /* The right content div*/
 .contentdiv.right {
   width: 19%;
+  margin-left: 2%;
   margin-right: 1%;
    background-color: #f1f1f1;
-}
-
-
-/********************************** LEFT **********************************/
-
-/* Friend List div */
-.friendlistdiv{
-    background-color: #D8D8D8;
-    float left;
-    width 96%;
-    margin: 2%;
-    height: 280px;
-
-    border: 3px solid #666;
-    border-radius: .5em;
-    padding: 10px;
-}
-
-/* Friend List H2 */
-.friendlistdiv h2{
-   text-align: center;
-   font-size 20px;
-}
-
-
-/* User List H2 */
-.userlistdiv h2{
-   text-align: center;
-   font-size 20px;
-}
-
-/* Table displaying Prosumer Data*/
-.usertable{
-    display: grid;
-    max-width: 100%;
-    background-color: #f1f1f1;
-     border: 3px solid #666;
-    border-radius: .5em;
-     border-collapse: collapse;
-    padding: 10px;
-
-     margin: auto;
-    display: flex;
-    justify-content: center
-
-}
-th,td{
-border: 3px solid #666;
-    border-radius: .5em;
-}
-
-
-
-/* Big Chat List div */
-.messagecentercontainer{
-    background-color: #D8D8D8;
-    float left;
-    margin-top: 3%;
-    width 100%;
-    height: 325px;
-
-    border: 3px solid #666;
-    border-radius: .5em;
-
-}
-/* Class for each of the chat priority divs */
-.messagecenterdiv{
-   background-color: #979797;
-    float left;
-    width 100%;
-    height: 240px;
-    margin-left: 5%;
-    margin-right: 5%;
-
-
-    border: 3px solid #666;
-    border-radius: .5em;
-
-}
-
-/* The light div meant for displaying messages. */
-.messagediv{
-    background-color: #f1f1f1;
-    float left;
-    width 100%;
-    height: 60px;
-    margin-left: 5%;
-    margin-right: 5%;
-        margin-top: 2%;
-
-
-    border: 3px solid #666;
-    border-radius: .5em;
-
-
-}
-.messageinput{
-
-    float left;
-    width 100%;
-    height: 100px;
-    margin-top: 10%;
-    resize: none;
-
-    border: 3px solid #666;
-    border-radius: .5em;
-
-
-}
-.messagecenterbutton{
-    height: 40px;
-    border: 3px solid #666;
-    border-radius: .5em;
-
-    margin-top: 1%;
-}
-
-
-/* Big Notifcation Center div */
-.notificationcentercontainer{
-    background-color: #D8D8D8;
-    float left;
-    width 100%;
-    height: 430px;
-    margin-top: 3%;
-
-    border: 3px solid #666;
-    border-radius: .5em;
-
-}
-/* Class for each of the chat priority divs */
-.notificationcenterdiv{
-   background-color: #979797;
-    float left;
-    width 100%;
-    height: 330px;
-    margin-left: 5%;
-    margin-right: 5%;
-    margin-bottom: 10px;
-
-    border: 3px solid #666;
-    border-radius: .5em;
-
-}
-
-
-.messageoutput{
-
-    float left;
-    width 100%;
-    height: 200px;
-
-
-    border: 3px solid #666;
-    border-radius: .5em;
-    resize: none;
-
 }
 
 
@@ -488,28 +328,42 @@ border: 3px solid #666;
     border-radius: .5em;
     padding: 10px;
 
+
 }
 
 /* Container for button used for uploading a new house picture for your house. */
 .uploadhousephotobuttoncontainer{
-    padding-top: 60px;
+    padding-top: 20px;
     margin: auto;
     display: flex;
     justify-content: center
     width: 30%
 
 
+
 }
+
+.deleteuserbuttoncontainer{
+    padding-top: 10px;
+    margin: auto;
+    display: left;
+    justify-content: center
+    width: 30%
+
+}
+
 
 /* The upload button*/
 .uploadbutton{
-    display: block;
+    display: left;
      width: 100%;
      height: 60px;
 
     border: 3px solid #666;
     border-radius: .5em;
     padding: 10px;
+
+
 }
 /* The upload button HOVER*/
 .uploadbutton:hover{

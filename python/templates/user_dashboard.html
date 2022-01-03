@@ -39,106 +39,6 @@
 
 	<div class ="contentcontainer">
 
-		<div class="contentdiv left">
-			<h1>Social Panel</h1>
-
-			<div class = "friendlistdiv">
-				<h2>Friends List</h2>
-
-					<table class="usertable">
-						<tr>
-							<th>UserID</th>
-							<th>Status</th>
-							<th>Zip Code</th>
-						</tr>
-
-						<tr>
-							<td>42</td>
-							<td>Offline</td>
-							<td>Go To</td>
-						</tr>
-
-						<tr>
-							<td>111</td>
-							<td>Offline</td>
-							<td>Go To</td>
-						</tr>
-
-						<tr>
-							<td>453</td>
-							<td>Online</td>
-							<td>Go To</td>
-						</tr>
-
-						<tr>
-							<td>13</td>
-							<td>BLACKOUT</td>
-							<td>Go To</td>
-						</tr>
-
-						<tr>
-							<td>87</td>
-							<td>Online</td>
-							<td>Go To</td>
-						</tr>
-
-					</table>
-				<!-- scrollbar -->
-			</div>
-
-
-			<div class = "messagecentercontainer">
-				<h2>Message Center</h2>
-
-				<div class = "messagecenterdiv">
-					<div class = "messagediv">
-						 <form action="/action_page.php" id="messageform">
-
-							 <label for="user">Choose a User:</label>
-							 <br>
-							<select id="user" name="userlist" form="messageform">
-							  <option value="User1">User1</option>
-							  <option value="User2">User2</option>
-							  <option value="User3">User3</option>
-							  <--! Ladda in dynamisk namnen på användare? -->
-							</select>
-
-							 <br>
-
-							 <textarea class="messageinput" rows="4" cols="18" name="message" form="messageform"></textarea>
-
-							 <br>
-							  <input class="messagecenterbutton" value="Send Message"type="submit">
-						 </form>
-
-							<br>
-
-
-					</div>
-
-				</div>
-
-
-			</div>
-
-
-			<div class = "notificationcentercontainer">
-				<h2>Notification Center</h2>
-
-				<div class = "notificationcenterdiv">
-					<h3>User Messages</h3>
-						<textarea class="messageoutput" rows="4" cols="18" name="message" form="messageform"></textarea>
-					   <input class="messagecenterbutton" value="Ack Message"type="submit">
-
-
-				</div>
-
-			</div>
-
-
-		</div>
-
-
 		<div class="contentdiv middle">
 			<h1>Household Panel</h1>
 
@@ -151,6 +51,14 @@
 
 				<h3>Zip Code</h3>
 				<p>{{postalcode}}</p>
+
+				<div class="deleteuserbuttoncontainer">
+                    <form action="/loremopusm" method="POST" enctype="multipart/form-data">
+                        <button type ="submit" class="uploadbutton">Delete My Account</button>
+                    </form>
+
+				</div>
+
 				
 				<div class="uploadhousephotobuttoncontainer">
                     <form action="/image" method="POST" enctype="multipart/form-data">

@@ -40,71 +40,6 @@
 
 	<div class ="contentcontainer">
 
-		<div class="contentdiv left">
-			<h1>Social Panel</h1>
-
-
-
-			<div class = "messagecentercontainer">
-				<h2>Message Center</h2>
-
-				<div class = "messagecenterdiv">
-					<div class = "messagediv">
-						 <form action="/action_page.php" id="messageform">
-
-							 <label for="user">Choose a User:</label>
-							 <br>
-							<select id="user" name="userlist" form="messageform">
-							  <option value="User1">User1</option>
-							  <option value="User2">User2</option>
-							  <option value="User3">User3</option>
-							  <--! Ladda in dynamisk namnen på användare? -->
-							</select>
-
-							 <br>
-
-							  <label for="prio">Choose the Priority:</label>
-							 <br>
-							  <select id="prio" name="priolist" form="messageform">
-							  <option value="high">High</option>
-							  <option value="medium">Medium</option>
-							  <option value="low">Low</option>
-							</select>
-
-							 <br>
-
-							 <textarea class="messageinput" rows="4" cols="18" name="message" form="messageform"></textarea>
-
-							 <br>
-							  <input class="messagecenterbutton" value="Send Message"type="submit">
-						 </form>
-
-							<br>
-
-
-					</div>
-
-				</div>
-
-
-			</div>
-
-
-			<div class = "notificationcentercontainer">
-				<h2>Notification Center</h2>
-
-				<div class = "notificationcenterdiv">
-					<h3>User Messages</h3>
-						<textarea class="messageoutput" rows="4" cols="18" name="message" form="messageform"></textarea>
-					   <input class="messagecenterbutton" value="Ack Message"type="submit">
-
-
-				</div>
-
-			</div>
-
-		</div>
-
 
 		<div class="contentdiv middle">
 			<h1>Admin Page</h1>
@@ -121,7 +56,10 @@
 
 
 					<div class="uploadadminphotobuttoncontainer">
-						<button class="uploadbutton" onclick="upload()">Upload New Admin Photo</button>
+						<form action="/image" method="POST" enctype="multipart/form-data">
+                        <input type="file" name="houseimage">
+                        <button type ="submit" class="uploadbutton">Upload New Admin Photo</button>
+                    </form>
 
 					</div>
 
@@ -140,10 +78,8 @@
 						<th>Block for selling</th>
 						<th>Update Credentials</th>
 						<th>Delete Account</th>
-						<th>   </th>
 						<th>IP</th>
 						<th>PORT</th>
-						<th>Last Logged in</th>
 					</tr>
 
 					<tr>
@@ -153,10 +89,8 @@
 						<td>Block</td>
 						<td>Update</td>
 						<td>Delete</td>
-						<td>   </td>
 						<td>192.168.1.1</td>
 						<td>5050</td>
-						<td>2021/11/11 13:54:21</td>
 					</tr>
 
 					<tr>
@@ -166,10 +100,8 @@
 						<td>Block</td>
 						<td>Update</td>
 						<td>Delete</td>
-						<td></td>
 						<td>192.168.1.1</td>
 						<td>5050</td>
-						<td>2021/11/11 13:54:21</td>
 					</tr>
 
 					<tr>
@@ -179,10 +111,8 @@
 						<td>Block</td>
 						<td>Update</td>
 						<td>Delete</td>
-						<td></td>
 						<td>192.168.1.1</td>
 						<td>5050</td>
-						<td>2021/11/11 13:54:21</td>
 					</tr>
 
 					<tr>
@@ -192,10 +122,8 @@
 						<td>Block</td>
 						<td>Update</td>
 						<td>Delete</td>
-						<td></td>
 						<td>192.168.1.1</td>
 						<td>5050</td>
-						<td>2021/11/11 13:54:21</td>
 					</tr>
 
 					<tr>
@@ -205,10 +133,8 @@
 						<td>Block</td>
 						<td>Update</td>
 						<td>Delete</td>
-						<td></td>
 						<td>192.168.1.1</td>
 						<td>5050</td>
-						<td>2021/11/11 13:54:21</td>
 					</tr>
 
 				</table>
