@@ -143,25 +143,20 @@
 			<h1>Household Panel</h1>
 
 			<div id="houseimagecontainer">
-					<img src="/static/assets/uploadedPictures/houses/houseexample.jpg" width="100%" height = 100%>
-                <script>
-                    /*
-                    post('/fetch', {}).then(response => {
-                        console.log(response);
-                        document.getElementById("houseimagecontainer").src = response["image"];
-                    });
-*/
-                </script>
+					<img src="/image" width="100%" height = 100%>
 			</div>
 			<div class ="houseinformationcontainer">
 				<h3>Household Name</h3>
 				<p>D HUSET</p>
 
 				<h3>Zip Code</h3>
-				<p>976 33</p>
+				<p>{{postalcode}}</p>
 				
 				<div class="uploadhousephotobuttoncontainer">
-					<button class="uploadbutton" onclick="upload()">Upload New House Photo</button>
+                    <form action="/image" method="POST" enctype="multipart/form-data">
+                        <input type="file" name="houseimage">
+                        <button type ="submit" class="uploadbutton">Upload New House Photo</button>
+                    </form>
 
 				</div>
 

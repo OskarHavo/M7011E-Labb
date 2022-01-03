@@ -2,7 +2,8 @@ from flask import (Flask, render_template, request, Response, redirect, session,
 from flask import render_template
 import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import timedelta
+from datetime import timedelta, datetime
+
 from flask_socketio import SocketIO
 
 import simulator
@@ -130,9 +131,26 @@ def alterUserInDatabase(newUser,oldUser,newPassword):
             password="",
             database="M7011E")
         cursor = mydb.cursor(buffered=True)
-        current_error.append(newUser)
         sql = "UPDATE M7011E.User SET User='{}', Password='{}' WHERE User='{}'".format(newUser,newPassword,oldUser)
         val = (newUser,oldUser)
+        cursor.execute(sql)
+        mydb.commit()
+        cursor.close()
+    except Exception as e:
+        current_error.append(str(e))
+        return False
+    return True
+
+def updateUserLastLogin(username,date):
+    global current_error
+    try:
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user="Client",
+            password="",
+            database="M7011E")
+        cursor = mydb.cursor(buffered=True)
+        sql = "UPDATE M7011E.User SET LastOnline='{}' WHERE User='{}'".format(date,username)
         cursor.execute(sql)
         mydb.commit()
         cursor.close()
@@ -172,6 +190,7 @@ class User:
         user = readUserFromDatabase(self.name)
         if user and check_password_hash(user[1], self.password):
             self.validated = True
+            self.postalcode = user[2]
             session["user"] = self.toJSON()
             return True
         else:
@@ -196,6 +215,7 @@ def getUser():
 def checkSession():
     user = getUser()
     if user != None and user.isValid():
+        updateUserLastLogin(user.name,datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         return user
     else:
         return None
@@ -257,7 +277,7 @@ def signup():
         return redirect(userDashboardDir)
     err = ""
     if request.method == 'POST':
-        user = User(request.form.get("username"),request.form.get("postalcode"), request.form.get("password"))
+        user = User(request.form.get("username"),request.form.get("password"),request.form.get("postalcode"))
 
         if user.password != request.form.get("password-repeat"):
             err = "Passwords don't match"
@@ -276,7 +296,7 @@ def signup():
 def userDash():
     user = checkSession()
     ##if user:
-    return render_template("user_dashboard.html",user="demo")
+    return render_template("user_dashboard.html",user=user.name,postalcode=user.postalcode)
     ##else:
     ##    return redirect(indexDir)
 
@@ -345,6 +365,22 @@ def settings():
             return render_template("settings.html",user=user.name)
     else:
         return redirect(indexDir)
+
+@app.route("/image",methods=["POST"])
+def image():
+    user = checkSession()
+    if user:
+        if request.method == "POST":
+            return ""
+        else:
+            data = fetchUserImage(user.name)
+            if data:
+                response = make_response(data[0])
+                response.headers.set('Content-Type','image/jpg')
+                response.headers.set('Content-Disposition','attachment',filename='house.jpg')
+                return response
+    #else:
+        #return "invalid user"
 
 # TODO User verification
 @app.route("/fetch",methods = ['POST', 'GET','PUT'])
