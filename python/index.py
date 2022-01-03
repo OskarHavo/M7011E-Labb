@@ -1,9 +1,11 @@
+import binascii
+
 from flask import (Flask, render_template, request, Response, redirect, session, make_response, jsonify)
 from flask import render_template
 import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta, datetime
-
+from io import StringIO
 from flask_socketio import SocketIO
 
 import simulator
@@ -98,6 +100,25 @@ def fetchUserImage(username):
         return None
     except Exception as e:
         current_error.append(str(e))
+
+def setUserImage(username,blob):
+    global current_error
+    try:
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user="Client",
+            password="",
+            database="M7011E")
+        cursor = mydb.cursor(buffered=True)
+        cursor.execute(
+            "UPDATE M7011E.User SET Image=%s WHERE User='%s'" % (blob, username))
+        mydb.commit()
+        cursor.close()
+        return True
+    except Exception as e:
+        current_error.append(str(e))
+        return False
+
 
 def writeUserToDatabase(user, password):
     global current_error
@@ -366,12 +387,21 @@ def settings():
     else:
         return redirect(indexDir)
 
-@app.route("/image",methods=["POST"])
+@app.route("/image",methods=["POST","GET"])
 def image():
     user = checkSession()
     if user:
         if request.method == "POST":
-            return ""
+#            bin_file = io.BytesIO(request.files["houseimage"].read()).getvalue()
+            bin_file = request.files["houseimage"].read()
+            bin_file = "0x" + binascii.hexlify(bin_file).decode("utf-8")
+            print(bin_file[:10])
+#            print(.stream)
+            if setUserImage(user.name,bin_file):
+                print("uploaded image")
+            else:
+                print("could not upload image")
+            return redirect("/user_dashboard")
         else:
             data = fetchUserImage(user.name)
             if data:
@@ -379,8 +409,6 @@ def image():
                 response.headers.set('Content-Type','image/jpg')
                 response.headers.set('Content-Disposition','attachment',filename='house.jpg')
                 return response
-    #else:
-        #return "invalid user"
 
 # TODO User verification
 @app.route("/fetch",methods = ['POST', 'GET','PUT'])
