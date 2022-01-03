@@ -333,7 +333,7 @@
 
 /* Container for button used for uploading a new house picture for your house. */
 .uploadhousephotobuttoncontainer{
-    padding-top: 20px;
+    padding-top: 60px;
     margin: auto;
     display: flex;
     justify-content: center
