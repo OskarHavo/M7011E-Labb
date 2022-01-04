@@ -337,17 +337,18 @@ def signup():
         return redirect(userDashboardDir)
     err = ""
     if request.method == 'POST':
-        user = User(request.form.get("username"),request.form.get("password"),request.form.get("postalcode"))
-
+        user = User(request.form.get("username"),request.form.get("password"),allowedPostalcode(request.form.get("postalcode")))
+        if not user.postalcode:
+            err = "Invalid postalcode\n"
         if user.password != request.form.get("password-repeat"):
-            err = "Passwords don't match"
+            err = err+ "Passwords don't match\n"
         elif writeUserToDatabase(user.name, generate_password_hash(user.password)):
             if user.validate():
                 return redirect(userDashboardDir)  ## Successful signup!!
             else:
-                err = "Server error: Created but could not validate new user :("
+                err = err+"Server error: Created but could not validate new user :("
         else:
-            err = "Existing user or server SNAFU :("
+            err = err+"Existing user or server SNAFU :("
 
     return render_template("create_user.html", error=err)
 
