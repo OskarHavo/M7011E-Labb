@@ -1,4 +1,5 @@
 import binascii
+import sys
 
 from flask import (Flask, render_template, request, Response, redirect, session, make_response, jsonify)
 from flask import render_template
@@ -55,6 +56,7 @@ host = "0.0.0.0"
 app = Flask(__name__)
 app.secret_key = fetchKey()
 app.permanent_session_lifetime = timedelta(minutes=999)
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024 # 2 megabytes
 socketio = SocketIO(app)
 
 global temporaryDatabase
@@ -141,19 +143,22 @@ def writeUserToDatabase(user, password):
         return False
     return True
 
-def alterUserInDatabase(newUser,oldUser,newPassword):
+def alterUserInDatabase(username,newPassword=None,newPostalCode=None):
     global current_error
     try:
-        if newUser == "" or oldUser == "":
-            return False
         mydb = mysql.connector.connect(
             host="localhost",
             user="Client",
             password="",
             database="M7011E")
         cursor = mydb.cursor(buffered=True)
-        sql = "UPDATE M7011E.User SET User='{}', Password='{}' WHERE User='{}'".format(newUser,newPassword,oldUser)
-        val = (newUser,oldUser)
+        sql = "UPDATE M7011E.User SET "# Password='{}' WHERE User='{}'".format(newUser,newPassword,oldUser)
+        if newPassword:
+            sql += "Password='%s'" %(newPassword)
+        if newPostalCode:
+            sql += "Postalcode='%s'" %(newPostalCode)
+        sql += "WHERE User='%s'" % (username)
+        print(sql)
         cursor.execute(sql)
         mydb.commit()
         cursor.close()
@@ -161,6 +166,23 @@ def alterUserInDatabase(newUser,oldUser,newPassword):
         current_error.append(str(e))
         return False
     return True
+
+def removeUserFromDatabase(username):
+    global current_error
+    try:
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user="Client",
+            password="",
+            database="M7011E")
+        cursor = mydb.cursor(buffered=True)
+        cursor.execute("DELETE FROM M7011E.User WHERE User='%s'" % (username))
+        mydb.commit()
+        cursor.close()
+        return True
+    except Exception as e:
+        current_error.append(str(e))
+        return False
 
 def updateUserLastLogin(username,date):
     global current_error
@@ -221,8 +243,25 @@ class User:
         return {"user": self.name, "password": self.password, "valid": self.validated,"postalcode":self.postalcode}
 
 
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+def allowed_file(filename):
+    return filename != "" and '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+## Check if the postal code is valid or not
+def allowedPostalcode(code):
+    code = code.replace(" ", "")
+    if code and code != "":
+        try:
+            int(code)
+        except:
+            return None
+        return code
+    return None
 
+def allowedPassword(password):
+    if password and len(password) > 3:
+        return password
+    return None
 
 def getUser():
     try:
@@ -367,36 +406,55 @@ def settings():
     user = checkSession()
     if user:
         if request.method == "POST":
-            username = request.form.get("username")
+            #username = request.form.get("username")
             password = request.form.get("password")
-            flag = False
-            if username and username != "":
-                #user.name = username
-                if alterUserInDatabase(username,user.name):
-                    user.name = username
-                    flag = True
-                    #user.validate()
-            if password and password != "":
-                user.password = password
+            postalcode = request.form.get("postalcode")
 
-                    #return redirect(dashboardDir)
-                #else:
-                #    return render_template("settings.html",user=user.name)
+
+            error = ""
+            if postalcode:
+                postalcode = allowedPostalcode(postalcode)
+                if not postalcode:
+                    error += "No valid postal code\n"
+            if password:
+                password = allowedPassword(password)
+                if not password:
+                    error += "No valid password"
+            if error != "":
+                return render_template("settings.html",user=user.name,error=error)
+
+            if alterUserInDatabase(user.name,password,postalcode):
+                if postalcode:
+                    user.postalcode = postalcode
+                if password:
+                    user.password = password
+                session["user"] = user.toJSON()
+                return redirect(userDashboardDir)
+
+            return render_template("settings.html", user=user.name)
         else:
             return render_template("settings.html",user=user.name)
     else:
         return redirect(indexDir)
+
 
 @app.route("/image",methods=["POST","GET"])
 def image():
     user = checkSession()
     if user:
         if request.method == "POST":
+            if 'houseimage' not in request.files:
+                return ""
+
 #            bin_file = io.BytesIO(request.files["houseimage"].read()).getvalue()
-            bin_file = request.files["houseimage"].read()
-            bin_file = "0x" + binascii.hexlify(bin_file).decode("utf-8")
-            print(bin_file[:10])
-#            print(.stream)
+            file = request.files["houseimage"]
+            if not allowed_file(file.name):
+                return ""
+
+            file = file.read()
+
+            bin_file = "0x" + binascii.hexlify(file).decode("utf-8")
+
             if setUserImage(user.name,bin_file):
                 print("uploaded image")
             else:

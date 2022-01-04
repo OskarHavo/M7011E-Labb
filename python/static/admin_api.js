@@ -61,7 +61,7 @@ function updateAdminGauges(simulatorData) {
 		marketdemand = simulatorData.demand.substring(0, 5);
 		marketdemandoutput = String((marketdemand / MaxValueDemand) * 100.0);
 
-		modelledelectrictyprice = simulatorData.price.substring(0, 5);
+		modelledelectrictyprice = simulatorData.modeledPrice.substring(0, 5);
 		modelledelectrictypriceoutput = String((modelledelectrictyprice / maxValuePrice) * 100.0);
 
 		document.getElementById("admingauge_production").style.width = productionoutput + "%";

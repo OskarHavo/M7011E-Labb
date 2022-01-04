@@ -13,6 +13,7 @@ class EnergyCentral:
         self.sellRatio = 1
         self.buffer = 0
         self.marketDemand = 0
+        self.modeledElectricityPrice = 0
         self.electricityPrice = 0
         self.date = datetime.datetime.now()
         self.mutex = threading.Lock()
@@ -70,6 +71,7 @@ class EnergyCentral:
                 "sellRatio":str(self.sellRatio),
                 "running":str(self.running),
                 "buffer":str(self.buffer),
+                "modeledPrice":str(self.modeledElectricityPrice),
                 "price":str(self.electricityPrice),
                 "timestamp":str(self.date),
                 "demand":str(self.marketDemand)}
@@ -97,7 +99,7 @@ class EnergyCentral:
 
 
 
-        self.electricityPrice = dataGeneration.calculateDailyEnergyPrice(self.currentCapacity,self.currentConsumption)
+        self.modeledElectricityPrice = dataGeneration.calculateDailyEnergyPrice(self.currentCapacity, self.currentConsumption)
 
 
     def stop(self):
