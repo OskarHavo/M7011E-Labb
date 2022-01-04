@@ -14,7 +14,7 @@ class EnergyCentral:
         self.buffer = 0
         self.marketDemand = 0
         self.modeledElectricityPrice = 0
-        self.electricityPrice = 0
+        self.electricityPrice = 15.0
         self.date = datetime.datetime.now()
         self.mutex = threading.Lock()
         self.delta = delta

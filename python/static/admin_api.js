@@ -54,7 +54,7 @@ function updateAdminGauges(simulatorData) {
 		// Second Value is a string showing the percentage of the total value that the current value is. Used for the gauge.
 
 		production = simulatorData.production.substring(0, 5);
-		productionoutput = String((production / maxValue) * 100.0);
+		productionoutput = String((production / maxProductionValue) * 100.0);
 
 		productionstatus = simulatorData.running.substring(0, 3);
 

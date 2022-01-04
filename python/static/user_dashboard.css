@@ -333,7 +333,7 @@
 
 /* Container for button used for uploading a new house picture for your house. */
 .uploadhousephotobuttoncontainer{
-    padding-top: 60px;
+    padding-top: 50px; /*funkar bra när zip code har något värde*/
     margin: auto;
     display: flex;
     justify-content: center
