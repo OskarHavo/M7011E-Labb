@@ -122,7 +122,7 @@ def setUserImage(username,blob):
         return False
 
 
-def writeUserToDatabase(user, password):
+def writeUserToDatabase(user, password,postalcode):
     global current_error
     try:
         if user == "" or password == "":
@@ -133,8 +133,8 @@ def writeUserToDatabase(user, password):
             password="",
             database="M7011E")
         cursor = mydb.cursor(buffered=True)
-        sql = "INSERT INTO User(User,Password) VALUES(%s,%s)"
-        val = (user, password)
+        sql = "INSERT INTO User(User,Password,Postalcode) VALUES(%s,%s,%s)"
+        val = (user, password,postalcode)
         cursor.execute(sql, val)
         mydb.commit()
         cursor.close()
@@ -242,11 +242,6 @@ class User:
     def toJSON(self):
         return {"user": self.name, "password": self.password, "valid": self.validated,"postalcode":self.postalcode}
 
-
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
-def allowed_file(filename):
-    return filename != "" and '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 ## Check if the postal code is valid or not
 def allowedPostalcode(code):
     code = code.replace(" ", "")
@@ -342,7 +337,7 @@ def signup():
             err = "Invalid postalcode\n"
         if user.password != request.form.get("password-repeat"):
             err = err+ "Passwords don't match\n"
-        elif writeUserToDatabase(user.name, generate_password_hash(user.password)):
+        elif writeUserToDatabase(user.name, generate_password_hash(user.password),user.postalcode):
             if user.validate():
                 return redirect(userDashboardDir)  ## Successful signup!!
             else:
@@ -438,6 +433,17 @@ def settings():
     else:
         return redirect(indexDir)
 
+@app.route(settingsDir+"/delete",methods=["POST"])
+def delete_user():
+    user = checkSession()
+    if user and request.method == "POST":
+        if removeUserFromDatabase(user.name):
+            return redirect(logoutDir)
+        else:
+            render_template("settings.html",user=user.name,error="Could not delete user")
+    else:
+        return redirect(indexDir)
+
 
 @app.route("/image",methods=["POST","GET"])
 def image():
@@ -449,8 +455,6 @@ def image():
 
 #            bin_file = io.BytesIO(request.files["houseimage"].read()).getvalue()
             file = request.files["houseimage"]
-            if not allowed_file(file.name):
-                return ""
 
             file = file.read()
 
