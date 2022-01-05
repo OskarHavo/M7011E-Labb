@@ -33,6 +33,8 @@ global createUserDir
 createUserDir = "/create_user"
 global settingsDir
 settingsDir = "/settings"
+global tableDir
+tableDir = "/table"
 global counter
 counter = 1
 
@@ -286,6 +288,11 @@ def index():
     if checkSession():
         return redirect(userDashboardDir)
     return render_template("index.html")
+
+
+@app.route(tableDir)
+def table():
+    return "I am table."
 
 
 @app.route(loginDir, methods=['POST', 'GET'])
