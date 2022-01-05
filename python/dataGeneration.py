@@ -21,7 +21,7 @@ class PowerProduction:
         i = deltaDate.days
 
         # These ranges create a healthy range of the total NetEnergyProduction. (Kan inte randomiza för varje call, man får nog randomiza 1 gång per hus och föra in det som inparameter)
-        A = 20  # random.randint(10, 12)  # Amplitude (Max/Min Value)
+        A = 10  # random.randint(10, 12)  # Amplitude (Max/Min Value)
         f = 0.01  # Frequency
         B = self.areaCode  # Phase  (Adjust for location)
         C = A * 1.5  # Makes sure the values are not too low and/or negative  ##Check so randomizing the afb values does it make it negative in some config

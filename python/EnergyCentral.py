@@ -5,8 +5,9 @@ import datetime
 
 class EnergyCentral:
     def __init__(self, maxCapacity,delta):
-        self.currentCapacity = maxCapacity
+        self.capacityModifier = 1
         self.maxCapacity = maxCapacity
+        self.currentCapacity = 0
         self.currentConsumption = 0
         self.clients = []
         self.running = 0 # 0 = Stopped 1-9 = Starting 10 = Running
@@ -55,7 +56,15 @@ class EnergyCentral:
                 self.running = 0
             elif valueName == "start":
                 self.running = 1
-            elif valueName == "price":
+            elif valueName == "powerplantproduction":
+                self.capacityModifier = value;
+                if self.capacityModifier == 0:
+                    self.running = 0
+                elif self.running == 0:
+                    self.running = 1
+            elif valueName == "marketRatio":
+                self.sellRatio = value
+            elif valueName == "currentelectricityprice":
                 self.electricityPrice = value
 
     def updateTime(self):
@@ -74,7 +83,9 @@ class EnergyCentral:
                 "modeledPrice":str(self.modeledElectricityPrice),
                 "price":str(self.electricityPrice),
                 "timestamp":str(self.date),
-                "demand":str(self.marketDemand)}
+                "demand":str(self.marketDemand),
+                "maxCapacityPercentage":str(self.capacityModifier),
+                "maxCapacity":str(self.maxCapacity)}
 
     def tick(self):
         self.updateTime()
@@ -82,14 +93,16 @@ class EnergyCentral:
         for client in self.clients:
             self.currentConsumption = self.currentConsumption + client.getPurchaseVolume()
 
-        self.currentCapacity = self.sellRatio*self.maxCapacity
+        cap = self.capacityModifier*self.maxCapacity
+
+        self.currentCapacity = self.sellRatio*cap
         if self.running < 10:
             self.currentCapacity = self.buffer
             if self.running > 0:
                 self.running = self.running + 1
             self.buffer = self.buffer - self.currentConsumption
         else:
-            self.buffer = self.buffer + self.maxCapacity - self.currentConsumption
+            self.buffer = self.buffer + cap - self.currentConsumption
 
         print(self.currentConsumption, "   ", self.marketDemand, "   ", self.currentCapacity, "   ", self.running)
         self.marketDemand = 1

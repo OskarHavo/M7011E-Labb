@@ -106,19 +106,24 @@ function updateAdminGauges(simulatorData) {
 	}
 }
 
+function uploadData(valuename, param) {
+	put('/fetch_admin', {"valueName":valuename,"data":param}).then(response => {
+	});
+}
 
 
 // Only Updates once each tick.
 function updateAdminSliders(simulatorData) {
 
-    var price = document.getElementById("currentelectricityprice").value;
-    document.getElementById("currentelectricitypriceText").innerHTML = price+"kr";
+    //var price = document.getElementById("currentelectricityprice").value;
+	document.getElementById("currentelectricityprice").value = simulatorData.price;
+    document.getElementById("currentelectricitypriceText").innerHTML = simulatorData.price+"kr";
 
-    var prod = document.getElementById("powerplantproduction").value;
-    document.getElementById("powerplantproductionText").innerHTML = prod+"%";
+    document.getElementById("powerplantproduction").value = simulatorData.maxCapacityPercentage *simulatorData.maxCapacity;
+    document.getElementById("powerplantproductionText").innerHTML = simulatorData.maxCapacityPercentage*100 +"%";
 
-    var marketRatio = document.getElementById("marketRatio").value;
-    document.getElementById("marketRatioText").innerHTML = marketRatio+"%";
+    document.getElementById("marketRatio").value = simulatorData.sellRatio*100;
+    document.getElementById("marketRatioText").innerHTML = simulatorData.sellRatio*100+"%";
 
 }
 
@@ -134,3 +139,25 @@ function updateAll(updater, delta, bufferSize=10) {
 	});
 
 }
+
+
+document.addEventListener('DOMContentLoaded', (event) => {
+		var slider = document.querySelectorAll('.slider');
+		slider.item(0).oninput = function () {
+				console.log(this.value);
+				uploadData(this.id,parseFloat(this.value));
+				document.getElementById("currentelectricitypriceText").innerHTML = this.value+"kr";
+		};
+		slider.item(1).oninput = function () {
+				console.log(this.value);
+				uploadData(this.id,parseFloat(this.value)/100);
+				document.getElementById("powerplantproductionText").innerHTML = this.value+"%";
+		};
+		slider.item(2).oninput = function () {
+				console.log(this.value);
+				uploadData(this.id,parseFloat(this.value)/100);
+				document.getElementById("marketRatioText").innerHTML = this.value+"%";
+		};
+});
+
+updateAdminSliders(fetchDataCycle())

@@ -268,3 +268,17 @@ function startStreaming(socket, chart, startx, starty, delta, bufferSize=10) {
 		setTimeout(callback, 10000);
 	});
 }
+
+document.addEventListener('DOMContentLoaded', (event) => {
+	var slider = document.querySelectorAll('.slider');
+	slider.item(0).oninput = function () {
+		console.log(this.value);
+		uploadData(this.id, parseFloat(this.value) / 100);
+		document.getElementById("buyingRatioText").innerHTML = this.value + "%";
+	};
+	slider.item(1).oninput = function () {
+		console.log(this.value);
+		uploadData(this.id, parseFloat(this.value) / 100);
+		document.getElementById("sellingRatioText").innerHTML = this.value + "%";
+	};
+});

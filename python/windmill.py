@@ -64,10 +64,6 @@ class ProductionNode:
         formattedDate = date - datetime.timedelta(microseconds=date.microsecond) # Ensures only 2 digits for seconds
         self.date = formattedDate
 
-    def updatePrice(self):
-        price = EnergyCentral.getEnergyPrice()
-        self.currentPrice = price
-
     def updateOutOfOrder(self, rand):
         if self.outOfOrder:
             # Turn back on with a 20% chance
@@ -82,7 +78,6 @@ class ProductionNode:
     def tick(self):
         with self.syncMutex:
             self.updateTime()
-            self.updatePrice()
             self.currentProduction, consumption, self.currentPurchase, powerToSell, buffer = self.chain.tick(self.date)
             return {
                 "production": str(self.currentProduction),
@@ -94,4 +89,4 @@ class ProductionNode:
                 "sellRatio":str(self.chain.sellRatio.sellRatio),
                 "timestamp": str(self.date),
                 "windspeed": str(self.currentProduction/3.0),
-                "electricityPrice": str(self.currentPrice) }
+                "electricityPrice": str(self.powerplant.getEnergyPrice()) }
