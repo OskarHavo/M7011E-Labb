@@ -230,18 +230,24 @@ class User:
                 self.validated = username["valid"]
                 self.postalcode = username["postalcode"]
                 self.root = username["root"]
+                self.ip = request.environ['REMOTE_ADDR']
+                self.port = request.environ['REMOTE_PORT']
             except:
                 self.name = username
                 self.password = ""
                 self.postalcode = ""
                 self.validated = False
                 self.root = False
+                self.ip = request.environ['REMOTE_ADDR']
+                self.port = request.environ['REMOTE_PORT']
             return
         self.name = username
         self.password = password
         self.postalcode = postalcode
         self.root = False
         self.validated = False
+        self.ip = request.environ['REMOTE_ADDR']
+        self.port = request.environ['REMOTE_PORT']
 
     def isValid(self):
         return self.validated
@@ -261,7 +267,7 @@ class User:
             return False
 
     def toJSON(self):
-        return {"user": self.name, "password": self.password, "valid": self.validated,"postalcode":self.postalcode,"root":self.root}
+        return {"user": self.name, "password": self.password, "valid": self.validated,"postalcode":self.postalcode,"root":self.root, "ip":self.ip, "root":self.root}
 
 ## Check if the postal code is valid or not
 def allowedPostalcode(code):
@@ -606,8 +612,8 @@ def fetch_all_users():
                         online,
                         "window.location.href='/user_dashboard/%s';"%user[0],
                         "window.location.href='/block_user/%s';" % user[0],
-                        '192.168.1.122',
-                        '8080')
+                        user[6],
+                        user[7])
                     )
                 table = UserTable(items)
                 # parse users
