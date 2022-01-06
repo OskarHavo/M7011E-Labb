@@ -380,10 +380,12 @@ def signup():
 @app.route(userDashboardDir)
 def userDash():
     user = checkSession()
-    ##if user:
-    return render_template("user_dashboard.html",user=user.name,postalcode=user.postalcode)
-    ##else:
-    ##    return redirect(indexDir)
+    if user:
+        if user.root:
+            return redirect(adminDashboardDir)
+        return render_template("user_dashboard.html",user=user.name,postalcode=user.postalcode)
+    else:
+        return redirect(indexDir)
 
 @app.route("/user_dashboard/<username>")
 def userDash2(username):
@@ -394,6 +396,7 @@ def userDash2(username):
     if user and user.root:
         userdata = readUserFromDatabase(username)
         if userdata:
+            session["user-backup"] = user.toJSON()
             user = User(userdata[0],userdata[1])
             user.validated = True
             user.postalcode = userdata[2]
@@ -429,7 +432,12 @@ def adminDash2(username):
 def logout():
     global current_error
     try:
-        session.pop("user")
+        if "user-backup" in session:
+            session["user"] = session["user-backup"]
+            session.pop("user-backup")
+            return redirect(adminDashboardDir)
+        else:
+            session.pop("user")
     except Exception as e:
         current_error.append(str(e))
     return redirect(indexDir)
@@ -587,7 +595,7 @@ def fetch_all_users():
                 for user in users:
                     if user[4] == 1:
                         continue
-                        
+
                     online = "Online"
                     if user[3] < now-delta:
                         online = "Offline"
