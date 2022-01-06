@@ -554,34 +554,32 @@ def fetch_admin():
 
 @app.route("/fetch_all_users_for_admin",methods = ['GET'])
 def fetch_all_users():
-    if True:#request.method == "GET":
-        #user = checkSession()   ## TODO set to admin user instead
+    if True:  # request.method == "GET":
+        # user = checkSession()   ## TODO set to admin user instead
         if True:
             users = readAllUserFromDatabase()
             print(users)
             if True:
                 items = []
-                now = datetime.now() - datetime(year=0,month=0,hour=0,minute=10,second=0)
+                delta = timedelta(minutes=10)
+                now = datetime.now()
                 for user in users:
-                    logindate = datetime.strptime(user[3], '%Y/%m/%d %H:%M:%S')
                     online = "Online"
-                    if logindate < now:
+                    if user[3] < now-delta:
                         online = "Offline"
                     items.append(Row(
-                        'user %s' % user[0],
+                        user[0],
                         online,
                         "console.log('goto')",
                         "console.log('blocked')",
-                        "console.log('update')",
-                        "Javascript:deleteRow(this)",
-                        'ip',
-                        'port')
+                        '192.168.1.122',
+                        '8080')
                     )
                 table = UserTable(items)
-                print("loaded user table:\n",str(table.__html__()))
+                print("loaded user table:\n", str(table.__html__()))
                 # parse users
-                return str(table.__html__())
-    return "<table></table>"
+                return jsonify({"table":str(table.__html__())})
+    return "{}"
 
 def stream_data():
     user = checkSession()

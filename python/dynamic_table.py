@@ -58,21 +58,19 @@ class ScriptButtonCol(Col):
 class UserTable(Table):
     user = Col('User')
     online = Col('Status')
-    goto = ScriptButtonCol("Go to")
-    block = ScriptButtonCol("Block")
-    update = ScriptButtonCol("Update")
-    delete = ScriptButtonCol("Delete")
-    ip = Col('IP')
+    goto = ScriptButtonCol("Go to User")
+    block = ScriptButtonCol("Block User")
+    #update = ScriptButtonCol("Update Credentials")
+    #delete = ScriptButtonCol("Delete")
+    ip = Col('IP Address')
     port = Col('Port')
 
 
 class Row(object):
-    def __init__(self,user,online,goto,block,update,delete,ip,port):
+    def __init__(self,user,online,goto,block,ip,port):
         self.user = user
         self.online = online
         self.goto = goto
         self.block = block
-        self.update = update
-        self.delete = delete
         self.ip = ip
         self.port = port

@@ -129,13 +129,12 @@ function updateAdminSliders(simulatorData) {
 
 
 function htmlToTable(){
-    	html = "<table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td>Name1</td><td>Description1</td></tr><tr><td>Name2</td><td>Description2</td></tr><tr><td>Name3</td><td>Description3</td></tr></tbody></table>";
+	post("/fetch_all_users_for_admin").then(value => {
 		var table = document.getElementById("prosumertableinadmin");
-	//	if(typeof table !== 'undefined' && table !== null) {
+        table.innerHTML = value.table;
+	})
+    	//html = "<table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td>Name1</td><td>Description1</td></tr><tr><td>Name2</td><td>Description2</td></tr><tr><td>Name3</td><td>Description3</td></tr></tbody></table>";
 
-        table.innerHTML = html;
-
-  	//	}
 }
 
 function updateAll(updater, delta, bufferSize=10) {
