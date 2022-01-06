@@ -548,6 +548,15 @@ def fetch():
             return "{}"
     return "{}"
 
+@app.route("/block_user/<username>")
+def block_user(username):
+    user = checkSession()
+    if user and user.root:
+        manager.alterNode(username,"block","")
+        return redirect(adminDashboardDir)
+    else:
+        return redirect(indexDir)
+
 @app.route("/fetch_admin",methods = ['GET','PUT'])
 def fetch_admin():
     if request.method == "GET":
@@ -576,14 +585,19 @@ def fetch_all_users():
                 delta = timedelta(minutes=10)
                 now = datetime.now()
                 for user in users:
+                    if user[4] == 1:
+                        continue
+                        
                     online = "Online"
                     if user[3] < now-delta:
                         online = "Offline"
+                    if manager.getNode(user[0]).getBlockStatus():
+                        online = "Blocked"
                     items.append(Row(
                         user[0],
                         online,
                         "window.location.href='/user_dashboard/%s';"%user[0],
-                        "console.log('block')",
+                        "window.location.href='/block_user/%s';" % user[0],
                         '192.168.1.122',
                         '8080')
                     )

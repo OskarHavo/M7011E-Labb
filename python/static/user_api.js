@@ -249,7 +249,13 @@ function updateUserSliders(simulatorData) {
 
     var sellRatio = parseFloat(simulatorData.sellRatio)*100;
 	document.getElementById("sellRatio").value = sellRatio;
-    document.getElementById("sellingRatioText").innerHTML = sellRatio+"%";
+	if (simulatorData.blocked == "True"){
+		document.getElementById("sellingRatioText").innerHTML = "BLOCKED";
+		document.getElementById("sellRatio").disabled = true;
+	} else {
+		document.getElementById("sellingRatioText").innerHTML = sellRatio+"%";
+	}
+
 }
 
 

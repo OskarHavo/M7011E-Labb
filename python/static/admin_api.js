@@ -155,19 +155,34 @@ function updateAll(updater, delta, bufferSize=10) {
 document.addEventListener('DOMContentLoaded', (event) => {
 		var slider = document.querySelectorAll('.slider');
 		slider.item(0).oninput = function () {
-				console.log(this.value);
-				uploadData(this.id,parseFloat(this.value));
-				document.getElementById("currentelectricitypriceText").innerHTML = this.value+"kr";
+			console.log(this.value);
+			uploadData(this.id, parseFloat(this.value));
+			document.getElementById("currentelectricitypriceText").innerHTML = this.value + "kr";
+
+			fetchDataCycle().then(value => {
+				//var simulatorData = simData[simData.length - 1];
+				updateAdminGauges(value);
+			});
 		};
 		slider.item(1).oninput = function () {
-				console.log(this.value);
-				uploadData(this.id,parseFloat(this.value)/100);
-				document.getElementById("powerplantproductionText").innerHTML = this.value+"%";
+			console.log(this.value);
+			uploadData(this.id, parseFloat(this.value) / 100);
+			document.getElementById("powerplantproductionText").innerHTML = this.value + "%";
+
+			fetchDataCycle().then(value => {
+				//var simulatorData = simData[simData.length - 1];
+				updateAdminGauges(value);
+			});
 		};
 		slider.item(2).oninput = function () {
-				console.log(this.value);
-				uploadData(this.id,parseFloat(this.value)/100);
-				document.getElementById("marketRatioText").innerHTML = this.value+"%";
+			console.log(this.value);
+			uploadData(this.id,parseFloat(this.value)/100);
+			document.getElementById("marketRatioText").innerHTML = this.value+"%";
+
+			fetchDataCycle().then(value => {
+				//var simulatorData = simData[simData.length - 1];
+				updateAdminGauges(value);
+			});
 		};
 });
 

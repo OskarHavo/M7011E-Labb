@@ -37,6 +37,9 @@ class ProductionNode:
             elif valueName == "sellRatio":
                 self.chain.sellRatio.setRatio(float(value))
                 return
+            elif valueName == "block":
+                # A user can 'technically' block themselves
+                self.chain.sellRatio.block()
             else:
                 print("Received some weird value ", valueName, value)
 
@@ -58,6 +61,9 @@ class ProductionNode:
     def getPurchaseVolume(self):
         with self.syncMutex:
             return self.currentPurchase
+    def getBlockStatus(self):
+        with self.syncMutex:
+            return self.chain.sellRatio.blocked > 0
 
     def updateTime(self):
         date = datetime.datetime.now()
@@ -86,7 +92,8 @@ class ProductionNode:
                 "powerToSell": str(powerToSell),
                 "buffer": str(buffer),
                 "buyRatio":str(self.chain.buyCalc.ratio),
-                "sellRatio":str(self.chain.sellRatio.sellRatio),
+                "sellRatio":str(self.chain.sellRatio.getRatio()),
                 "timestamp": str(self.date),
                 "windspeed": str(self.currentProduction/3.0),
-                "electricityPrice": str(self.powerplant.getEnergyPrice()) }
+                "electricityPrice": str(self.powerplant.getEnergyPrice()),
+                "blocked": str(self.chain.sellRatio.blocked > 0)}

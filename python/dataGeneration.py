@@ -83,14 +83,28 @@ class SellRatioCalc:
         self.sellRatio = sellRatio
         self.buy = buyCalculator
         self.result = 0
+        self.blocked = 0
+
     def setRatio(self,ratio):
+        if self.blocked > 0:
+            # Can't change value until we are unblocked, then the value will be restored.
+            return
         self.sellRatio = ratio
+    def getRatio(self):
+        if self.blocked > 0:
+            return 1
+        return self.sellRatio
     def currentValue(self):
         return self.result
+
+    def block(self):
+        self.blocked = 10
 
     # Calculate how much electricity we can sell back to the power grid.
     # No electricity will be sold if the consumption is larger than the consumption.
     def tick(self):
+        if self.blocked > 0:
+            self.blocked = self.blocked - 1
         quota = np.clip(self.buy.currentValue(),self.buy.currentValue(),0)
         if quota < 0:
             quota = -quota*self.sellRatio
@@ -125,6 +139,7 @@ class ConsumptionChain:
         self.buffer.sellRatio = self.sellRatio
         self.prod = productionProducer
         self.con = consumptionProducer
+
 
     def tick(self,date):
         bruttoProd = self.prod.tick(date)

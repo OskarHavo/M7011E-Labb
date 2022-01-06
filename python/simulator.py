@@ -114,6 +114,10 @@ class SimulationManager:
         with self.mutex:
             if ID in self.productionNodes:
                 self.productionNodes[ID].stop()
+    def getNode(self,ID):
+        with self.mutex:
+            if ID in self.productionNodes:
+                return self.productionNodes[ID].client
     def __del__(self):
         with self.mutex:
             for key in self.productionNodes:
