@@ -127,12 +127,24 @@ function updateAdminSliders(simulatorData) {
 
 }
 
+
+function htmlToTable(){
+    	html = "<table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td>Name1</td><td>Description1</td></tr><tr><td>Name2</td><td>Description2</td></tr><tr><td>Name3</td><td>Description3</td></tr></tbody></table>";
+		var table = document.getElementById("prosumertableinadmin");
+	//	if(typeof table !== 'undefined' && table !== null) {
+
+        table.innerHTML = html;
+
+  	//	}
+}
+
 function updateAll(updater, delta, bufferSize=10) {
 	fetchDataCycle().then(value => {
 		//var simulatorData = simData[simData.length - 1];
 		updateRawSimulatorDataOutput(value);
 		updateAdminGauges(value);
 		updateAdminSliders(value);
+		htmlToTable();
 
 		//uploadData("buyRatio",buyRatio);
 		updater = setTimeout(updateAll, delta * 1000, updater, delta, bufferSize);
