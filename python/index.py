@@ -95,7 +95,7 @@ def readAllUserFromDatabase():
             password="",
             database="M7011E")
         cursor = mydb.cursor(buffered=True)
-        cursor.execute("SELECT User,Password,Postalcode FROM User")
+        cursor.execute("SELECT User,Password,Postalcode,LastOnline FROM User")
         rows = cursor.fetchall()
         print("fetched users from database:", rows)
         cursor.close()
@@ -561,11 +561,15 @@ def fetch_all_users():
             print(users)
             if True:
                 items = []
+                now = datetime.now() - datetime(year=0,month=0,hour=0,minute=10,second=0)
                 for user in users:
-                    #logindate =
+                    logindate = datetime.strptime(user[3], '%Y/%m/%d %H:%M:%S')
+                    online = "Online"
+                    if logindate < now:
+                        online = "Offline"
                     items.append(Row(
                         'user %s' % user[0],
-                        'yes',
+                        online,
                         "console.log('goto')",
                         "console.log('blocked')",
                         "console.log('update')",
