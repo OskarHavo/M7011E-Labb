@@ -282,3 +282,5 @@ document.addEventListener('DOMContentLoaded', (event) => {
 		document.getElementById("sellingRatioText").innerHTML = this.value + "%";
 	};
 });
+
+updateUserSliders(fetchDataCycle());

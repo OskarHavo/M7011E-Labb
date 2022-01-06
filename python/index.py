@@ -95,9 +95,8 @@ def readAllUserFromDatabase():
             password="",
             database="M7011E")
         cursor = mydb.cursor(buffered=True)
-        cursor.execute("SELECT User,Password,Postalcode,LastOnline FROM User")
+        cursor.execute("SELECT User,Password,Postalcode,LastOnline,Root FROM User")
         rows = cursor.fetchall()
-        print("fetched users from database:", rows)
         cursor.close()
         return rows
     except Exception as e:
@@ -178,7 +177,6 @@ def alterUserInDatabase(username,newPassword=None,newPostalCode=None):
         if newPostalCode:
             sql += "Postalcode='%s'" %(newPostalCode)
         sql += "WHERE User='%s'" % (username)
-        print(sql)
         cursor.execute(sql)
         mydb.commit()
         cursor.close()
@@ -329,7 +327,10 @@ def login():
             currentUser = User(username, password)
             if currentUser.validate():
                 # login successful
-                return redirect(userDashboardDir)
+                if currentUser.root:
+                    return redirect(adminDashboardDir)
+                else:
+                    return redirect(userDashboardDir)
             else:
                 return render_template("login.html", error="Invalid username or password")
         except Exception as e:
@@ -587,7 +588,6 @@ def fetch_all_users():
                         '8080')
                     )
                 table = UserTable(items)
-                print("loaded user table:\n", str(table.__html__()))
                 # parse users
                 return jsonify({"table":str(table.__html__())})
     return "{}"
@@ -622,5 +622,19 @@ def socket_disconnect():
         print("client",user.name,"disconnected :(")
 
 
+
+def serverStartup():
+    users = readAllUserFromDatabase()
+
+    for user in users:
+        if user[4] == 0:
+            temporaryDatabase.new(user[0])
+            manager.startNode(user[0], int(user[2]), [-5, 5], [-5, 5])
+            print("Started simulation windmill for user:", user[0])
+    socketio.run(app, host=host)  # , ssl_context='adhoc')
+
+
+
 if __name__ == "__main__":
-    socketio.run(app,host=host)#, ssl_context='adhoc')
+    serverStartup()
+
