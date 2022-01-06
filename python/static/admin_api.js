@@ -46,7 +46,7 @@ function updateAdminGauges(simulatorData) {
 	var maxValue = 30.0;
 	var maxProductionValue = 100.0;
 	var maxValuePrice = 50.0;
-	var MaxValueDemand = 100.0;
+	var MaxValueDemand = 200.0;
 
 
 	try {
