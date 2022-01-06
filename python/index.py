@@ -496,8 +496,8 @@ def delete_user():
         return redirect(indexDir)
 
 
-@app.route("/image",methods=["POST","GET"])
-def image():
+@app.route("/image/<usertype>",methods=["POST","GET"])
+def image(usertype):
     user = checkSession()
     if user:
         if request.method == "POST":
@@ -515,7 +515,9 @@ def image():
                 print("uploaded image")
             else:
                 print("could not upload image")
-            return redirect("/user_dashboard")
+
+            if usertype == "admin": return redirect("/admin_dashboard")
+            else: return redirect("/user_dashboard")
         else:
             data = fetchUserImage(user.name)
             if data:
@@ -612,8 +614,8 @@ def fetch_all_users():
                         online,
                         "window.location.href='/user_dashboard/%s';"%user[0],
                         "window.location.href='/block_user/%s';" % user[0],
-                        user[6],
-                        user[7])
+                        user[6], # Problem1
+                        user[7]) # Problem2
                     )
                 table = UserTable(items)
                 # parse users
