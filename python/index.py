@@ -580,8 +580,8 @@ def fetch_all_users():
                 table = UserTable(items)
                 print("loaded user table:\n", str(table.__html__()))
                 # parse users
-                return str(table.__html__())
-    return "<table></table>"
+                return jsonify({"table":str(table.__html__())})
+    return "{}"
 
 def stream_data():
     user = checkSession()
