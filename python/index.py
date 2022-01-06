@@ -624,16 +624,17 @@ def socket_disconnect():
 
 
 def serverStartup():
-    users = readAllUserFromDatabase()
+    try:
+        users = readAllUserFromDatabase()
 
-    for user in users:
-        if user[4] == 0:
-            temporaryDatabase.new(user[0])
-            manager.startNode(user[0], int(user[2]), [-5, 5], [-5, 5])
-            print("Started simulation windmill for user:", user[0])
+        for user in users:
+            if user[4] == 0:
+                temporaryDatabase.new(user[0])
+                manager.startNode(user[0], int(user[2]), [-5, 5], [-5, 5])
+                print("Started simulation windmill for user:", user[0])
+    except:
+        print("Running without database! Are you connected?")
     socketio.run(app, host=host)  # , ssl_context='adhoc')
-
-
 
 if __name__ == "__main__":
     serverStartup()
