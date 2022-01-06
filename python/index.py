@@ -76,7 +76,7 @@ def readUserFromDatabase(user):
             password="",
             database="M7011E")
         cursor = mydb.cursor(buffered=True)
-        cursor.execute("SELECT User,Password,Postalcode FROM User WHERE User='%s'" % (user))
+        cursor.execute("SELECT User,Password,Postalcode,Root FROM User WHERE User='%s'" % (user))
         row = cursor.fetchone()
         cursor.close()
         if row is not None:
@@ -224,23 +224,25 @@ def updateUserLastLogin(username,date):
 
 
 class User:
-    def __init__(self, username,password=None,postalcode=97753):
+    def __init__(self, username,password=None,postalcode=97753,root = False):
         if password == None:
             try:
                 self.name = username["user"]
                 self.password = username["password"]
                 self.validated = username["valid"]
                 self.postalcode = username["postalcode"]
+                self.root = username["root"]
             except:
                 self.name = username
                 self.password = ""
                 self.postalcode = ""
                 self.validated = False
+                self.root = False
             return
         self.name = username
         self.password = password
         self.postalcode = postalcode
-
+        self.root = False
         self.validated = False
 
     def isValid(self):
@@ -254,13 +256,14 @@ class User:
         if user and check_password_hash(user[1], self.password):
             self.validated = True
             self.postalcode = user[2]
+            self.root = user[3] == 1
             session["user"] = self.toJSON()
             return True
         else:
             return False
 
     def toJSON(self):
-        return {"user": self.name, "password": self.password, "valid": self.validated,"postalcode":self.postalcode}
+        return {"user": self.name, "password": self.password, "valid": self.validated,"postalcode":self.postalcode,"root":self.root}
 
 ## Check if the postal code is valid or not
 def allowedPostalcode(code):
@@ -383,19 +386,27 @@ def userDash():
 
 @app.route("/user_dashboard/<username>")
 def userDash2(username):
-    user = User(username,"")
-    user.postalcode = "97753"
-    user.validated = True
-    session["user"] = user.toJSON()
-    if user:
-        return render_template("user_dashboard.html",user=user.name)
+    user = checkSession()
+    #user.postalcode = "97753"
+    #user.validated = True
+    #session["user"] = user.toJSON()
+    if user and user.root:
+        userdata = readUserFromDatabase(username)
+        if userdata:
+            user = User(userdata[0],userdata[1])
+            user.validated = True
+            user.postalcode = userdata[2]
+            session["user"] = user.toJSON()
+            return render_template("user_dashboard.html",user=user.name)
+        return redirect(adminDash)
     else:
         return redirect(indexDir)
+
 
 @app.route(adminDashboardDir)
 def adminDash():
     user = checkSession()
-    if user:
+    if user and user.root:
         return render_template("admin_dashboard.html",user=user.name)
     else:
         return redirect(indexDir)
@@ -555,11 +566,11 @@ def fetch_admin():
 @app.route("/fetch_all_users_for_admin",methods = ['GET'])
 def fetch_all_users():
     if True:  # request.method == "GET":
-        # user = checkSession()   ## TODO set to admin user instead
-        if True:
+        user = checkSession()   ## TODO set to admin user instead
+        if user and user.root:
             users = readAllUserFromDatabase()
-            print(users)
-            if True:
+            #print(users)
+            if users:
                 items = []
                 delta = timedelta(minutes=10)
                 now = datetime.now()
@@ -570,8 +581,8 @@ def fetch_all_users():
                     items.append(Row(
                         user[0],
                         online,
-                        "console.log('goto')",
-                        "console.log('blocked')",
+                        "window.location.href='/user_dashboard/%s';"%user[0],
+                        "console.log('block')",
                         '192.168.1.122',
                         '8080')
                     )
