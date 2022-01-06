@@ -2,12 +2,12 @@ import binascii
 import sys
 
 from flask import (Flask, render_template, request, Response, redirect, session, make_response, jsonify)
-from flask import render_template
 import mysql.connector
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta, datetime
 from io import StringIO
 from flask_socketio import SocketIO
+from dynamic_table import *
 
 import simulator
 from simulator import *
@@ -82,6 +82,24 @@ def readUserFromDatabase(user):
         if row is not None:
             return row
         return None
+    except Exception as e:
+        current_error.append(str(e))
+        return None
+
+def readAllUserFromDatabase():
+    global current_error
+    try:
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user="Client",
+            password="",
+            database="M7011E")
+        cursor = mydb.cursor(buffered=True)
+        cursor.execute("SELECT User,Password,Postalcode FROM User")
+        rows = cursor.fetchall()
+        print("fetched users from database:", rows)
+        cursor.close()
+        return rows
     except Exception as e:
         current_error.append(str(e))
         return None
@@ -533,6 +551,33 @@ def fetch_admin():
         return "{}"
     else:
         return "{}"
+
+@app.route("/fetch_all_users_for_admin",methods = ['GET'])
+def fetch_all_users():
+    if True:#request.method == "GET":
+        #user = checkSession()   ## TODO set to admin user instead
+        if True:
+            users = readAllUserFromDatabase()
+            print(users)
+            if True:
+                items = []
+                for user in users:
+                    #logindate =
+                    items.append(Row(
+                        'user %s' % user[0],
+                        'yes',
+                        "console.log('goto')",
+                        "console.log('blocked')",
+                        "console.log('update')",
+                        "Javascript:deleteRow(this)",
+                        'ip',
+                        'port')
+                    )
+                table = UserTable(items)
+                print("loaded user table:\n",str(table.__html__()))
+                # parse users
+                return str(table.__html__())
+    return "<table></table>"
 
 def stream_data():
     user = checkSession()
