@@ -232,7 +232,7 @@ def setHistoricalData(username,data):
             password="",
             database="M7011E")
         cursor = mydb.cursor(buffered=True)
-        sql = "UPDATE M7011E.User SET HistoricalData='{}' WHERE User='{}'".format(data)
+        sql = "UPDATE M7011E.User SET HistoricalData='{}' WHERE User='{}'".format(data,username)
         cursor.execute(sql)
         mydb.commit()
         cursor.close()
@@ -586,7 +586,7 @@ def fetch():
         if user:
             data = getHistoricalData(user.name)
             if data:
-                return json.loads(data[0].decode("utf-8"))
+                return data[0].decode("utf-8")
             else:
                 return "{}"
             #if not temporaryDatabase.get(user.name):
@@ -670,18 +670,22 @@ def stream_data(timestamp):
         windmill = manager.getNode(user.name)
         data,nextTimestamp = windmill.getNext(timestamp)
 
-        old_data = json.loads(getHistoricalData()[0].decode("utf-8"))
+        d = getHistoricalData(user.name)
+        old_data = json.loads(d[0].decode("utf-8"))
+#        print("old data", d[0], "   ", type(old_data))
         old_data['history'].append(data)
 
-        old_data_string = str(old_data).encode("utf-8")
-        print("Old data:", old_data_string)
-        setHistoricalData(old_data_string)
+        old_data_string = str(old_data)
+        old_data_string = str.replace(old_data_string,"'","\"")
+#        print("Old data:", old_data_string)
+        setHistoricalData(user.name,old_data_string)
 
         print("Streaming data for user ", user.name, "at timestamp", nextTimestamp)
         ## här
         socketio.emit("stream partition", (data,str(nextTimestamp)), callback=stream_data)
     else:
         print("User",user.name,"tried to be sneaky and stream data!")
+
 
 
 @socketio.on("start stream")
