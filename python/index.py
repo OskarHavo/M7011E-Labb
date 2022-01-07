@@ -297,7 +297,7 @@ def getUser():
 def checkSession():
     user = getUser()
     if user != None and user.isValid():
-        updateUserLastLogin(user.name,datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        updateUserLastLogin(user.name,datetime.now().strftime("%Y-%m-%d %H:%M:%S"),user.ip,user.port)
         return user
     else:
         return None
@@ -622,10 +622,13 @@ def fetch_all_users():
                 return jsonify({"table":str(table.__html__())})
     return "{}"
 
-def stream_data(stream):
+def stream_data(timestamp):
+    timestamp = datetime.strptime(timestamp,"%Y-%m-%d %H:%M:%S")
     user = checkSession()
     if user:
-        socketio.emit("stream partition", {stream.get(),stream}, callback=stream_data)
+        windmill = manager.getNode(user.name)
+        data,nextTimestamp = windmill.getNext(timestamp)
+        socketio.emit("stream partition", (data,str(nextTimestamp)), callback=stream_data)
     else:
         print("User",user.name,"tried to be sneaky and stream data!")
 
@@ -634,11 +637,12 @@ def stream_data(stream):
 def start_stream():
     user = checkSession()
     if user:
-        if not temporaryDatabase.get(user.name):
-            temporaryDatabase.new(user.name)
-            manager.startNode(user.name, int(user.postalcode), [-1, 1], [-1, 1])
-        stream = manager.getNode(user.name).getStream()
-        stream_data(stream)
+        #if not temporaryDatabase.get(user.name):
+            #temporaryDatabase.new(user.name)
+        manager.startNode(user.name, int(user.postalcode), [-1, 1], [-1, 1])
+        startTime = datetime.now()
+        stream_data(str(startTime-timedelta(seconds=100,microseconds=startTime.microsecond))) ## timedelta lets us fetch previous windmill updates
+
 
 @socketio.on('connect')
 def socket_connect():

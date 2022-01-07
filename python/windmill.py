@@ -7,20 +7,54 @@ from EnergyCentral import EnergyCentral
 
 class WindmillQueue:
     def __init__(self, maxLen = 10):
-        self.queue = []
-        self.sem = threading.Semaphore(0)
-        self.mtx = threading.Lock()
+        self.queue = [] # FIFO queue of datapoints
+
+        self.condition = threading.Condition()
+        #self.conditionMutex = threading.RLock()
+        self.queueMutex = threading.Lock()
         self.maxLen = maxLen
-    def get(self):
-        self.sem.acquire()
-        with self.mtx:
-            return self.queue.pop(0)
+    def getNext(self,timestamp):
+
+        # Check if the timestamp is older than all datapoints in the queue
+        with self.queueMutex:
+            # 2022-01-07 10:59:56
+            newTime = datetime.datetime.strptime(self.queue[0]["timestamp"],"%Y-%m-%d %H:%M:%S")
+            # If timestamp is older than all samples in queue
+            if newTime > timestamp:
+                return self.queue[0],newTime
+
+        # Check if the timestamp is newer then all datapoints in the queue
+        with self.condition:
+
+            self.queueMutex.acquire()   # Manually aquire the queue lock
+            newTime = datetime.datetime.strptime(self.queue[-1]["timestamp"],"%Y-%m-%d %H:%M:%S")
+
+            if newTime <= timestamp:
+                # The timestamp is newer. We need to wait for a windmill update
+                self.queueMutex.release()   # Release queue mutex so a new value can be added
+                self.condition.wait() # Wait to be unlocked byt the windmill
+
+                with self.queueMutex:   # Yes, we need to lock the queue mutex again because we had to wait
+                    # The newly added data will always be valid since it has a newer timestamp.
+                    newTime = self.queue[-1]["timestamp"]
+                    return self.queue[-1],newTime
+            else:
+                self.queueMutex.release()
+
+        # The datapoint we seek is neither the newest or the oldest
+        with self.queueMutex:
+            for d in self.queue:
+                newtime = datetime.datetime.strptime(d["timestamp"],"%Y-%m-%d %H:%M:%S")
+                if newtime  > timestamp:
+                    return d,newtime
+
     def put(self,data):
-        with self.mtx:
+        with self.queueMutex:
             self.queue.append(data)
             if self.maxLen < len(self.queue):
-                self.queue.pop()
-            self.sem.release()
+                self.queue.pop(0)
+            with self.condition:
+                self.condition.notify_all() # Notify any thread that is waiting for a new value
 
 
 class ProductionNode:
@@ -36,7 +70,7 @@ class ProductionNode:
         self.energyBuffer = 0
         self.currentProduction = 0
         self.currentPrice = 15.0
-        self.timeData = []
+        self.timeData = WindmillQueue()
 
         productionProducer = dataGeneration.DataProducer(
             dataGeneration.RandomState(postalCode+random.random(), productionRandomRange),
@@ -84,9 +118,8 @@ class ProductionNode:
         with self.syncMutex:
             return self.chain.sellRatio.blocked > 0
 
-    def getStream(self):
-        self.timeData.append(WindmillQueue)
-        return self.timeData[-1]
+    def getNext(self,timestamp):
+        return self.timeData.getNext(timestamp)
 
     def updateTime(self):
         date = datetime.datetime.now()
@@ -120,6 +153,5 @@ class ProductionNode:
                 "windspeed": str(self.currentProduction/3.0),
                 "electricityPrice": str(self.powerplant.getEnergyPrice()),
                 "blocked": str(self.chain.sellRatio.blocked > 0)}
-            for port in self.timeData:
-                port.put(data)
+            self.timeData.put(data)
             return data

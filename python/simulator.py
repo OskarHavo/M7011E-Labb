@@ -101,11 +101,14 @@ class SimulationManager:
 
     def __del__(self, instance):
         self.powerplant.stop()
+
+    ## This starts a windmill simulation for a user if one has not been started yet.
     def startNode(self,ID,*var):
         with self.mutex:
-            self.productionNodes[ID] = NodeManager(self.bus,self.delta,ID,var,self.powerplant,self.database)
-            thread = threading.Thread(target=NodeManager.run,args=(self.productionNodes[ID],))
-            thread.start()
+            if not ID in self.productionNodes:
+                self.productionNodes[ID] = NodeManager(self.bus,self.delta,ID,var,self.powerplant,self.database)
+                thread = threading.Thread(target=NodeManager.run,args=(self.productionNodes[ID],))
+                thread.start()
     def alterNode(self,username,valueName,data):
         with self.mutex:
             self.productionNodes[username].client.setValue(valueName,data)
