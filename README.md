@@ -43,14 +43,13 @@ The price is calculated through having a base price and then adding/subtracting 
 
 ***RESTful API*** <br>
 **Robin** <br>
-robyn
+We use POST, GET commands in HTML using flask's integrated requests solution.
 
 ### Advanced
 
 ***Historical Data*** <br>
 **Robin** <br>
-robyn
-
+We upload ALL data to the database and then we retrieve ALL data and plot it in a bar chart.
 
 ***Locational Data*** <br>
 **Oskar** <br>
@@ -84,11 +83,11 @@ By using using the sliders in the web interface you can control the ratio.
 
 ***Login/Logout*** <br>
 **Robin** <br>
-robyn
+The user provides username and password which POSTs and checks if this combiniation exists in the database, if so redirect to user dashboard.
 
 ***Upload House Photo*** <br>
 **Robin** <br>
-robyn
+The user selects a photo from their device and uploads it, which POSTs the image and enters it to our database as a blob. It is then fetched from the databased and displayed in the uploaders dashboard.
 
 
 ***Viewable Data*** <br>
@@ -98,15 +97,15 @@ All the required data is displayed in raw form, graph form and most extensively 
 ### Advanced
 ***Account Deletion / Change Info*** <br>
 **Oskar & Robin** <br>
-robyn
+We have a settings menu where you can change password and delete your user.
 
 
 ***Multiple Logins*** <br>
 **Robin** <br>
-robyn
+This is done via sessions directly in flask. Flask provides a cookie which is encrypted with the server's password.
 
 
-***Reorder Gagues with Drag and Drop*** <br>
+***Reorder Gauges with Drag and Drop*** <br>
 **Oskar** <br>
 We have implemented draggable gauges based on an example in order to easily visualize the data and to allow the user to change the order as it deems fit.
 
@@ -120,7 +119,7 @@ We have implemented draggable gauges based on an example in order to easily visu
 
 ***Account Deletion / Change Info of Other Users*** <br>
 **Oskar & Robin** <br>
-robyn
+We have a settings menu where you can change password and delete your user. Using the Go To function in our prosumer table, the admin can easily change credentials and delete OTHER users.
 
 
 
@@ -152,7 +151,7 @@ The market demand is displayed in one of our gauges. It is calculated as describ
 
 ***Modelled Electricity Price*** <br>
 **Oskar** <br>
-The Modelled Electricity Priceis displayed in one of our gauges. It is calculated as described in the Mathematical Model section.
+The Modelled Electricity Price is displayed in one of our gauges. It is calculated as described in the Mathematical Model section.
 
 
 ***Ratio of Buffer/Market*** <br>
@@ -176,9 +175,9 @@ The IP and PORT data is extracted from Flask and then displayed in the admins pr
 
 ***Real Time Data Stream*** <br>
 **Robin** <br>
-robyn
+The server provides socket functions, when the server receives a request, it will check the windmill for new data.
 
-***Reorder Gagues with Drag and Drop*** <br>
+***Reorder Gauges with Drag and Drop*** <br>
 **Oskar** <br>
 We have implemented draggable gauges based on an example in order to easily visualize the data and to allow the user to change the order as it deems fit.
 
@@ -186,13 +185,13 @@ We have implemented draggable gauges based on an example in order to easily visu
 
 ***Simulataneous Usage Across Different Devices*** <br>
 **Robin** <br>
-robyn
+This is done via sessions directly in flask. Flask provides a cookie which is encrypted with the server's password.
 
 
 
 ***Streaming Over Socket*** <br>
 **Robin** <br>
-robyn
+The server provides socket functions, when the server receives a request, it will check the windmill for new data.
 
 
 
@@ -202,8 +201,10 @@ robyn
 
 
 # Authentication Design
-dd
+This is done via sessions directly in flask. Flask provides a cookie which is encrypted with the server's password.
+To combat unauthorized users we have introduced a status cookie which aims to check if the user is validated or not. This is implemented by making the server validate each user in the database. This prevents someone from injecting a user in our database, since it would also have to be validated by the server.
 
+We also serialize each user object in user cookies which are used for providing secure user data. Such as the user's name, IP and port.
 
 # Time Log
 Robin Danielsson: n Hours Total
