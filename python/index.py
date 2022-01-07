@@ -1,4 +1,5 @@
 import binascii
+import json
 import sys
 
 from flask import (Flask, render_template, request, Response, redirect, session, make_response, jsonify)
@@ -221,8 +222,6 @@ def updateUserLastLogin(username,date,ip = "255.255.255.255",port="1234"):
         current_error.append(str(e))
         return False
     return True
-
-
 
 def setHistoricalData(username,data):
     global current_error
@@ -587,7 +586,7 @@ def fetch():
         if user:
             data = getHistoricalData(user.name)
             if data:
-                return data
+                return json.loads(data[0].decode("utf-8"))
             else:
                 return "{}"
             #if not temporaryDatabase.get(user.name):
@@ -670,6 +669,14 @@ def stream_data(timestamp):
     if user:
         windmill = manager.getNode(user.name)
         data,nextTimestamp = windmill.getNext(timestamp)
+
+        old_data = json.loads(getHistoricalData()[0].decode("utf-8"))
+        old_data['history'].append(data)
+
+        old_data_string = str(old_data).encode("utf-8")
+        print("Old data:", old_data_string)
+        setHistoricalData(old_data_string)
+
         print("Streaming data for user ", user.name, "at timestamp", nextTimestamp)
         ## här
         socketio.emit("stream partition", (data,str(nextTimestamp)), callback=stream_data)
