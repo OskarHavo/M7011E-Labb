@@ -95,7 +95,7 @@ def readAllUserFromDatabase():
             password="",
             database="M7011E")
         cursor = mydb.cursor(buffered=True)
-        cursor.execute("SELECT User,Password,Postalcode,LastOnline,Root FROM User")
+        cursor.execute("SELECT User,Password,Postalcode,LastOnline,Root,LoginIP,LoginPort FROM User")
         rows = cursor.fetchall()
         cursor.close()
         return rows
@@ -202,7 +202,7 @@ def removeUserFromDatabase(username):
         current_error.append(str(e))
         return False
 
-def updateUserLastLogin(username,date):
+def updateUserLastLogin(username,date,ip = "255.255.255.255",port="1234"):
     global current_error
     try:
         mydb = mysql.connector.connect(
@@ -211,7 +211,7 @@ def updateUserLastLogin(username,date):
             password="",
             database="M7011E")
         cursor = mydb.cursor(buffered=True)
-        sql = "UPDATE M7011E.User SET LastOnline='{}' WHERE User='{}'".format(date,username)
+        sql = "UPDATE M7011E.User SET LastOnline='{}', LoginIP='{}',LoginPort='{}' WHERE User='{}'".format(date,ip,port,username)
         cursor.execute(sql)
         mydb.commit()
         cursor.close()
