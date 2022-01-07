@@ -5,8 +5,7 @@ StartLimitIntervalSec=0
 
 [Service]
 Type=simple
-Restart=always
-RestartSec=10
+Restart=never
 WorkingDirectory=/var/lib/jenkins/workspace/M7011E-web
 ExecStart=python3 python/index.py
 
