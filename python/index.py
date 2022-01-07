@@ -223,6 +223,44 @@ def updateUserLastLogin(username,date,ip = "255.255.255.255",port="1234"):
     return True
 
 
+
+def setHistoricalData(username,data):
+    global current_error
+    try:
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user="Client",
+            password="",
+            database="M7011E")
+        cursor = mydb.cursor(buffered=True)
+        sql = "UPDATE M7011E.User SET HistoricalData='{}' WHERE User='{}'".format(data)
+        cursor.execute(sql)
+        mydb.commit()
+        cursor.close()
+    except Exception as e:
+        current_error.append(str(e))
+        return False
+    return True
+
+def getHistoricalData(user):
+    global current_error
+    try:
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user="Client",
+            password="",
+            database="M7011E")
+        cursor = mydb.cursor(buffered=True)
+        cursor.execute("SELECT HistoricalData FROM User WHERE User='%s'" % (user))
+        row = cursor.fetchone()
+        cursor.close()
+        if row is not None:
+            return row
+        return None
+    except Exception as e:
+        current_error.append(str(e))
+        return None
+
 class User:
     def __init__(self, username,password=None,postalcode=97753,root = False):
         if password == None:
@@ -547,9 +585,11 @@ def fetch():
         return jsonify({"data":request.args.get("username")})
     elif request.method == "GET":
         if user:
-            data = fetchUserImage(user.name)
+            data = getHistoricalData(user.name)
             if data:
-                return jsonify({"image":data[0]})
+                return data
+            else:
+                return "{}"
             #if not temporaryDatabase.get(user.name):
             #    temporaryDatabase.new(user.name)
             #    manager.startNode(user.name, int(user.postalcode), [-1, 1], [-1, 1])

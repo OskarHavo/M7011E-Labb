@@ -169,6 +169,11 @@
         socket.on('connect', function() {
             startStreaming(socket,con,1,100,10,20);
         });
+
+
+        post("fetch",{}).then(data=>{
+            console.log(data)
+        });
 /*
         socket.on("stream partition",function (data,callback){
             console.log(data);
