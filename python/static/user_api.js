@@ -260,18 +260,19 @@ function updateUserSliders(simulatorData) {
 
 
 function startStreaming(socket, chart, startx, starty, delta, bufferSize=10) {
-	socket.emit('start stream', {data: 'I\'m connected!'}, (data) => {
+	socket.emit('start stream', (data) => {
 		console.log("started stream ack");
 	});
 
-	socket.on("stream partition", function (value, callback) {
+	socket.on("stream partition", function (value,callback_arg, callback) {
 		simData.push(value);
 		console.log(value);
 		updateGraph(chart, startx, starty, bufferSize = 10);
 		updateRawSimulatorDataOutput(value);
 		updateUserGauges(value);
 		updateUserSliders(value);
-		setTimeout(callback, 10000);
+		callback(callback_arg);
+		//setTimeout(callback, 10000);
 	});
 }
 

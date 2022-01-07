@@ -614,28 +614,31 @@ def fetch_all_users():
                         online,
                         "window.location.href='/user_dashboard/%s';"%user[0],
                         "window.location.href='/block_user/%s';" % user[0],
-                        user[6], # Problem1
-                        user[7]) # Problem2
+                        user[5], # Problem1
+                        user[6]) # Problem2
                     )
                 table = UserTable(items)
                 # parse users
                 return jsonify({"table":str(table.__html__())})
     return "{}"
 
-def stream_data():
+def stream_data(stream):
     user = checkSession()
     if user:
-        if not temporaryDatabase.get(user.name):
-            temporaryDatabase.new(user.name)
-            manager.startNode(user.name, int(user.postalcode), [-1, 1], [-1, 1])
-        socketio.emit("stream partition", temporaryDatabase.get(user.name)[-1], callback=stream_data)
+        socketio.emit("stream partition", {stream.get(),stream}, callback=stream_data)
     else:
         print("User",user.name,"tried to be sneaky and stream data!")
 
 
 @socketio.on("start stream")
-def start_stream(data):
-    stream_data()
+def start_stream():
+    user = checkSession()
+    if user:
+        if not temporaryDatabase.get(user.name):
+            temporaryDatabase.new(user.name)
+            manager.startNode(user.name, int(user.postalcode), [-1, 1], [-1, 1])
+        stream = manager.getNode(user.name).getStream()
+        stream_data(stream)
 
 @socketio.on('connect')
 def socket_connect():
