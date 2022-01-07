@@ -72,7 +72,7 @@ const request = ( url, params = {}, method = 'GET' ) => {
 
 var simData = [];
 var trailLength = 10;
-
+/*
 function fetchDataCycle() {
 	return post('/fetch', {}).then(response => {
 		if (simData.length== 0 || simData[simData.length - 1]["timestamp"] != response["timestamp"]) {
@@ -85,7 +85,7 @@ function fetchDataCycle() {
 		}
 	});
 }
-
+*/
 const post = (url, params) => request(url,params,'GET');
 const put = (url,params) => request(url,params,"PUT");
 var k = 0
@@ -291,4 +291,4 @@ document.addEventListener('DOMContentLoaded', (event) => {
 	};
 });
 
-updateUserSliders(fetchDataCycle());
+//updateUserSliders(fetchDataCycle());

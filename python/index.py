@@ -631,6 +631,7 @@ def stream_data(timestamp):
         windmill = manager.getNode(user.name)
         data,nextTimestamp = windmill.getNext(timestamp)
         print("Streaming data for user ", user.name, "at timestamp", nextTimestamp)
+        ## här
         socketio.emit("stream partition", (data,str(nextTimestamp)), callback=stream_data)
     else:
         print("User",user.name,"tried to be sneaky and stream data!")
