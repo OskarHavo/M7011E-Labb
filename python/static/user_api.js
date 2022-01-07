@@ -253,6 +253,7 @@ function updateUserSliders(simulatorData) {
 		document.getElementById("sellingRatioText").innerHTML = "BLOCKED";
 		document.getElementById("sellRatio").disabled = true;
 	} else {
+		document.getElementById("sellRatio").disabled = false;
 		document.getElementById("sellingRatioText").innerHTML = sellRatio+"%";
 	}
 

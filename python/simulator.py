@@ -106,6 +106,7 @@ class SimulationManager:
     def startNode(self,ID,*var):
         with self.mutex:
             if not ID in self.productionNodes:
+                print("Starting simulator node for", ID)
                 self.productionNodes[ID] = NodeManager(self.bus,self.delta,ID,var,self.powerplant,self.database)
                 thread = threading.Thread(target=NodeManager.run,args=(self.productionNodes[ID],))
                 thread.start()
@@ -120,6 +121,7 @@ class SimulationManager:
     def getNode(self,ID):
         with self.mutex:
             if ID in self.productionNodes:
+                print("Fetching simulator node for user", ID)
                 return self.productionNodes[ID].client
     def __del__(self):
         with self.mutex:

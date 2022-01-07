@@ -15,6 +15,10 @@ class WindmillQueue:
         self.maxLen = maxLen
     def getNext(self,timestamp):
 
+        with self.queueMutex:
+            if len(self.queue) > 0:
+                return self.queue[0]
+
         # Check if the timestamp is older than all datapoints in the queue
         with self.queueMutex:
             # 2022-01-07 10:59:56

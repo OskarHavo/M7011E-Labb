@@ -202,6 +202,8 @@ def removeUserFromDatabase(username):
         current_error.append(str(e))
         return False
 
+# Update the user login date, IP number and port on the database. Call this whenever a uer logs in
+# or updates their login info
 def updateUserLastLogin(username,date,ip = "255.255.255.255",port="1234"):
     global current_error
     try:
@@ -628,6 +630,7 @@ def stream_data(timestamp):
     if user:
         windmill = manager.getNode(user.name)
         data,nextTimestamp = windmill.getNext(timestamp)
+        print("Streaming data for user ", user.name, "at timestamp", nextTimestamp)
         socketio.emit("stream partition", (data,str(nextTimestamp)), callback=stream_data)
     else:
         print("User",user.name,"tried to be sneaky and stream data!")
@@ -641,6 +644,7 @@ def start_stream():
             #temporaryDatabase.new(user.name)
         manager.startNode(user.name, int(user.postalcode), [-1, 1], [-1, 1])
         startTime = datetime.now()
+        print("Starting stream for user", user.name)
         stream_data(str(startTime-timedelta(seconds=100,microseconds=startTime.microsecond))) ## timedelta lets us fetch previous windmill updates
 
 
@@ -668,7 +672,7 @@ def serverStartup():
             if user[4] == 0:
                 temporaryDatabase.new(user[0])
                 manager.startNode(user[0], int(user[2]), [-5, 5], [-5, 5])
-                print("Started simulation windmill for user:", user[0])
+                #print("Started simulation windmill for user:", user[0])
     except:
         print("Running without database! Are you connected?")
     socketio.run(app, host=host)  # , ssl_context='adhoc')
