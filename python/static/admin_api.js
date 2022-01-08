@@ -133,6 +133,7 @@ function htmlToTable(){
 		var table = document.getElementById("prosumertableinadmin");
         table.innerHTML = value.table;
 	})
+
 }
 
 function updateAll(updater, delta, bufferSize=10) {

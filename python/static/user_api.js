@@ -189,8 +189,8 @@ function updateUserGauges(simulatorData) {
 		windspeed = String(parseFloat(simulatorData.windspeed)).substring(0, 5);
 		windspeedoutput = String((windspeed / maxValueWindSpeed) * 100.0);
 
-		netproduction = String(parseFloat(production) - parseFloat(consumption)).substring(0, 4);
-		netproductionoutput = String((Math.abs(netproduction) / maxValueNetProduction) * 100.0).substring(0, 4);
+		netproduction = String(parseFloat(production) - parseFloat(consumption)).substring(0, 5);
+		netproductionoutput = String((Math.abs(netproduction) / maxValueNetProduction) * 100.0).substring(0, 5);
 
 		buffer = simulatorData.buffer.substring(0, 5);
 		bufferoutput = String((buffer / MaxValueBuffer) * 100.0);
