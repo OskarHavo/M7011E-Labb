@@ -79,6 +79,11 @@
 				<div class = "historicaldataoutputdiv" id="historicaldataoutputdiv">
 
 				</div>
+
+                <h2>Historical Data</h2>
+                <div id="historycharts" style="width:100%;max-width:800px;margin:auto;margin-top:20px;background-color:white;padding:10px;box-shadow:0 0 10px;border-radius:10px">
+                        <canvas id="history" style="width:100%"></canvas>
+                </div>
 			</div>
 
 
@@ -208,7 +213,8 @@
             console.log("started streaming");
         });
 
-		historicalDataRetriever()
+        var historychart = genHistoryChart("history",0,200);
+		historicalDataRetriever(historychart)
 
     </script>
 

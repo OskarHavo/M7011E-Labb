@@ -35,6 +35,43 @@ function genTimeChart(chartName,minimum,maximum) {
 	});
 }
 
+function genHistoryChart(chartName,minimum,maximum) {
+	return new Chart(chartName, {
+		type: "line",
+		data: {
+			labels: [],
+			datasets: [{
+				label: "Consumption",
+				fill: false,
+				backgroundColor: "rgb(0,0,255,1.0)",
+				borderColor: "rgb(200,192,80)",
+				pointBackgroundColor: 'rgba(180,172,60,0.3)',
+				tension:0.2,
+				data: []
+			},
+			{
+				label:"Production",
+				fill: false,
+				backgroundColor: "rgb(0,0,255,1.0)",
+				borderColor: "rgb(20,30,100)",
+				pointBackgroundColor: 'rgba(30,50,120,0.3)',
+				tension:0.2,
+				data: []
+			}]
+		},
+		options: {
+			plugins: {
+				legend: {
+					position: 'top',
+				},
+			},
+			scales: {
+				yAxes: [{ticks: {min: 0, max:maximum}}],
+			}
+		}
+	});
+}
+
 //var chart = genTimeChart("mychart",-20,20);
 function addData(chart, label, data) {
 	chart.data.labels.push(label);
@@ -88,13 +125,10 @@ function fetchDataCycle() {
 */
 const post = (url, params) => request(url,params,'GET');
 const put = (url,params) => request(url,params,"PUT");
-var k = 0
 //var repeater;
 
 function updateGraph(chart,bufferSize=10) {
 	if (simData.length > 0) {
-		var i = k;
-		k = k + 1;
 		var data = simData[simData.length - 1];
 
 		var d = new Date(data.timestamp+"Z");
@@ -158,20 +192,37 @@ function updateRawSimulatorDataOutput(simulatorData) {
 	document.getElementById("datetext").innerHTML = simulatorData.timestamp;
 
 }
-function historicalDataRetriever(){
+function historicalDataRetriever(chart){
 	post("fetch",{}).then(data=>{
 		var div = document.getElementById("historicaldataoutputdiv");
+		console.log(data)
 
-        outputlist = []
-		for data in data.history:
-		    timestamp = data.timestamp
-		    consumption = data.consumption
-		    production = data.production
-		    price = data.electricityPrice
-		    var output = "Timestamp: " + str(timestamp)  + " Consumption: " + str(consumption)  + " Production: " + str(production)  + " Price: " + str(price)  + "\n"
-		    outputlist.append(output)
+        var output = ""
+		for (var i = 0, size = data.history.length; i < size; i++) {
+			var currentData = data.history[i];
 
-        div.innerHTML = outputlist;
+			var d = new Date(currentData.timestamp + "Z");
+			//chart.data.labels = []
+			chart.data.labels.push(d.getUTCHours() + ":" + d.getUTCMinutes() + ":" + d.getUTCSeconds());
+			//chart.data.datasets[0] = []
+			chart.data.datasets[0].data.push(currentData["consumption"]);
+			//chart.data.datasets[1] = []
+			chart.data.datasets[1].data.push(currentData["production"]);
+
+
+
+
+			chart.options.scales.yAxes = [{ticks: {min: 0, max: maximum}}];
+
+			//output += "Timestamp: " + data.history[i].timestamp + " Consumption: " + data.history[i].consumption + " Production: " + data.history[i].production + " Price: " + data.history[i].electricityPrice + "\n"
+		}
+		var maximum = Math.max.apply(null, chart.data.datasets[0].data);
+		var prodMax = Math.max.apply(null, chart.data.datasets[1].data);
+		if (prodMax > maximum) {
+			maximum = prodMax;
+		}
+		chart.update();
+		div.innerHTML = output;
 	});
 }
 
