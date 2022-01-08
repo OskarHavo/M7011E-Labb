@@ -126,7 +126,7 @@ class BufferCalc:
         buyValue = self.buyCalc.currentValue()
         sellValue = self.sellRatio.currentValue()
         if buyValue < 0:
-            self.buffer = self.buffer + (-buyValue)-sellValue
+            self.buffer = np.clip(self.buffer + (-buyValue)-sellValue,0,100)
         return self.buffer
 
 
