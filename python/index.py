@@ -62,11 +62,9 @@ app.permanent_session_lifetime = timedelta(minutes=999)
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024 # 2 megabytes
 socketio = SocketIO(app)
 
-global temporaryDatabase
-temporaryDatabase = Database()
 
 global manager
-manager = SimulationManager(10,temporaryDatabase)
+manager = SimulationManager(10)
 
 def readUserFromDatabase(user):
     global current_error
@@ -528,6 +526,7 @@ def delete_user():
     user = checkSession()
     if user and request.method == "POST":
         if removeUserFromDatabase(user.name):
+            manager.stopNode(user.name)
             return redirect(logoutDir)
         else:
             render_template("settings.html",user=user.name,error="Could not delete user")
@@ -542,8 +541,6 @@ def image(usertype):
         if request.method == "POST":
             if 'houseimage' not in request.files:
                 return ""
-
-#            bin_file = io.BytesIO(request.files["houseimage"].read()).getvalue()
             file = request.files["houseimage"]
 
             file = file.read()
@@ -576,11 +573,10 @@ def fetch():
         function = request.values.json["function"]
         if function == "create":
             if user.name != "" and user.postalcode != "":
-                temporaryDatabase.new(user.name)
                 manager.startNode(user.name,int(user.postalcode),[-5,5],[-5,5])
         elif function == "delete":
             if user:
-                temporaryDatabase.remove(user.name)
+                manager.stopNode(user.name)
         return jsonify({"data":request.args.get("username")})
     elif request.method == "GET":
         if user:
@@ -663,13 +659,15 @@ def fetch_all_users():
                 return jsonify({"table":str(table.__html__())})
     return "{}"
 
-@socketio.on("stream partition")
+# This function can only be called if the client has received a callback from the server.
+# The client must first ask the server to start a streaming session.
 def stream_data(timestamp):
     timestamp = datetime.strptime(timestamp,"%Y-%m-%d %H:%M:%S")
     user = checkSession()
     if user:
         windmill = manager.getNode(user.name)
         data,nextTimestamp = windmill.getNext(timestamp)
+
 
 #        d = getHistoricalData(user.name)
 #        old_data = json.loads(d[0].decode("utf-8"))
@@ -681,14 +679,18 @@ def stream_data(timestamp):
 #        print("Old data:", old_data_string)
 #        setHistoricalData(user.name,old_data_string)
 
-        print("Streaming data for user ", user.name, "at timestamp", nextTimestamp)
-        ## här
-        socketio.emit("stream partition", (data,str(nextTimestamp)), callback=stream_data,to=request.sid)
+        if data:
+            print("Streaming data for user ", user.name, "at timestamp", nextTimestamp, " and length", len(data))
+            # Send the newly fetched data to the client.
+            socketio.emit("stream partition", (data,str(nextTimestamp)), callback=stream_data,to=request.sid)
+        else:
+            # There is currently no more data available atm.
+            socketio.emit("stream partition",(None,str(timestamp)),callback=stream_data,to=request.sid)
     else:
         print("User",user.name,"tried to be sneaky and stream data!")
 
 
-
+# Start a data streaming session
 @socketio.on("start stream")
 def start_stream():
     user = checkSession()
@@ -722,7 +724,6 @@ def serverStartup():
 
         for user in users:
             if user[4] == 0:
-                temporaryDatabase.new(user[0])
                 manager.startNode(user[0], int(user[2]), [-5, 5], [-5, 5])
                 #print("Started simulation windmill for user:", user[0])
     except:

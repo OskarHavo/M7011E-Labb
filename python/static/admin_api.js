@@ -154,7 +154,7 @@ function updateAll(updater, delta, bufferSize=10) {
 
 document.addEventListener('DOMContentLoaded', (event) => {
 		var slider = document.querySelectorAll('.slider');
-		slider.item(0).oninput = function () {
+		slider.item(0).onmouseup = function () {
 			console.log(this.value);
 			uploadData(this.id, parseFloat(this.value));
 			document.getElementById("currentelectricitypriceText").innerHTML = this.value + "kr";
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 				updateAdminGauges(value);
 			});
 		};
-		slider.item(1).oninput = function () {
+		slider.item(1).onmouseup = function () {
 			console.log(this.value);
 			uploadData(this.id, parseFloat(this.value) / 100);
 			document.getElementById("powerplantproductionText").innerHTML = this.value + "%";
@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 				updateAdminGauges(value);
 			});
 		};
-		slider.item(2).oninput = function () {
+		slider.item(2).onmouseup = function () {
 			console.log(this.value);
 			uploadData(this.id,parseFloat(this.value)/100);
 			document.getElementById("marketRatioText").innerHTML = this.value+"%";

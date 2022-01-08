@@ -64,13 +64,12 @@ class MessageBus:
             return response.json()
 
 class NodeManager:
-    def __init__(self,messageBus, delta,ID,var,powerplant,database):
+    def __init__(self,messageBus, delta,ID,var,powerplant):
         self.client = windmill.ProductionNode(ID,var[0],var[1],var[2],powerplant)
         self.delta = delta
         self.mutex = threading.Lock()
         self.running = False
         self.messageBus = messageBus
-        self.database = database
     def stop(self):
         with self.mutex:
             self.running = False
@@ -83,13 +82,12 @@ class NodeManager:
                 if not self.running:
                     break
             data = self.client.tick()
-            self.database.put(data,self.client.user)
             sleep(self.delta)
 
 
 
 class SimulationManager:
-    def __init__(self,globalDelta,database,availableEnergy = 100):
+    def __init__(self,globalDelta,availableEnergy = 100):
         self.productionNodes = {}   # Username, thread
         self.delta = globalDelta
         self.bus = MessageBus("http://localhost:4242")
@@ -97,7 +95,6 @@ class SimulationManager:
         self.powerplant = EnergyCentral(availableEnergy,self.delta)
         thread = threading.Thread(target=EnergyCentral.run,args=(self.powerplant,))
         thread.start()
-        self.database = database
 
     def __del__(self, instance):
         self.powerplant.stop()
@@ -106,8 +103,7 @@ class SimulationManager:
     def startNode(self,ID,*var):
         with self.mutex:
             if not ID in self.productionNodes:
-                print("Starting simulator node for", ID)
-                self.productionNodes[ID] = NodeManager(self.bus,self.delta,ID,var,self.powerplant,self.database)
+                self.productionNodes[ID] = NodeManager(self.bus,self.delta,ID,var,self.powerplant)
                 thread = threading.Thread(target=NodeManager.run,args=(self.productionNodes[ID],))
                 thread.start()
     def alterNode(self,username,valueName,data):
@@ -121,7 +117,6 @@ class SimulationManager:
     def getNode(self,ID):
         with self.mutex:
             if ID in self.productionNodes:
-                print("Fetching simulator node for user", ID)
                 return self.productionNodes[ID].client
     def __del__(self):
         with self.mutex:

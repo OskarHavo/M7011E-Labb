@@ -260,13 +260,11 @@ function updateUserSliders(simulatorData) {
 
 document.addEventListener('DOMContentLoaded', (event) => {
 	var slider = document.querySelectorAll('.slider');
-	slider.item(0).oninput = function () {
-		console.log(this.value);
+	slider.item(0).onmouseup = function () {
 		uploadData(this.id, parseFloat(this.value) / 100);
 		document.getElementById("buyingRatioText").innerHTML = this.value + "%";
 	};
-	slider.item(1).oninput = function () {
-		console.log(this.value);
+	slider.item(1).onmouseup = function () {
 		uploadData(this.id, parseFloat(this.value) / 100);
 		document.getElementById("sellingRatioText").innerHTML = this.value + "%";
 	};

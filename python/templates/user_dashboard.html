@@ -167,8 +167,8 @@
         var socket = io();
 
         socket.on('connect', function() {
-            console.log(socket.id);
-            socket.join(socket.id)
+            console.log("Connected to streaming server as ID " + socket.id);
+            socket.emit('join',socket.id)
             //startStreaming(socket,con,1,100,10,20);
         });
 
@@ -177,39 +177,36 @@
         });
 
         socket.on("stream partition", function (value, callback_arg, callback) {
-            console.log(socket.id);
-            simData.push(value);
-            console.log(value);
-            updateGraph(con, bufferSize = 10);
-            updateRawSimulatorDataOutput(value);
-            updateUserGauges(value);
-            updateUserSliders(value);
-            callback(callback_arg);
-            //setTimeout(callback, 10000);
+            if (value != null) {
+                // We got some data!
+                console.log(value)
+                for (var i = 0, size = value.length; i < size; i++) {
+                    simData.push(value[i]);
+                    updateGraph(con, bufferSize = 10);
+                    updateRawSimulatorDataOutput(value[i]);
+                    updateUserGauges(value[i]);
+                    updateUserSliders(value[i]);
+                }
+
+                // Signal the server that we're ready for more!
+                callback(callback_arg);
+            } else {
+                // We didn't get any data :(
+                // Wait a couple seconds before pinging the server for more data.
+                // The time is not relevant, since we will always resume the data stream
+                // from the most recent data sample we received ;)
+                setTimeout(callback, 5000,callback_arg);
+            }
         });
 
-        socket.to(socket.id).emit('start stream', (data) => {
-            console.log("started stream ack");
+        <!-- Start streaming data from our windmill -->
+        socket.emit('start stream', (data) => {
+            console.log("started streaming");
         });
-
 
         post("fetch",{}).then(data=>{
             console.log(data)
         });
-/*
-        socket.on("stream partition",function (data,callback){
-            console.log(data);
-            setTimeout(callback,5000);
-            //callback();
-        })
- */
-/*
-        socket.on("server response", function (msg) {
-            console.log("received server ack!")
-            //console.log(msg);
-        });
-
- */
     </script>
 
 
