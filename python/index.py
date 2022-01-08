@@ -3,12 +3,15 @@ import json
 import sys
 
 from flask import (Flask, render_template, request, Response, redirect, session, make_response, jsonify)
-import mysql.connector
+
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta, datetime
 from io import StringIO
 from flask_socketio import SocketIO
+
+import databaseFunctions
 from dynamic_table import *
+from databaseFunctions import *
 
 import simulator
 from simulator import *
@@ -39,25 +42,10 @@ tableDir = "/table"
 global counter
 counter = 1
 
-def fetchKey():
-    global current_error
-    try:
-        mydb = mysql.connector.connect(
-            host="localhost",
-            user="Client",
-            password="",
-            database="M7011E")
-        cursor = mydb.cursor(buffered=True)
-        cursor.execute("SELECT Secret FROM SessionSecret WHERE ServerName='Flask'")
-        cursor.close()
-        return str(cursor.fetchone())
-    except Exception as e:
-        current_error.append(str(e))
-        return "supersecretpassword"
 
 host = "0.0.0.0"
 app = Flask(__name__)
-app.secret_key = fetchKey()
+app.secret_key = databaseFunctions.fetchKey()
 app.permanent_session_lifetime = timedelta(minutes=999)
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024 # 2 megabytes
 socketio = SocketIO(app)
@@ -66,197 +54,7 @@ socketio = SocketIO(app)
 global manager
 manager = SimulationManager(10)
 
-def readUserFromDatabase(user):
-    global current_error
-    try:
-        mydb = mysql.connector.connect(
-            host="localhost",
-            user="Client",
-            password="",
-            database="M7011E")
-        cursor = mydb.cursor(buffered=True)
-        cursor.execute("SELECT User,Password,Postalcode,Root FROM User WHERE User='%s'" % (user))
-        row = cursor.fetchone()
-        cursor.close()
-        if row is not None:
-            return row
-        return None
-    except Exception as e:
-        current_error.append(str(e))
-        return None
 
-def readAllUserFromDatabase():
-    global current_error
-    try:
-        mydb = mysql.connector.connect(
-            host="localhost",
-            user="Client",
-            password="",
-            database="M7011E")
-        cursor = mydb.cursor(buffered=True)
-        cursor.execute("SELECT User,Password,Postalcode,LastOnline,Root,LoginIP,LoginPort FROM User")
-        rows = cursor.fetchall()
-        cursor.close()
-        return rows
-    except Exception as e:
-        current_error.append(str(e))
-        return None
-
-def fetchUserImage(username):
-    global current_error
-    try:
-        mydb = mysql.connector.connect(
-            host="localhost",
-            user="Client",
-            password="",
-            database="M7011E")
-        cursor = mydb.cursor(buffered=True)
-        cursor.execute(
-            "SELECT Image FROM User WHERE User='%s'" % (username))
-        row = cursor.fetchone()
-        cursor.close()
-        if row is not None:
-            return row
-        return None
-    except Exception as e:
-        current_error.append(str(e))
-
-def setUserImage(username,blob):
-    global current_error
-    try:
-        mydb = mysql.connector.connect(
-            host="localhost",
-            user="Client",
-            password="",
-            database="M7011E")
-        cursor = mydb.cursor(buffered=True)
-        cursor.execute(
-            "UPDATE M7011E.User SET Image=%s WHERE User='%s'" % (blob, username))
-        mydb.commit()
-        cursor.close()
-        return True
-    except Exception as e:
-        current_error.append(str(e))
-        return False
-
-
-def writeUserToDatabase(user, password,postalcode):
-    global current_error
-    try:
-        if user == "" or password == "":
-            return False
-        mydb = mysql.connector.connect(
-            host="localhost",
-            user="Client",
-            password="",
-            database="M7011E")
-        cursor = mydb.cursor(buffered=True)
-        sql = "INSERT INTO User(User,Password,Postalcode) VALUES(%s,%s,%s)"
-        val = (user, password,postalcode)
-        cursor.execute(sql, val)
-        mydb.commit()
-        cursor.close()
-    except Exception as e:
-        current_error.append(str(e))
-        return False
-    return True
-
-def alterUserInDatabase(username,newPassword=None,newPostalCode=None):
-    global current_error
-    try:
-        mydb = mysql.connector.connect(
-            host="localhost",
-            user="Client",
-            password="",
-            database="M7011E")
-        cursor = mydb.cursor(buffered=True)
-        sql = "UPDATE M7011E.User SET "# Password='{}' WHERE User='{}'".format(newUser,newPassword,oldUser)
-        if newPassword:
-            sql += "Password='%s'" %(newPassword)
-        if newPostalCode:
-            sql += "Postalcode='%s'" %(newPostalCode)
-        sql += "WHERE User='%s'" % (username)
-        cursor.execute(sql)
-        mydb.commit()
-        cursor.close()
-    except Exception as e:
-        current_error.append(str(e))
-        return False
-    return True
-
-def removeUserFromDatabase(username):
-    global current_error
-    try:
-        mydb = mysql.connector.connect(
-            host="localhost",
-            user="Client",
-            password="",
-            database="M7011E")
-        cursor = mydb.cursor(buffered=True)
-        cursor.execute("DELETE FROM M7011E.User WHERE User='%s'" % (username))
-        mydb.commit()
-        cursor.close()
-        return True
-    except Exception as e:
-        current_error.append(str(e))
-        return False
-
-# Update the user login date, IP number and port on the database. Call this whenever a uer logs in
-# or updates their login info
-def updateUserLastLogin(username,date,ip = "255.255.255.255",port="1234"):
-    global current_error
-    try:
-        mydb = mysql.connector.connect(
-            host="localhost",
-            user="Client",
-            password="",
-            database="M7011E")
-        cursor = mydb.cursor(buffered=True)
-        sql = "UPDATE M7011E.User SET LastOnline='{}', LoginIP='{}',LoginPort='{}' WHERE User='{}'".format(date,ip,port,username)
-        cursor.execute(sql)
-        mydb.commit()
-        cursor.close()
-    except Exception as e:
-        current_error.append(str(e))
-        return False
-    return True
-
-def setHistoricalData(username,data):
-    global current_error
-    try:
-        mydb = mysql.connector.connect(
-            host="localhost",
-            user="Client",
-            password="",
-            database="M7011E")
-        cursor = mydb.cursor(buffered=True)
-        sql = "UPDATE M7011E.User SET HistoricalData='{}' WHERE User='{}'".format(data,username)
-        cursor.execute(sql)
-        mydb.commit()
-        cursor.close()
-    except Exception as e:
-        current_error.append(str(e))
-        return False
-    return True
-
-def getHistoricalData(user):
-    global current_error
-    try:
-        mydb = mysql.connector.connect(
-            host="localhost",
-            user="Client",
-            password="",
-            database="M7011E")
-        cursor = mydb.cursor(buffered=True)
-        cursor.execute("SELECT HistoricalData FROM User WHERE User='%s'" % (user))
-        row = cursor.fetchone()
-        cursor.close()
-        if row is not None:
-            return row
-        return None
-    except Exception as e:
-        current_error.append(str(e))
-        return None
 
 class User:
     def __init__(self, username,password=None,postalcode=97753,root = False):
@@ -448,6 +246,13 @@ def userDash2(username):
         return redirect(adminDash)
     else:
         return redirect(indexDir)
+
+@app.route("/demopage")
+def userDash3():
+    user = User("Demo","",postalcode=1234)
+    user.validated = True
+    session["user"] = user.toJSON()
+    return render_template("user_dashboard.html",user=user.name,postalcode=user.postalcode)
 
 
 @app.route(adminDashboardDir)
