@@ -157,13 +157,12 @@ function updateRawSimulatorDataOutput(simulatorData) {
 	// Set the text in the top bar
 	document.getElementById("datetext").innerHTML = simulatorData.timestamp;
 
-
-    // Om man vill göra ett flöde med alla timestamps, funkar ej dock.
-  /*  div = document.getElementById('rawdataoutputdiv');
-    div.insertAdjacentHTML('afterbegin', '<div>' + dateoutput + '<hr></div>');
-    div.insertAdjacentHTML('afterbegin', '<div>' + output1 + '<hr></div>');
-    div.insertAdjacentHTML('afterbegin', '<div>' + output2 + '<hr></div>');
-    div.insertAdjacentHTML('afterbegin', '<div>' + output3 + '<hr></div>');*/
+}
+function historicalDataRetriever(){
+	post("fetch",{}).then(data=>{
+		var div = document.getElementById("historicaldataoutputdiv");
+        div.innerHTML = data.history;
+	});
 }
 
 

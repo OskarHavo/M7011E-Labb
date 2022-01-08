@@ -430,6 +430,20 @@
     border-bottom-style: solid;
 }
 
+.historicaldataoutputdiv{
+
+    float: left;
+    height: 240px;
+    margin-top: 2%;
+    width: 100%;
+    background-color: #ffffff;
+    border: 3px solid #666;
+    border-radius: .5em;
+    padding: 10px;
+
+    overflow:auto;
+}
+
 
 
 
