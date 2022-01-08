@@ -582,7 +582,7 @@ def fetch():
         if user:
             data = getHistoricalData(user.name)
             if data:
-                return data[0].decode("utf-8")
+                return jsonify(data[0].decode("utf-8"))
             else:
                 return "{}"
             #if not temporaryDatabase.get(user.name):
