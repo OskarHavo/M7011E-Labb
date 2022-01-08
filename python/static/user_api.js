@@ -161,7 +161,8 @@ function updateRawSimulatorDataOutput(simulatorData) {
 function historicalDataRetriever(){
 	post("fetch",{}).then(data=>{
 		var div = document.getElementById("historicaldataoutputdiv");
-        div.innerHTML = data.history;
+		var dataArray = JSON.stringify(data.history)
+        div.innerHTML = dataArray;
 	});
 }
 
