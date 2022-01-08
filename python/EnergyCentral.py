@@ -16,6 +16,7 @@ class EnergyCentral:
         self.marketDemand = 0
         self.modeledElectricityPrice = 0
         self.electricityPrice = 15.0
+        self.blackout = False
         self.date = datetime.datetime.now()
         self.mutex = threading.Lock()
         self.delta = delta
@@ -47,6 +48,9 @@ class EnergyCentral:
     def getEnergyPrice(self):
         with self.mutex:
             return self.electricityPrice
+    def getBlackoutStatus(self):
+        with self.mutex:
+            return self.blackout
 
     def setValue(self,valueName, value):
         with self.mutex:

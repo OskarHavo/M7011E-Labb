@@ -2,6 +2,7 @@ import datetime
 import random
 import math
 import numpy as np
+from random import randrange
 from EnergyCentral import EnergyCentral
 
 class PowerConsumption:
@@ -20,14 +21,33 @@ class PowerProduction:
         deltaDate = date - self.startDate  # Calculate where in the sinewave you are.
         i = deltaDate.days
 
-        # These ranges create a healthy range of the total NetEnergyProduction. (Kan inte randomiza för varje call, man får nog randomiza 1 gång per hus och föra in det som inparameter)
-        A = 10  # random.randint(10, 12)  # Amplitude (Max/Min Value)
-        f = 0.01  # Frequency
-        B = self.areaCode  # Phase  (Adjust for location)
-        C = A * 1.5  # Makes sure the values are not too low and/or negative  ##Check so randomizing the afb values does it make it negative in some config
+        if EnergyCentral.getBlackoutStatus() == False:
+            # These ranges create a healthy range of the total NetEnergyProduction. (Kan inte randomiza för varje call, man får nog randomiza 1 gång per hus och föra in det som inparameter)
+            A = 10  # random.randint(10, 12)  # Amplitude (Max/Min Value)
+            f = 0.01  # Frequency
+            B = self.areaCode  # Phase  (Adjust for location)
+            C = A * 1.5  # Makes sure the values are not too low and/or negative  ##Check so randomizing the afb values does it make it negative in some config
 
-        powerProduction = A * math.sin(2.0 * math.pi * f * np.float64(i) + B) + C  # Sinuswave
-        # print(str(i) + " AND " + str(powerProduction ))
+            powerProduction = A * math.sin(2.0 * math.pi * f * np.float64(i) + B) + C  # Sinuswave
+        else:
+            # If blackout, randomize 4 areacodes and set the production which is sent to these areas to zero.
+            affectedPostalCodes = []
+
+            affectedPostalCodes.append(randrange(10))
+            affectedPostalCodes.append(randrange(10))
+            affectedPostalCodes.append(randrange(10))
+            affectedPostalCodes.append(randrange(10))
+
+            if self.areaCode in affectedPostalCodes:
+                powerProduction = 0
+            else:
+                A = 10
+                f = 0.01
+                B = self.areaCode
+                C = A * 1.5 
+
+                powerProduction = A * math.sin(2.0 * math.pi * f * np.float64(i) + B) + C  # Sinuswave
+
         return powerProduction
 
 # Calculates how much we need to buy based on the current consumption, production and buy ratio

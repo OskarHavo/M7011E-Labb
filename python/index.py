@@ -449,14 +449,17 @@ def fetch_all_users():
                     if user[4] == 1:
                         continue
 
-                    online = "Online"
+                    user_status = "Online"
                     if user[3] < now-delta:
-                        online = "Offline"
+                        user_status = "Offline"
                     if manager.getNode(user[0]).getBlockStatus():
-                        online = "Blocked"
+                        user_status = "Blocked"
+                    if "rubbe hitta bra condition" == True:
+                        user_status = "Blackout"
+
                     items.append(Row(
                         user[0],
-                        online,
+                        user_status,
                         "window.location.href='/user_dashboard/%s';"%user[0],
                         "window.location.href='/block_user/%s';" % user[0],
                         user[5], # Problem1
