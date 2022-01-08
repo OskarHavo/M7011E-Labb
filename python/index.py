@@ -16,6 +16,8 @@ from databaseFunctions import *
 import simulator
 from simulator import *
 
+from windmillhistory import Windmillhistory
+
 global current_error
 current_error = []
 
@@ -53,6 +55,7 @@ socketio = SocketIO(app)
 
 global manager
 manager = SimulationManager(10)
+dataHistory = Windmillhistory(manager)
 
 
 
@@ -533,7 +536,8 @@ def serverStartup():
                 #print("Started simulation windmill for user:", user[0])
     except:
         print("Running without database! Are you connected?")
-    socketio.run(app, host=host)  # , ssl_context='adhoc')
+    dataHistory.start()
+    socketio.run(app, host=host,port=4000)  # , ssl_context='adhoc')
 
 if __name__ == "__main__":
     serverStartup()
