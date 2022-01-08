@@ -22,7 +22,7 @@ def roundTime(dt=None, roundTo=60):
 
 class Windmillhistory():
     ## Create a new windmill history generator. Default delta time is 60 seconds
-    def __init__(self, simulator, timeDelta = 60*10):
+    def __init__(self, simulator, timeDelta = 60*60*12):
         self.sim = simulator
         self.running = False
         self.mtx=Lock()
@@ -37,11 +37,11 @@ class Windmillhistory():
                 timestamp = datetime.datetime.now() - datetime.timedelta(seconds=10)
                 print ("Iterating through", len(self.sim.productionNodes), "nodes")
                 for username in self.sim.productionNodes:
-                    data = self.sim.productionNodes[username].client.getNext(timestamp)[0]
+                    data = self.sim.productionNodes[username].client.getNext(timestamp)[0][0]
                     oldData = databaseFunctions.getHistoricalData(username)
 
-                    if not oldData:
-                        oldData = {'history':[]}
+                    if not oldData[0]:
+                        oldData = {'history': []}
                     else:
                         oldData = json.loads(oldData[0].decode("utf-8"))
                     #        print("old data", d[0], "   ", type(old_data))

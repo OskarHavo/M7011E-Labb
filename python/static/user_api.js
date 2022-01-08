@@ -35,27 +35,36 @@ function genTimeChart(chartName,minimum,maximum) {
 	});
 }
 
-function genHistoryChart(chartName,minimum,maximum) {
+function genHistoryChart(chartName) {
 	return new Chart(chartName, {
-		type: "line",
+		type: "bar",
 		data: {
 			labels: [],
 			datasets: [{
 				label: "Consumption",
 				fill: false,
-				backgroundColor: "rgb(0,0,255,1.0)",
+				backgroundColor: "rgb(255,0,0,1.0)",
 				borderColor: "rgb(200,192,80)",
 				pointBackgroundColor: 'rgba(180,172,60,0.3)',
-				tension:0.2,
+				//tension:0.2,
 				data: []
 			},
 			{
 				label:"Production",
 				fill: false,
-				backgroundColor: "rgb(0,0,255,1.0)",
+				backgroundColor: "rgb(0,255,0,1.0)",
 				borderColor: "rgb(20,30,100)",
 				pointBackgroundColor: 'rgba(30,50,120,0.3)',
-				tension:0.2,
+				//tension:0.2,
+				data: []
+			},
+			{
+				label:"Price",
+				fill: false,
+				backgroundColor: "rgb(0,0,255,1.0)",
+				borderColor: "rgb(20,255,100)",
+				pointBackgroundColor: 'rgba(20,255,40,0.3)',
+				//tension:0.2,
 				data: []
 			}]
 		},
@@ -66,7 +75,9 @@ function genHistoryChart(chartName,minimum,maximum) {
 				},
 			},
 			scales: {
-				yAxes: [{ticks: {min: 0, max:maximum}}],
+				y: {
+					beginAtZero:true
+				}
 			}
 		}
 	});
@@ -200,27 +211,26 @@ function historicalDataRetriever(chart){
         var output = ""
 		for (var i = 0, size = data.history.length; i < size; i++) {
 			var currentData = data.history[i];
-
-			var d = new Date(currentData.timestamp + "Z");
 			//chart.data.labels = []
-			chart.data.labels.push(d.getUTCHours() + ":" + d.getUTCMinutes() + ":" + d.getUTCSeconds());
+			chart.data.labels.push(currentData["timestamp"]);
 			//chart.data.datasets[0] = []
 			chart.data.datasets[0].data.push(currentData["consumption"]);
 			//chart.data.datasets[1] = []
 			chart.data.datasets[1].data.push(currentData["production"]);
+			chart.data.datasets[2].data.push(currentData["electricityPrice"]);
 
 
 
 
-			chart.options.scales.yAxes = [{ticks: {min: 0, max: maximum}}];
+			//chart.options.scales.yAxes = [{ticks: {min: 0, max: maximum}}];
 
 			//output += "Timestamp: " + data.history[i].timestamp + " Consumption: " + data.history[i].consumption + " Production: " + data.history[i].production + " Price: " + data.history[i].electricityPrice + "\n"
 		}
-		var maximum = Math.max.apply(null, chart.data.datasets[0].data);
-		var prodMax = Math.max.apply(null, chart.data.datasets[1].data);
-		if (prodMax > maximum) {
-			maximum = prodMax;
-		}
+		//var maximum = Math.max.apply(null, chart.data.datasets[0].data);
+		//var prodMax = Math.max.apply(null, chart.data.datasets[1].data);
+		//if (prodMax > maximum) {
+	//		maximum = prodMax;
+	//	}
 		chart.update();
 		div.innerHTML = output;
 	});
