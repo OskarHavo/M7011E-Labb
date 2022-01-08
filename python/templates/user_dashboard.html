@@ -167,7 +167,29 @@
         var socket = io();
 
         socket.on('connect', function() {
-            startStreaming(socket,con,1,100,10,20);
+            console.log(socket.id);
+            socket.join(socket.id)
+            //startStreaming(socket,con,1,100,10,20);
+        });
+
+        socket.on('disconnect', function() {
+            console.log(socket.id);
+        });
+
+        socket.on("stream partition", function (value, callback_arg, callback) {
+            console.log(socket.id);
+            simData.push(value);
+            console.log(value);
+            updateGraph(con, bufferSize = 10);
+            updateRawSimulatorDataOutput(value);
+            updateUserGauges(value);
+            updateUserSliders(value);
+            callback(callback_arg);
+            //setTimeout(callback, 10000);
+        });
+
+        socket.to(socket.id).emit('start stream', (data) => {
+            console.log("started stream ack");
         });
 
 

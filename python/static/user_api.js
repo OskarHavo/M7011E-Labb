@@ -91,7 +91,7 @@ const put = (url,params) => request(url,params,"PUT");
 var k = 0
 //var repeater;
 
-function updateGraph(chart,startx,starty,bufferSize=10) {
+function updateGraph(chart,bufferSize=10) {
 	if (simData.length > 0) {
 		var i = k;
 		k = k + 1;
@@ -112,8 +112,6 @@ function updateGraph(chart,startx,starty,bufferSize=10) {
 		}
 
 		chart.options.scales.yAxes = [{ticks: {min: 0, max: maximum}}];
-		startx++;
-		starty += Math.floor(Math.random() * 10) - 4;
 		chart.update();
 	}
 }
@@ -259,23 +257,6 @@ function updateUserSliders(simulatorData) {
 
 }
 
-
-function startStreaming(socket, chart, startx, starty, delta, bufferSize=10) {
-	socket.emit('start stream', (data) => {
-		console.log("started stream ack");
-	});
-
-	socket.on("stream partition", function (value,callback_arg, callback) {
-		simData.push(value);
-		console.log(value);
-		updateGraph(chart, startx, starty, bufferSize = 10);
-		updateRawSimulatorDataOutput(value);
-		updateUserGauges(value);
-		updateUserSliders(value);
-		callback(callback_arg);
-		//setTimeout(callback, 10000);
-	});
-}
 
 document.addEventListener('DOMContentLoaded', (event) => {
 	var slider = document.querySelectorAll('.slider');

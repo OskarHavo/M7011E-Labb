@@ -663,6 +663,7 @@ def fetch_all_users():
                 return jsonify({"table":str(table.__html__())})
     return "{}"
 
+@socketio.on("stream partition")
 def stream_data(timestamp):
     timestamp = datetime.strptime(timestamp,"%Y-%m-%d %H:%M:%S")
     user = checkSession()
@@ -670,19 +671,19 @@ def stream_data(timestamp):
         windmill = manager.getNode(user.name)
         data,nextTimestamp = windmill.getNext(timestamp)
 
-        d = getHistoricalData(user.name)
-        old_data = json.loads(d[0].decode("utf-8"))
+#        d = getHistoricalData(user.name)
+#        old_data = json.loads(d[0].decode("utf-8"))
 #        print("old data", d[0], "   ", type(old_data))
-        old_data['history'].append(data)
+#        old_data['history'].append(data)
 
-        old_data_string = str(old_data)
-        old_data_string = str.replace(old_data_string,"'","\"")
+#        old_data_string = str(old_data)
+#        old_data_string = str.replace(old_data_string,"'","\"")
 #        print("Old data:", old_data_string)
-        setHistoricalData(user.name,old_data_string)
+#        setHistoricalData(user.name,old_data_string)
 
         print("Streaming data for user ", user.name, "at timestamp", nextTimestamp)
         ## här
-        socketio.emit("stream partition", (data,str(nextTimestamp)), callback=stream_data)
+        socketio.emit("stream partition", (data,str(nextTimestamp)), callback=stream_data,to=request.sid)
     else:
         print("User",user.name,"tried to be sneaky and stream data!")
 
@@ -704,7 +705,7 @@ def start_stream():
 def socket_connect():
     user = checkSession()
     if user:
-        print("client", user.name, "connected :)")
+        print("client", user.name,"with sid",request.sid, "connected :)")
         #socketio.emit("server response",callback=ack)
 
 
@@ -712,8 +713,7 @@ def socket_connect():
 def socket_disconnect():
     user = checkSession()
     if user:
-        print("client",user.name,"disconnected :(")
-
+        print("client",user.name,"with sid",request.sid,"disconnected :(")
 
 
 def serverStartup():
