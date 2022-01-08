@@ -537,7 +537,7 @@ def serverStartup():
     except:
         print("Running without database! Are you connected?")
     dataHistory.start()
-    socketio.run(app, host=host,port=4000)  # , ssl_context='adhoc')
+    socketio.run(app, host=host)  # , ssl_context='adhoc')
 
 if __name__ == "__main__":
     serverStartup()
