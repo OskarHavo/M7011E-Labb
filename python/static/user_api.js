@@ -161,8 +161,17 @@ function updateRawSimulatorDataOutput(simulatorData) {
 function historicalDataRetriever(){
 	post("fetch",{}).then(data=>{
 		var div = document.getElementById("historicaldataoutputdiv");
-		var dataArray = JSON.stringify(data.history)
-        div.innerHTML = dataArray;
+
+        outputlist = []
+		for data in data.history:
+		    timestamp = data.timestamp
+		    consumption = data.consumption
+		    production = data.production
+		    price = data.electricityPrice
+		    var output = "Timestamp: " + str(timestamp)  + " Consumption: " + str(consumption)  + " Production: " + str(production)  + " Price: " + str(price)  + "\n"
+		    outputlist.append(output)
+
+        div.innerHTML = outputlist;
 	});
 }
 
