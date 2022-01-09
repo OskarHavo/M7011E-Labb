@@ -121,7 +121,7 @@ class EnergyCentral:
             self.buffer = self.buffer + cap - self.currentConsumption
 
         print(self.currentConsumption, "   ", self.marketDemand, "   ", self.currentCapacity, "   ", self.running)
-        self.marketDemand = 1
+        self.marketDemand = 0
         if self.currentCapacity > 0:
             self.marketDemand = (self.currentConsumption / self.currentCapacity)*100.0
 

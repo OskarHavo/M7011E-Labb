@@ -123,20 +123,7 @@ const request = ( url, params = {}, method = 'GET' ) => {
 
 var simData = [];
 var trailLength = 10;
-/*
-function fetchDataCycle() {
-	return post('/fetch', {}).then(response => {
-		if (simData.length== 0 || simData[simData.length - 1]["timestamp"] != response["timestamp"]) {
-			simData.push(response)
-			if (simData.length > trailLength) {
-				simData.slice(1, simData.length)
-			}
-			console.log(simData[simData.length - 1])
-		return simData[simData.length-1]
-		}
-	});
-}
-*/
+
 const post = (url, params) => request(url,params,'GET');
 const put = (url,params) => request(url,params,"PUT");
 //var repeater;
