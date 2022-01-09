@@ -62,7 +62,6 @@ class ProductionNode:
         self.user = user
         self.powerplant = powerplant
         self.syncMutex = threading.Lock()
-        powerplant.attach(self)
         self.currentPurchase = 0
         self.energyBuffer = 0
         self.currentProduction = 0
@@ -79,6 +78,7 @@ class ProductionNode:
             dataGeneration.PowerConsumption()
         )
         self.chain = dataGeneration.ConsumptionChain(consumptionProducer, productionProducer, self.powerplant, 0.5, 0.5,user)
+        powerplant.attach(user)
 
     def setValue(self, valueName, value=None):
         with self.syncMutex:
