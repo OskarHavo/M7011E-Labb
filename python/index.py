@@ -1,19 +1,14 @@
 import binascii
 import json
+import databaseFunctions
 
 from flask import (Flask, render_template, request, Response, redirect, session, make_response, jsonify)
-
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta, datetime
-
 from flask_socketio import SocketIO
-
-import databaseFunctions
 from dynamic_table import *
 from databaseFunctions import *
-
 from simulator import *
-
 from windmillhistory import Windmillhistory
 
 global current_error
@@ -35,8 +30,6 @@ global createUserDir
 createUserDir = "/create_user"
 global settingsDir
 settingsDir = "/settings"
-global tableDir
-tableDir = "/table"
 global counter
 counter = 1
 
@@ -143,11 +136,6 @@ def index():
     if checkSession():
         return redirect(userDashboardDir)
     return render_template("index.html")
-
-
-@app.route(tableDir)
-def table():
-    return "I am table."
 
 
 @app.route(loginDir, methods=['POST', 'GET'])
@@ -426,7 +414,7 @@ def fetch_all_users():
                         user_status = "Offline"
                     if manager.getNode(user[0]).getBlockStatus():
                         user_status = "Blocked"
-                    if "rubbe hitta bra condition" == True:
+                    if manager.powerplant.clients[user[0]]["powerOutage"]:
                         user_status = "Blackout"
 
                     items.append(Row(
