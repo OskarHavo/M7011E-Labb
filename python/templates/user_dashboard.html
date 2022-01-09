@@ -173,8 +173,12 @@
 
         socket.on('connect', function() {
             console.log("Connected to streaming server as ID " + socket.id);
-            socket.emit('join',socket.id)
-            //startStreaming(socket,con,1,100,10,20);
+            socket.emit('join', socket.id)
+
+            // Start streaming data from our windmill
+            socket.emit('start stream', (data) => {
+                console.log("started streaming");
+            });
         });
 
         socket.on('disconnect', function() {
@@ -196,11 +200,6 @@
                 // Signal the server that we're ready for more!
                 callback(callback_arg);
             }
-        });
-
-        <!-- Start streaming data from our windmill -->
-        socket.emit('start stream', (data) => {
-            console.log("started streaming");
         });
 
         var historychart = genHistoryChart("history");
