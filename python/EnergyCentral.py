@@ -1,3 +1,4 @@
+import random
 import threading
 from time import sleep
 import dataGeneration
@@ -9,18 +10,20 @@ class EnergyCentral:
         self.maxCapacity = maxCapacity
         self.currentCapacity = 0
         self.currentConsumption = 0
-        self.clients = []
+        self.clients = {}
         self.running = 0 # 0 = Stopped 1-9 = Starting 10 = Running
         self.sellRatio = 1
         self.buffer = 0
         self.marketDemand = 0
         self.modeledElectricityPrice = 0
         self.electricityPrice = 15.0
-        self.blackout = False
+        self.blackoutRandState = dataGeneration.RandomState(random.random(),[0,1])
         self.date = datetime.datetime.now()
         self.mutex = threading.Lock()
         self.delta = delta
-    def getAvailableEnergy(self):
+    def getAvailableEnergy(self,user):
+        if self.clients[user]["powerOutage"]:
+            return 0
         if self.running < 10:
             if len(self.clients) == 0:
                 return self.buffer
@@ -34,16 +37,11 @@ class EnergyCentral:
             return len(self.clients)
     def attach(self,client):
         with self.mutex:
-            self.clients.append(client)
-            return len(self.clients)-1
+            self.clients[client] = {"powerOutage":False}
     def detach(self,client):
         with self.mutex:
-            if len(self.clients) == 1:
-                self.clients.clear()
-                return
-            self.clients[client.powerID] = self.clients[-1]
-            self.clients.remove(len(self.clients)-1)
-            self.clients.append(client)
+            if client in self.clients:
+                del self.clients[client]
 
     def getEnergyPrice(self):
         with self.mutex:
@@ -91,11 +89,25 @@ class EnergyCentral:
                 "maxCapacityPercentage":str(self.capacityModifier),
                 "maxCapacity":str(self.maxCapacity)}
 
+    def updatePowerOutage(self):
+        for client in self.clients:
+            rn = self.blackoutRandState.tick()
+            if self.clients["powerOutage"]:
+                # Turn back on with a 20% chance
+                if rn < 0.2:
+                    self.clients["powerOutage"] = False
+            else:
+                # Turn off with a 10% chance
+                if rn < 0.1:
+                    self.clients["powerOutage"] = True
+
     def tick(self):
         self.updateTime()
+        self.updatePowerOutage()
         self.currentConsumption = 0
         for client in self.clients:
-            self.currentConsumption = self.currentConsumption + client.getPurchaseVolume()
+            if not self.clients[client]["powerOutage"]:
+                self.currentConsumption = self.currentConsumption + client.getPurchaseVolume()
 
         cap = self.capacityModifier*self.maxCapacity
 

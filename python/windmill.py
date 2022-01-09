@@ -62,7 +62,7 @@ class ProductionNode:
         self.user = user
         self.powerplant = powerplant
         self.syncMutex = threading.Lock()
-        self.powerID = powerplant.attach(self)
+        powerplant.attach(self)
         self.currentPurchase = 0
         self.energyBuffer = 0
         self.currentProduction = 0
@@ -78,7 +78,7 @@ class ProductionNode:
             dataGeneration.RandomState(postalCode+random.random(), consumptionRandomRange),
             dataGeneration.PowerConsumption()
         )
-        self.chain = dataGeneration.ConsumptionChain(consumptionProducer, productionProducer, self.powerplant, 0.5, 0.5)
+        self.chain = dataGeneration.ConsumptionChain(consumptionProducer, productionProducer, self.powerplant, 0.5, 0.5,user)
 
     def setValue(self, valueName, value=None):
         with self.syncMutex:
@@ -127,17 +127,6 @@ class ProductionNode:
         date = datetime.datetime.now()
         formattedDate = date - datetime.timedelta(microseconds=date.microsecond) # Ensures only 2 digits for seconds
         self.date = formattedDate
-
-    def updateOutOfOrder(self, rand):
-        if self.outOfOrder:
-            # Turn back on with a 20% chance
-            if rand < 0.2:
-                self.outOfOrder = False
-        else:
-            # Turn off with a 10% chance
-            if rand < 0.1:
-                self.outOfOrder = True
-        return self.outOfOrder
 
     def tick(self):
         with self.syncMutex:

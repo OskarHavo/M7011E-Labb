@@ -17,44 +17,35 @@ class PowerProduction:
     def __init__(self,startDate,areaCode):
         self.startDate = startDate
         self.areaCode = areaCode
+        self.outOfOrder = False
+        self.outOfOrderState = RandomState(areaCode,[0,1])
+
+    def updateOutOfOrder(self, rand):
+        if self.outOfOrder:
+            # Turn back on with a 20% chance
+            if rand < 0.2:
+                self.outOfOrder = False
+        else:
+            # Turn off with a 10% chance
+            if rand < 0.1:
+                self.outOfOrder = True
+        return self.outOfOrder
+
     def tick(self,date):
         deltaDate = date - self.startDate  # Calculate where in the sinewave you are.
         i = deltaDate.days
 
-        # Placeholder
-        if True:
-
-
-        # Det här går inte och du vet varför. Fixa utan att ändra i EnergyCentral
-        #if EnergyCentral.getBlackoutStatus() == False:
-
-
+        self.updateOutOfOrder(self.outOfOrderState.tick())
+        if self.outOfOrder:
+            return 0
 
             # These ranges create a healthy range of the total NetEnergyProduction. (Kan inte randomiza för varje call, man får nog randomiza 1 gång per hus och föra in det som inparameter)
-            A = 10  # random.randint(10, 12)  # Amplitude (Max/Min Value)
-            f = 0.01  # Frequency
-            B = self.areaCode  # Phase  (Adjust for location)
-            C = A * 1.5  # Makes sure the values are not too low and/or negative  ##Check so randomizing the afb values does it make it negative in some config
+        A = 10  # random.randint(10, 12)  # Amplitude (Max/Min Value)
+        f = 0.01  # Frequency
+        B = self.areaCode  # Phase  (Adjust for location)
+        C = A * 1.5  # Makes sure the values are not too low and/or negative  ##Check so randomizing the afb values does it make it negative in some config
 
-            powerProduction = A * math.sin(2.0 * math.pi * f * np.float64(i) + B) + C  # Sinuswave
-        else:
-            # If blackout, randomize 4 areacodes and set the production which is sent to these areas to zero.
-            affectedPostalCodes = []
-
-            affectedPostalCodes.append(randrange(10))
-            affectedPostalCodes.append(randrange(10))
-            affectedPostalCodes.append(randrange(10))
-            affectedPostalCodes.append(randrange(10))
-
-            if self.areaCode in affectedPostalCodes:
-                powerProduction = 0
-            else:
-                A = 10
-                f = 0.01
-                B = self.areaCode
-                C = A * 1.5 
-
-                powerProduction = A * math.sin(2.0 * math.pi * f * np.float64(i) + B) + C  # Sinuswave
+        powerProduction = A * math.sin(2.0 * math.pi * f * np.float64(i) + B) + C  # Sinuswave
 
         return powerProduction
 
@@ -65,13 +56,14 @@ class PowerProduction:
 # Requires updates from consumption provider, production provider, available electricity
 # Requires previous update from buffer
 class BuyCalc:
-    def __init__(self,consumptionProducer,productionProducer,electricity,buffer,buyRatio):
+    def __init__(self,consumptionProducer,productionProducer,electricity,buffer,buyRatio,clientID):
         self.prod = productionProducer
         self.con = consumptionProducer
         self.el = electricity
         self.ratio = buyRatio
         self.result = 0
         self.buffer = buffer
+        self.client = clientID
 
 
     def setRatio(self,ratio):
@@ -86,7 +78,7 @@ class BuyCalc:
     # Uses stored electricity in the buffer to calculate how much we need to buy from the power grid.
     # Negative values represent a surplus of production energy.
     def tick(self):
-        electricity = self.el.getAvailableEnergy()
+        electricity = self.el.getAvailableEnergy(self.client)
         wantedConsumption = self.con.currentValue()
         production = self.prod.currentValue()
         currentBuffer = self.buffer.currentValue()
@@ -161,8 +153,8 @@ class BufferCalc:
 
 
 class ConsumptionChain:
-    def __init__(self,consumptionProducer,productionProducer, powergrid,buyRatio,sellRatio):
-        self.buyCalc = BuyCalc(consumptionProducer,productionProducer,powergrid,None,buyRatio)
+    def __init__(self,consumptionProducer,productionProducer, powergrid,buyRatio,sellRatio,clientID):
+        self.buyCalc = BuyCalc(consumptionProducer,productionProducer,powergrid,None,buyRatio,clientID)
         self.buffer = BufferCalc(self.buyCalc,None)
         self.buyCalc.buffer = self.buffer
         self.sellRatio = SellRatioCalc(self.buyCalc,sellRatio)

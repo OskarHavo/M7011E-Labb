@@ -36,12 +36,12 @@ class TestDataGeneration(unittest.TestCase):
             def currentValue(self):
                 return 10
         class PowerGrid():
-            def getAvailableEnergy(self):
+            def getAvailableEnergy(self,user):
                 return 100
         class Buffer():
             def currentValue(self):
                 return 10
-        calc = BuyCalc(ConsumptionProducer(),ProductionProducer(),PowerGrid(),Buffer(),1.0)
+        calc = BuyCalc(ConsumptionProducer(),ProductionProducer(),PowerGrid(),Buffer(),1.0,"Demo")
 
         calc.setRatio(0.5)
         self.assertEqual(calc.getRatio(),0.5, "Should be 0.5")
@@ -102,7 +102,7 @@ class TestDataGeneration(unittest.TestCase):
             def tick(self,date):
                 return 10
         class PowerGrid():
-            def getAvailableEnergy(self):
+            def getAvailableEnergy(self,user):
                 return 100
         class Buffer():
             def currentValue(self):
@@ -120,7 +120,7 @@ class TestDataGeneration(unittest.TestCase):
             def tick(self):
                 return 75
 
-        chain = ConsumptionChain(ConsumptionProducer(),ProductionProducer(),PowerGrid(),0.5,0.75)
+        chain = ConsumptionChain(ConsumptionProducer(),ProductionProducer(),PowerGrid(),0.5,0.75,"Test")
 
         currentProduction, consumption, currentPurchase, powerToSell, buffer = chain.tick(datetime.date(year=2021,month=11,day=27))
         self.assertEqual(currentProduction,10,"Should be 10")
