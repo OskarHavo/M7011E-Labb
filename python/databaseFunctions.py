@@ -1,5 +1,6 @@
 import mysql.connector
 
+
 def fetchKey():
     global current_error
     try:
@@ -34,6 +35,7 @@ def readUserFromDatabase(user):
     except Exception as e:
         return None
 
+
 def readAllUserFromDatabase():
     global current_error
     try:
@@ -49,6 +51,7 @@ def readAllUserFromDatabase():
         return rows
     except Exception as e:
         return None
+
 
 def fetchUserImage(username):
     global current_error
@@ -69,7 +72,8 @@ def fetchUserImage(username):
     except Exception as e:
         return None
 
-def setUserImage(username,blob):
+
+def setUserImage(username, blob):
     global current_error
     try:
         mydb = mysql.connector.connect(
@@ -87,7 +91,7 @@ def setUserImage(username,blob):
         return False
 
 
-def writeUserToDatabase(user, password,postalcode):
+def writeUserToDatabase(user, password, postalcode):
     global current_error
     try:
         if user == "" or password == "":
@@ -99,7 +103,7 @@ def writeUserToDatabase(user, password,postalcode):
             database="M7011E")
         cursor = mydb.cursor(buffered=True)
         sql = "INSERT INTO User(User,Password,Postalcode) VALUES(%s,%s,%s)"
-        val = (user, password,postalcode)
+        val = (user, password, postalcode)
         cursor.execute(sql, val)
         mydb.commit()
         cursor.close()
@@ -107,7 +111,8 @@ def writeUserToDatabase(user, password,postalcode):
         return False
     return True
 
-def alterUserInDatabase(username,newPassword=None,newPostalCode=None):
+
+def alterUserInDatabase(username, newPassword=None, newPostalCode=None):
     global current_error
     try:
         mydb = mysql.connector.connect(
@@ -116,11 +121,11 @@ def alterUserInDatabase(username,newPassword=None,newPostalCode=None):
             password="",
             database="M7011E")
         cursor = mydb.cursor(buffered=True)
-        sql = "UPDATE M7011E.User SET "# Password='{}' WHERE User='{}'".format(newUser,newPassword,oldUser)
+        sql = "UPDATE M7011E.User SET "
         if newPassword:
-            sql += "Password='%s'" %(newPassword)
+            sql += "Password='%s'" % (newPassword)
         if newPostalCode:
-            sql += "Postalcode='%s'" %(newPostalCode)
+            sql += "Postalcode='%s'" % (newPostalCode)
         sql += "WHERE User='%s'" % (username)
         cursor.execute(sql)
         mydb.commit()
@@ -129,6 +134,7 @@ def alterUserInDatabase(username,newPassword=None,newPostalCode=None):
         current_error.append(str(e))
         return False
     return True
+
 
 def removeUserFromDatabase(username):
     global current_error
@@ -146,9 +152,11 @@ def removeUserFromDatabase(username):
     except Exception as e:
         return False
 
-# Update the user login date, IP number and port on the database. Call this whenever a uer logs in
-# or updates their login info
-def updateUserLastLogin(username,date,ip = "255.255.255.255",port="1234"):
+
+"""Update the user login date, IP number and port on the database. Call this whenever a uer logs in or updates their login info"""
+
+
+def updateUserLastLogin(username, date, ip="255.255.255.255", port="1234"):
     global current_error
     try:
         mydb = mysql.connector.connect(
@@ -157,7 +165,9 @@ def updateUserLastLogin(username,date,ip = "255.255.255.255",port="1234"):
             password="",
             database="M7011E")
         cursor = mydb.cursor(buffered=True)
-        sql = "UPDATE M7011E.User SET LastOnline='{}', LoginIP='{}',LoginPort='{}' WHERE User='{}'".format(date,ip,port,username)
+        sql = "UPDATE M7011E.User SET LastOnline='{}', LoginIP='{}',LoginPort='{}' WHERE User='{}'".format(date, ip,
+                                                                                                           port,
+                                                                                                           username)
         cursor.execute(sql)
         mydb.commit()
         cursor.close()
@@ -165,7 +175,8 @@ def updateUserLastLogin(username,date,ip = "255.255.255.255",port="1234"):
         return False
     return True
 
-def setHistoricalData(username,data):
+
+def setHistoricalData(username, data):
     global current_error
     try:
         mydb = mysql.connector.connect(
@@ -174,13 +185,14 @@ def setHistoricalData(username,data):
             password="",
             database="M7011E")
         cursor = mydb.cursor(buffered=True)
-        sql = "UPDATE M7011E.User SET HistoricalData='{}' WHERE User='{}'".format(data,username)
+        sql = "UPDATE M7011E.User SET HistoricalData='{}' WHERE User='{}'".format(data, username)
         cursor.execute(sql)
         mydb.commit()
         cursor.close()
     except Exception as e:
         return False
     return True
+
 
 def getHistoricalData(user):
     global current_error

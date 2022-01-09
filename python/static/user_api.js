@@ -86,7 +86,6 @@ function genHistoryChart(chartName) {
 	});
 }
 
-//var chart = genTimeChart("mychart",-20,20);
 function addData(chart, label, data) {
 	chart.data.labels.push(label);
 	var i = 0;
@@ -126,7 +125,6 @@ var trailLength = 10;
 
 const post = (url, params) => request(url,params,'GET');
 const put = (url,params) => request(url,params,"PUT");
-//var repeater;
 
 function updateGraph(chart,bufferSize=10) {
 	if (simData.length > 0) {
@@ -136,7 +134,7 @@ function updateGraph(chart,bufferSize=10) {
 		chart.data.labels.push(d.getUTCHours()+":"+d.getUTCMinutes()+":"+d.getUTCSeconds());
 		chart.data.datasets[0].data.push(data["consumption"]);
 		chart.data.datasets[1].data.push(data["production"]);
-		//addData(chart, i, data);
+
 		if (chart.data.labels.length > bufferSize) {
 			removeFirst(chart);
 		}
@@ -301,7 +299,6 @@ function updateUserSliders(simulatorData) {
 
 }
 
-
 document.addEventListener('DOMContentLoaded', (event) => {
 	var slider = document.querySelectorAll('.slider');
 	slider.item(0).onmouseup = function () {
@@ -313,5 +310,3 @@ document.addEventListener('DOMContentLoaded', (event) => {
 		document.getElementById("sellingRatioText").innerHTML = this.value + "%";
 	};
 });
-
-//updateUserSliders(fetchDataCycle());

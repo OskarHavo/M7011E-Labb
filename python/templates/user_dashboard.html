@@ -1,172 +1,165 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Dashboard</title>
-	<script src="https://kit.fontawesome.com/bd50140c14.js" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
-	<script src="/static/user_api.js"></script>
-	<script src="/static/dragablegauges.js"></script>
+    <title>Dashboard</title>
+    <script src="https://kit.fontawesome.com/bd50140c14.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <script src="/static/user_api.js"></script>
+    <script src="/static/dragablegauges.js"></script>
     <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
-	<link rel="stylesheet" href="/static/user_dashboard.css">
+    <link rel="stylesheet" href="/static/user_dashboard.css">
 
 </head>
 <body>
-	<div class="topnav">
-		<a class="active" href="/">Home</a>
-		<div class="login-container">
-			<a id="currentUser">{{user}}</a>
-			<a href="/settings"><i class="fas fa-cog"></i></a>
-			<a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-		</div>
-	</div>
+<div class="topnav">
+    <a class="active" href="/">Home</a>
+    <div class="login-container">
+        <a id="currentUser">{{user}}</a>
+        <a href="/settings"><i class="fas fa-cog"></i></a>
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+</div>
 
 
+<div class="timelinecontainer">
+
+    <div class="timelinedate" id="datetext">
+        <h1>error</h1>
+    </div>
+
+</div>
 
 
+<div class="contentcontainer">
+
+    <div class="contentdiv middle">
+        <h1>Household Panel</h1>
+
+        <div id="houseimagecontainer">
+            <img src="/image/user" width="100%" height=100%>
+        </div>
+        <div class="houseinformationcontainer">
+            <h3>Household Name</h3>
+            <p>{{user}}'s House</p>
+
+            <h3>Postal Code</h3>
+            <p>{{postalcode}}</p>
+
+            <div class="uploadhousephotobuttoncontainer">
+                <form action="/image/user" method="POST" enctype="multipart/form-data">
+                    <input type="file" name="houseimage" accept=".jpg, .png, .jpeg">
+                    <button type="submit" class="uploadbutton">Upload New House Photo</button>
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="simulatorcontainer">
+            <h2>Simulator Data</h2>
+            <div class="rawdataoutputdiv">
+                <h4 id="rawDataOutput_DATE"></h4>
+                <p id="rawDataOutput_OUTPUT1"></p>
+                <p id="rawDataOutput_OUTPUT2"></p>
+                <p id="rawDataOutput_OUTPUT3"></p>
+            </div>
+        </div>
+
+        <div class="graphcontainer">
+            <h2>Consumption/Production Graph</h2>
+            <div class="graph" id="charts">
+                <canvas id="consumption" style="width:100%"></canvas>
+            </div>
+
+            <h2>Historical Data Graph</h2>
+            <div class="graph" id="historycharts">
+                <canvas id="history" style="width:100%"></canvas>
+            </div>
+        </div>
 
 
-	<div class="timelinecontainer">
+    </div>
 
-		<div class =  "timelinedate" id="datetext">
-        	<h1>error</h1>
-   		</div>
+    <div class="contentdiv right">
+        <h1>Monitoring Panel</h1>
+
+        <div class="gaugecontainer">
+
+
+            <div draggable="true" class="gauge">
+                <p>CONSUMPTION </p>
+                <div class="gaugemeterfull">
+                    <div class="gaugemeter" id="usergauge_consumption"></div>
+                </div>
+                <p id="usergauge_consumption_text"></p>
+            </div>
+
+            <div draggable="true" class="gauge">
+                <p>PRODUCTION</p>
+                <div class="gaugemeterfull">
+                    <div class="gaugemeter" id="usergauge_production"></div>
+                </div>
+                <p id="usergauge_production_text"></p>
+
+            </div>
+
+            <div draggable="true" class="gauge">
+                <p>WIND SPEED</p>
+                <div class="gaugemeterfull">
+                    <div class="gaugemeter" id="usergauge_windspeed"></div>
+                </div>
+                <p id="usergauge_windspeed_text"></p>
+            </div>
+
+            <div draggable="true" class="gauge">
+                <p>NET PRODUCTION</p>
+                <
+                <div class="gaugemeterfull">
+                    <div class="gaugemeter" id="usergauge_netproduction"></div>
+                </div>
+                <p id="usergauge_netproduction_text"></p>
+
+            </div>
+
+            <div draggable="true" class="gauge">
+                <p>ENERGY BUFFER SIZE</p>
+                <div class="gaugemeterfull">
+                    <div class="gaugemeter" id="usergauge_buffer"></div>
+                </div>
+                <p id="usergauge_buffer_text"></p>
+            </div>
+
+            <div draggable="true" class="gauge">
+                <p>CURRENT ELECTRICITY PRICE</p>
+                <div class="gaugemeterfull">
+                    <div class="gaugemeter" id="usergauge_price"></div>
+                </div>
+                <p id="usergauge_price_text"></p>
+            </div>
+
+
+            <div class="slidercontainer">
+
+                <p>BUYING/BUFFER RATIO SLIDER</p>
+                <input type="range" min="0" max="100" value="50" class="slider" id="buyRatio">
+                <p id="buyingRatioText"></p>
+
+                <p>SELLING/BUFFER RATIO SLIDER</p>
+                <input type="range" min="0" max="100" value="50" class="slider" id="sellRatio">
+                <p id="sellingRatioText"></p>
+
+            </div>
+
+
+        </div>
 
     </div>
 
 
+</div>
 
-	<div class ="contentcontainer">
-
-		<div class="contentdiv middle">
-			<h1>Household Panel</h1>
-
-			<div id="houseimagecontainer">
-					<img src="/image/user" width="100%" height = 100%>
-			</div>
-			<div class ="houseinformationcontainer">
-				<h3>Household Name</h3>
-				<p>{{user}}'s House</p>
-
-				<h3>Postal Code</h3>
-				<p>{{postalcode}}</p>
-				
-				<div class="uploadhousephotobuttoncontainer">
-                    <form action="/image/user" method="POST" enctype="multipart/form-data">
-                        <input type="file" name="houseimage" accept=".jpg, .png, .jpeg">
-                        <button type ="submit" class="uploadbutton">Upload New House Photo</button>
-                    </form>
-
-				</div>
-
-			</div>
-
-			<div class ="simulatorcontainer">
-				<h2>Simulator Data</h2>
-				<div class = "rawdataoutputdiv">
-                	<h4 id="rawDataOutput_DATE"></h4>
-					<p id="rawDataOutput_OUTPUT1"></p>
-					<p id="rawDataOutput_OUTPUT2"></p>
-					<p id="rawDataOutput_OUTPUT3"></p>
-				</div>
-			</div>
-
-			<div class ="graphcontainer">
-				<h2>Consumption/Production Graph</h2>
-	                <div class ="graph" id="charts">
-                        <canvas id="consumption" style="width:100%"></canvas>
-	                </div>
-
-                <h2>Historical Data Graph</h2>
-                <div class ="graph"  id="historycharts">
-                        <canvas id="history" style="width:100%"></canvas>
-                </div>
-			</div>
-
-
-
-		</div>
-
-		<div class="contentdiv right">
-			<h1>Monitoring Panel</h1>
-
-			<div class="gaugecontainer">
-
-
-				<div draggable="true" class="gauge">
-					<p>CONSUMPTION </p>
-					<div class ="gaugemeterfull">
-						<div class="gaugemeter" id="usergauge_consumption"></div>
-					</div>
-					<p id="usergauge_consumption_text"></p>
-				</div>
-
-				<div draggable="true" class="gauge">
-					<p>PRODUCTION</p>
-					<div class ="gaugemeterfull">
-						<div class="gaugemeter" id="usergauge_production"></div>
-					</div>
-					<p id="usergauge_production_text"></p>
-
-				</div>
-
-				<div draggable="true" class="gauge">
-					<p>WIND SPEED</p>
-					<div class ="gaugemeterfull">
-						<div class="gaugemeter" id="usergauge_windspeed"></div>
-					</div>
-					<p id="usergauge_windspeed_text"></p>
-				</div>
-
-				<div draggable="true" class="gauge">
-					<p>NET PRODUCTION</p>
-<					<div class ="gaugemeterfull">
-						<div class="gaugemeter" id="usergauge_netproduction"></div>
-					</div>
-					<p id="usergauge_netproduction_text"></p>
-
-				</div>
-
-				<div draggable="true" class="gauge">
-					<p>ENERGY BUFFER SIZE</p>
-					<div class ="gaugemeterfull">
-						<div class="gaugemeter" id="usergauge_buffer"></div>
-					</div>
-					<p id="usergauge_buffer_text"></p>
-				</div>
-
-				<div draggable="true" class="gauge">
-					<p>CURRENT ELECTRICITY PRICE</p>
-					<div class ="gaugemeterfull">
-						<div class="gaugemeter" id="usergauge_price"></div>
-					</div>
-					<p id="usergauge_price_text"></p>
-				</div>
-
-
-
-			<div class="slidercontainer">
-
-				<p>BUYING/BUFFER RATIO SLIDER</p>
-				<input type="range" min="0" max="100" value="50" class="slider" id="buyRatio">
-				<p id="buyingRatioText"></p>
-
-				<p>SELLING/BUFFER RATIO SLIDER</p>
-				<input type="range" min="0" max="100" value="50" class="slider" id="sellRatio">
-				<p id="sellingRatioText"></p>
-
-			</div>
-
-
-			</div>
-
-		</div>
-
-
-
-	</div>
-
-	<!--  Simulator Updater-->
-	<script>
+<!--  Simulator Updater-->
+<script>
 		var con = genTimeChart("consumption",0,200);
         //var conUpdater;
         var socket = io();
@@ -205,7 +198,8 @@
         var historychart = genHistoryChart("history");
 		historicalDataRetriever(historychart)
 
-    </script>
+
+</script>
 
 
 </body>

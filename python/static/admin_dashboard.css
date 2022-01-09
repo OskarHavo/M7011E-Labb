@@ -1,299 +1,340 @@
+
 * {
-    box-sizing: border-box;
-    font-family: "Bahnschrift"
+	box-sizing: border-box;
+	font-family: "Bahnschrift"
 }
+
 
 /* Style the navbar */
-.topnav {
-  overflow: hidden;
-  background-color: #D8D8D8;
 
-  border: 3px solid #666;
-  border-radius: .5em;
+.topnav {
+	overflow: hidden;
+	background-color: #D8D8D8;
+	border: 3px solid #666;
+	border-radius: .5em;
 }
+
 
 /* Navbar links */
+
 .topnav a {
-  float: left;
-  display: block;
-  color: black;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 17px;
+	float: left;
+	display: block;
+	color: black;
+	text-align: center;
+	padding: 14px 16px;
+	text-decoration: none;
+	font-size: 17px;
 }
+
 
 /* Navbar links on mouse-over */
+
 .topnav a:hover {
-  background-color: #979797;;
-  color: black;
+	background-color: #979797;
+	;
+	color: black;
 }
+
 
 /* Active/current link */
+
 .topnav a.active {
-  background-color: #2196F3;
-  color: white;
+	background-color: #2196F3;
+	color: white;
 }
+
 
 /* Style the input container */
+
 .topnav .login-container {
-  float: right;
+	float: right;
 }
+
 
 /* Style the input field inside the navbar */
+
 .topnav input[type=text] {
-  padding: 6px;
-  margin-top: 8px;
-  font-size: 17px;
-  border: none;
-  width: 150px; /* adjust as needed (as long as it doesn't break the topnav) */
+	padding: 6px;
+	margin-top: 8px;
+	font-size: 17px;
+	border: none;
+	width: 150px;
+	/* adjust as needed (as long as it doesn't break the topnav) */
 }
 
+
 /* Style the button inside the input container */
+
 .topnav .login-container button {
-  float: right;
-  padding: 6px;
-  margin-top: 8px;
-  margin-right: 16px;
-  background: #ddd;
-  font-size: 17px;
-  border: none;
-  cursor: pointer;
+	float: right;
+	padding: 6px;
+	margin-top: 8px;
+	margin-right: 16px;
+	background: #ddd;
+	font-size: 17px;
+	border: none;
+	cursor: pointer;
 }
 
 .topnav .login-container button:hover {
-  background: #ccc;
+	background: #ccc;
 }
+
 
 /* Add responsiveness - On small screens, display the navbar vertically instead of horizontally */
+
 @media screen and (max-width: 600px) {
-  .topnav .login-container {
-    float: none;
-  }
-  .topnav a, .topnav input[type=text], .topnav .login-container button {
-    float: none;
-    display: block;
-    text-align: left;
-    width: 100%;
-    margin: 0;
-    padding: 14px;
-  }
-  .topnav input[type=text] {
-    border: 1px solid #ccc;
-  }
-  .topnav input[type=password] {
-    border: 1px solid #ccc;
-  }
+	.topnav .login-container {
+		float: none;
+	}
+	.topnav a,
+	.topnav input[type=text],
+	.topnav .login-container button {
+		float: none;
+		display: block;
+		text-align: left;
+		width: 100%;
+		margin: 0;
+		padding: 14px;
+	}
+	.topnav input[type=text] {
+		border: 1px solid #ccc;
+	}
+	.topnav input[type=password] {
+		border: 1px solid #ccc;
+	}
 }
 
- /* Dropdown Button */
+
+/* Dropdown Button */
+
 .dropbtn {
-  background-color: #3498DB;
-  color: white;
-  padding: 16px;
-  font-size: 16px;
-  border: none;
-  cursor: pointer;
+	background-color: #3498DB;
+	color: white;
+	padding: 16px;
+	font-size: 16px;
+	border: none;
+	cursor: pointer;
 }
+
 
 /* Dropdown button on hover & focus */
-.dropbtn:hover, .dropbtn:focus {
-  background-color: #2980B9;
+
+.dropbtn:hover,
+.dropbtn:focus {
+	background-color: #2980B9;
 }
+
 
 /* The container <div> - needed to position the dropdown content */
+
 .dropdown {
-  position: relative;
-  display: inline-block;
+	position: relative;
+	display: inline-block;
 }
+
 
 /* Dropdown Content (Hidden by Default) */
+
 .dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #f1f1f1;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
+	display: none;
+	position: absolute;
+	background-color: #f1f1f1;
+	min-width: 160px;
+	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+	z-index: 1;
 }
+
 
 /* Links inside the dropdown */
+
 .dropdown-content form {
-  color: black;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
+	color: black;
+	padding: 12px 16px;
+	text-decoration: none;
+	display: block;
 }
 
+
 /* Change color of dropdown links on hover */
-.dropdown-content a:hover {background-color: #ddd}
+
+.dropdown-content a:hover {
+	background-color: #ddd
+}
+
 
 /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
-.show {display:block;}
 
+.show {
+	display: block;
+}
 
 
 /* ////////////////////////////////////////////////////////////////////////// */
 
 
-
-
-
 /* Container for the entire timeline bar */
+
 .timelinecontainer {
-  float: left;
-  width: 80%;
-  margin-left: 10%;
-  margin-right: 10%;
-  margin-top: 1%;
-  margin-bottom: 1%;
-  height: 120px;
-  padding: 5px;
-  text-align: center;
-  background-color: #f1f1f1;
-
-  border: 3px solid #666;
-  border-radius: .5em;
-
+	float: left;
+	width: 80%;
+	margin-left: 10%;
+	margin-right: 10%;
+	margin-top: 1%;
+	margin-bottom: 1%;
+	height: 120px;
+	padding: 5px;
+	text-align: center;
+	background-color: #f1f1f1;
+	border: 3px solid #666;
+	border-radius: .5em;
 }
 
 
 /* The div showing the current date. */
-.timelinedate{
-    font-size: 60px;
-    text-align: center;
-    width: 100%;
-    padding-top: 15px;
 
-    /* Center content*/
-    margin: auto;
-    margin-bottom: 1%;
-    display: flex;
-    justify-content: center
+.timelinedate {
+	font-size: 60px;
+	text-align: center;
+	width: 100%;
+	padding-top: 15px;
+	/* Center content*/
+	margin: auto;
+	margin-bottom: 1%;
+	display: flex;
+	justify-content: center
 }
-
-
 
 
 /* The main div containing the main windows. */
+
 .contentcontainer:after {
-  content: "";
-  display: table;
-  clear: both;
+	content: "";
+	display: table;
+	clear: both;
 }
+
 
 /* The main class for the divs inside the content container. */
-.contentdiv {
-  float: left;
-  padding: 10px;
-  height: 1140px;
-  text-align: center;
-  background-color: green;
-  margin-bottom: 50px;
 
-  border: 3px solid #666;
-  border-radius: .5em;
+.contentdiv {
+	float: left;
+	padding: 10px;
+	height: 1140px;
+	text-align: center;
+	background-color: green;
+	margin-bottom: 50px;
+	border: 3px solid #666;
+	border-radius: .5em;
 }
+
+
 /* Horizontal line under each title of each content div. */
-.contentdiv h1{
-    border-bottom-style: solid;
+
+.contentdiv h1 {
+	border-bottom-style: solid;
 }
+
 
 /* The middle content div*/
+
 .contentdiv.middle {
-  width: 59%;
-  margin-left: 10%;
-  background-color: #D8D8D8;
+	width: 59%;
+	margin-left: 10%;
+	background-color: #D8D8D8;
 }
+
 
 /* The right content div*/
+
 .contentdiv.right {
-  width: 19%;
-  margin-left: 2%;
-  margin-right: 1%;
-   background-color: #f1f1f1;
+	width: 19%;
+	margin-left: 2%;
+	margin-right: 1%;
+	background-color: #f1f1f1;
 }
-
-
 
 
 /********************************** RIGHT **********************************/
 
+
 /* Inivisble div containing all gauges */
-.gaugecontainer{
 
-    height: 590px;
-    display: grid;
-    grid-template-columns: repeat(1, 5fr);
-    gap: 10px;
-    background-color: #D8D8D8;
-    margin-top: 15%;
-
+.gaugecontainer {
+	height: 590px;
+	display: grid;
+	grid-template-columns: repeat(1, 5fr);
+	gap: 10px;
+	background-color: #D8D8D8;
+	margin-top: 15%;
 }
+
+
 /* Dragable Gauges */
+
 .gauge {
-  border: 3px solid #666;
-  background-color: #ddd;
-  border-radius: .5em;
-  padding: 10px;
-  padding-top: 10px;
-  cursor: move;
-  width: 100%;
-  height: 140px;
+	border: 3px solid #666;
+	background-color: #ddd;
+	border-radius: .5em;
+	padding: 10px;
+	padding-top: 10px;
+	cursor: move;
+	width: 100%;
+	height: 140px;
 }
+
+
 /* Dragable Gauges  OVER*/
+
 .gauge.over {
-  border: 3px dotted #666;
+	border: 3px dotted #666;
 }
+
+
 /* The full gauge MAX WIDTH */
-.gaugemeterfull{
-    width: 100%;
-    height: 30px;
-    background-color: #003300;
-    border-radius: 25px;
-    border: 2px solid black;
 
+.gaugemeterfull {
+	width: 100%;
+	height: 30px;
+	background-color: #003300;
+	border-radius: 25px;
+	border: 2px solid black;
 }
+
+
 /* The current gauge value CURRENT WIDTH*/
-.gaugemeter{
-    width: 50%;
-    height: 26px;
-    background-color: #007300;
-    border-radius: 25px;
 
-    -webkit-transition: all 0.5s ease-in-out;
-    transition: all 0.5s ease-in-out;
-}
-#admingauge_productionstatus_text{
-
-    font-size: 30px;
+.gaugemeter {
+	width: 50%;
+	height: 26px;
+	background-color: #007300;
+	border-radius: 25px;
+	-webkit-transition: all 0.5s ease-in-out;
+	transition: all 0.5s ease-in-out;
 }
 
+#admingauge_productionstatus_text {
+	font-size: 30px;
+}
 
 
 /* The container containing all the sliders. */
-.slidercontainer{
 
-    margin-top: 10%;
-    float: left;
-    width: 100%;
-    height: 310px;
-    background-color: #D8D8D8;
-
-    border: 3px solid #666;
-    border-radius: .5em;
-    padding: 10px;
-
-     line-height: 0.3;
-
-
+.slidercontainer {
+	margin-top: 10%;
+	float: left;
+	width: 100%;
+	height: 310px;
+	background-color: #D8D8D8;
+	border: 3px solid #666;
+	border-radius: .5em;
+	padding: 10px;
+	line-height: 0.3;
 }
 
-
-
-#statustext{
-
-    color: green;
+#statustext {
+	color: green;
 }
 
 
@@ -301,130 +342,125 @@
 
 
 /* The div containing all admin content.*/
-.adminboxcontainer{
 
-    float: left;
-    width: 100%;
-    height: 300px;
-
-    margin: auto;
-    display: flex;
-    justify-content: center
+.adminboxcontainer {
+	float: left;
+	width: 100%;
+	height: 300px;
+	margin: auto;
+	display: flex;
+	justify-content: center
 }
-
 
 
 /* The div containing the house image.*/
-.adminphotocontainer{
 
-    margin-left: 10%;
-    float: left;
-    width: 50%;
-    height: 300px;
-    background-color: #f1f1f1;
-
-    border: 3px solid #666;
-    border-radius: .5em;
+.adminphotocontainer {
+	margin-left: 10%;
+	float: left;
+	width: 50%;
+	height: 300px;
+	background-color: #f1f1f1;
+	border: 3px solid #666;
+	border-radius: .5em;
 }
+
 
 /* Div containing information about the users house. */
-.admininformationcontainer{
 
-    margin-right: 10%;
-    float: left;
-    width: 30%;
-    height: 300px;
-    font-size: 22px;
-    background-color: #979797;
-
-     border: 3px solid #666;
-    border-radius: .5em;
-    padding: 10px;
-
-
+.admininformationcontainer {
+	margin-right: 10%;
+	float: left;
+	width: 30%;
+	height: 300px;
+	font-size: 22px;
+	background-color: #979797;
+	border: 3px solid #666;
+	border-radius: .5em;
+	padding: 10px;
 }
+
 
 /* Container for button used for uploading a new house picture for your house. */
-.uploadadminphotobuttoncontainer{
-    margin: auto;
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    margin-top: 50px;
 
-
+.uploadadminphotobuttoncontainer {
+	margin: auto;
+	display: flex;
+	justify-content: center;
+	width: 100%;
+	margin-top: 50px;
 }
+
 
 /* The upload button*/
-.uploadbutton{
-    display: block;
-     width: 100%;
-     height: 60px;
 
-    border: 3px solid #666;
-    border-radius: .5em;
-    padding: 10px;
+.uploadbutton {
+	display: block;
+	width: 100%;
+	height: 60px;
+	border: 3px solid #666;
+	border-radius: .5em;
+	padding: 10px;
 }
+
+
 /* The upload button HOVER*/
-.uploadbutton:hover{
-    background-color: #f1f1f1;
-    cursor: pointer;
 
+.uploadbutton:hover {
+	background-color: #f1f1f1;
+	cursor: pointer;
 }
+
 
 /* User List div */
-.userlistdiv{
-    background-color: #D8D8D8;
-    float: left;
-    width: 100%;
-    height: 660px;
-    margin-top:5%;
 
-    border: 3px solid #666;
-    border-radius: .5em;
-    padding: 10px;
+.userlistdiv {
+	background-color: #D8D8D8;
+	float: left;
+	width: 100%;
+	height: 660px;
+	margin-top: 5%;
+	border: 3px solid #666;
+	border-radius: .5em;
+	padding: 10px;
 }
+
 
 /* User List H2 */
-.userlistdiv h2{
-   text-align: center;
+
+.userlistdiv h2 {
+	text-align: center;
 }
+
 
 /* Table displaying Prosumer Data*/
-.prosumertable{
-    display: grid;
-    max-width: 100%;
-    background-color: #f1f1f1;
-     border: 3px solid #666;
-    border-radius: .5em;
-     border-collapse: collapse;
-    padding: 10px;
 
-     margin: auto;
-    display: flex;
-    justify-content: center
-
-}
-th,td{
-border: 3px solid #666;
-    border-radius: .5em;
+.prosumertable {
+	display: grid;
+	max-width: 100%;
+	background-color: #f1f1f1;
+	border: 3px solid #666;
+	border-radius: .5em;
+	border-collapse: collapse;
+	padding: 10px;
+	margin: auto;
+	display: flex;
+	justify-content: center
 }
 
+th,
+td {
+	border: 3px solid #666;
+	border-radius: .5em;
+}
 
 
 /* Place the divs on top of each other and not next to eachother when using mobile. */
+
 @media screen and (max-width: 600px) {
-  .contentdiv.left, .contentdiv.middle .contentdiv.rightdiv{
-    width: 100%;
-  }
+	.contentdiv.left,
+	.contentdiv.middle .contentdiv.rightdiv {
+		width: 100%;
+	}
 }
-
-
-
-
-
-
-
-
-
 

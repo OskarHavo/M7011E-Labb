@@ -18,26 +18,21 @@ var trailLength = 2;
 
 function fetchDataCycle() {
 	return post('/fetch_admin', {}).then(response => {
-		//if (simData.length== 0 || simData[simData.length - 1]["timestamp"] != response["timestamp"]) {
 			adminSimData.push(response)
 			if (adminSimData.length > trailLength) {
 				adminSimData.slice(1, adminSimData.length)
 			}
 			console.log(adminSimData[adminSimData.length - 1])
 		return adminSimData[adminSimData.length-1]
-		//}
 	});
 }
 
 const post = (url, params) => request(url,params,'GET');
 const put = (url,params) => request(url,params,"PUT");
 
-
 function updateRawSimulatorDataOutput(simulatorData) {
-
 	// Set the text in the top bar
 	document.getElementById("datetext").innerHTML = simulatorData.timestamp;
-
 }
 
 function updateAdminGauges(simulatorData) {
@@ -47,7 +42,6 @@ function updateAdminGauges(simulatorData) {
 	var maxProductionValue = 100.0;
 	var maxValuePrice = 50.0;
 	var MaxValueDemand = 200.0;
-
 
 	try {
 		// First Value is a string showing the formatted value. Used for the string showing the value.
@@ -111,7 +105,6 @@ function uploadData(valuename, param) {
 	});
 }
 
-
 // Only Updates once each tick.
 function updateAdminSliders(simulatorData) {
 
@@ -127,7 +120,6 @@ function updateAdminSliders(simulatorData) {
 
 }
 
-
 function htmlToTable(){
 	post("/fetch_all_users_for_admin").then(value => {
 		var table = document.getElementById("prosumertableinadmin");
@@ -138,18 +130,15 @@ function htmlToTable(){
 
 function updateAll(updater, delta, bufferSize=10) {
 	fetchDataCycle().then(value => {
-		//var simulatorData = simData[simData.length - 1];
 		updateRawSimulatorDataOutput(value);
 		updateAdminGauges(value);
 		updateAdminSliders(value);
 		htmlToTable();
 
-		//uploadData("buyRatio",buyRatio);
 		updater = setTimeout(updateAll, delta * 1000, updater, delta, bufferSize);
 	});
 
 }
-
 
 document.addEventListener('DOMContentLoaded', (event) => {
 		var slider = document.querySelectorAll('.slider');
@@ -159,7 +148,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
 			document.getElementById("currentelectricitypriceText").innerHTML = this.value + "kr";
 
 			fetchDataCycle().then(value => {
-				//var simulatorData = simData[simData.length - 1];
 				updateAdminGauges(value);
 			});
 		};
@@ -169,7 +157,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
 			document.getElementById("powerplantproductionText").innerHTML = this.value + "%";
 
 			fetchDataCycle().then(value => {
-				//var simulatorData = simData[simData.length - 1];
 				updateAdminGauges(value);
 			});
 		};
@@ -179,10 +166,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
 			document.getElementById("marketRatioText").innerHTML = this.value+"%";
 
 			fetchDataCycle().then(value => {
-				//var simulatorData = simData[simData.length - 1];
 				updateAdminGauges(value);
 			});
 		};
 });
-
 updateAdminSliders(fetchDataCycle())

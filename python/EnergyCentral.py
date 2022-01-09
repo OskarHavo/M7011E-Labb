@@ -1,44 +1,47 @@
 import random
 import threading
-from time import sleep
 import dataGeneration
 import datetime
 
+
 class EnergyCentral:
-    def __init__(self, maxCapacity,delta):
+    def __init__(self, maxCapacity, delta):
         self.capacityModifier = 1
         self.maxCapacity = maxCapacity
         self.currentCapacity = 0
         self.currentConsumption = 0
         self.clients = {}
-        self.running = 0 # 0 = Stopped 1-9 = Starting 10 = Running
+        self.running = 0  # 0 = Stopped 1-9 = Starting 10 = Running
         self.sellRatio = 1
         self.buffer = 0
         self.marketDemand = 0
         self.modeledElectricityPrice = 0
         self.electricityPrice = 15.0
-        self.blackoutRandState = dataGeneration.RandomState(random.random(),[0,1])
+        self.blackoutRandState = dataGeneration.RandomState(random.random(), [0, 1])
         self.date = datetime.datetime.now()
         self.mutex = threading.Lock()
         self.delta = delta
-    def getAvailableEnergy(self,user):
+
+    def getAvailableEnergy(self, user):
         if self.clients[user]["powerOutage"]:
             return 0
         if self.running < 10:
             if len(self.clients) == 0:
                 return self.buffer
-            return self.buffer/float(len(self.clients))
+            return self.buffer / float(len(self.clients))
         if len(self.clients) == 0:
             return self.currentCapacity
-        return self.currentCapacity/ float(len(self.clients))
+        return self.currentCapacity / float(len(self.clients))
 
     def nUsers(self):
         with self.mutex:
             return len(self.clients)
-    def attach(self,client):
+
+    def attach(self, client):
         with self.mutex:
-            self.clients[client] = {"powerOutage":False}
-    def detach(self,client):
+            self.clients[client] = {"powerOutage": False}
+
+    def detach(self, client):
         with self.mutex:
             if client in self.clients:
                 del self.clients[client]
@@ -46,11 +49,12 @@ class EnergyCentral:
     def getEnergyPrice(self):
         with self.mutex:
             return self.electricityPrice
+
     def getBlackoutStatus(self):
         with self.mutex:
             return self.blackout
 
-    def setValue(self,valueName, value):
+    def setValue(self, valueName, value):
         with self.mutex:
             if valueName == "sellRatio":
                 self.sellRatio = value;
@@ -71,23 +75,23 @@ class EnergyCentral:
 
     def updateTime(self):
         date = datetime.datetime.now()
-        formattedDate = date - datetime.timedelta(microseconds=date.microsecond) # Ensures only 2 digits for seconds
+        formattedDate = date - datetime.timedelta(microseconds=date.microsecond)  # Ensures only 2 digits for seconds
         self.date = formattedDate
 
     def getCurrentData(self):
         with self.mutex:
             return {
-                "production":str(self.currentCapacity),
-                "consumption":str(self.currentConsumption),
-                "sellRatio":str(self.sellRatio),
-                "running":str(self.running),
-                "buffer":str(self.buffer),
-                "modeledPrice":str(self.modeledElectricityPrice),
-                "price":str(self.electricityPrice),
-                "timestamp":str(self.date),
-                "demand":str(self.marketDemand),
-                "maxCapacityPercentage":str(self.capacityModifier),
-                "maxCapacity":str(self.maxCapacity)}
+                "production": str(self.currentCapacity),
+                "consumption": str(self.currentConsumption),
+                "sellRatio": str(self.sellRatio),
+                "running": str(self.running),
+                "buffer": str(self.buffer),
+                "modeledPrice": str(self.modeledElectricityPrice),
+                "price": str(self.electricityPrice),
+                "timestamp": str(self.date),
+                "demand": str(self.marketDemand),
+                "maxCapacityPercentage": str(self.capacityModifier),
+                "maxCapacity": str(self.maxCapacity)}
 
     def updatePowerOutage(self):
         for client in self.clients:
@@ -109,9 +113,9 @@ class EnergyCentral:
             if not self.clients[client]["powerOutage"]:
                 self.currentConsumption = self.currentConsumption + client.getPurchaseVolume()
 
-        cap = self.capacityModifier*self.maxCapacity
+        cap = self.capacityModifier * self.maxCapacity
 
-        self.currentCapacity = self.sellRatio*cap
+        self.currentCapacity = self.sellRatio * cap
         if self.running < 10:
             self.currentCapacity = self.buffer
             if self.running > 0:
@@ -123,19 +127,16 @@ class EnergyCentral:
         print(self.currentConsumption, "   ", self.marketDemand, "   ", self.currentCapacity, "   ", self.running)
         self.marketDemand = 0
         if self.currentCapacity > 0:
-            self.marketDemand = (self.currentConsumption / self.currentCapacity)*100.0
+            self.marketDemand = (self.currentConsumption / self.currentCapacity) * 100.0
 
-
-
-
-        self.modeledElectricityPrice = dataGeneration.calculateDailyEnergyPrice(self.currentCapacity, self.currentConsumption)
-
+        self.modeledElectricityPrice = dataGeneration.calculateDailyEnergyPrice(self.currentCapacity,
+                                                                                self.currentConsumption)
 
     def stop(self):
         with self.mutex:
             self.running = 0
 
-    def run(self,socketio):
+    def run(self, socketio):
         with self.mutex:
             self.running = 1
         while True:
