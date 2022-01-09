@@ -74,13 +74,12 @@ class ProductionNode:
             dataGeneration.PowerProduction(datetime.datetime(1970, 1, 1), postalCode)
         )
         consumptionProducer = dataGeneration.DataProducer(
-            dataGeneration.RandomState(postalCode+random.random(), productionRandomRange),
+            dataGeneration.RandomState(postalCode+random.random(), consumptionRandomRange),
             dataGeneration.PowerConsumption()
         )
         self.chain = dataGeneration.ConsumptionChain(consumptionProducer, productionProducer, self.powerplant, 0.5, 0.5)
 
-    def setValue(self, valueName, value):
-        print("setting value", valueName, "to",value)
+    def setValue(self, valueName, value=None):
         with self.syncMutex:
             if valueName == "buyRatio":
                 self.chain.buyCalc.setRatio(float(value))
