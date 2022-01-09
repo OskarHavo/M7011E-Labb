@@ -75,9 +75,12 @@ function genHistoryChart(chartName) {
 				},
 			},
 			scales: {
-				y: {
-					beginAtZero:true
-				}
+				yAxes: [{
+                display: true,
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
 			}
 		}
 	});
