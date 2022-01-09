@@ -123,7 +123,7 @@ class EnergyCentral:
         with self.mutex:
             self.running = 0
 
-    def run(self):
+    def run(self,socketio):
         with self.mutex:
             self.running = 1
         while True:
@@ -131,4 +131,4 @@ class EnergyCentral:
                 if self.running == 0:
                     break
                 self.tick()
-            sleep(self.delta)
+            socketio.sleep(self.delta)

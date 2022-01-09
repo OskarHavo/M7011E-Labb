@@ -54,7 +54,7 @@ socketio = SocketIO(app)
 
 
 global manager
-manager = SimulationManager(10)
+manager = SimulationManager(10,socketio)
 dataHistory = Windmillhistory(manager)
 
 
@@ -470,35 +470,28 @@ def fetch_all_users():
                 return jsonify({"table":str(table.__html__())})
     return "{}"
 
+def stream_callback(data,timestamp,sessiondata,sid):
+    sessiondata["timestamp"] = str(timestamp)
+    socketio.emit("stream partition",(data,sessiondata),callback=stream_data,to=sid)
+
 # This function can only be called if the client has received a callback from the server.
 # The client must first ask the server to start a streaming session.
-def stream_data(timestamp):
-    timestamp = datetime.strptime(timestamp,"%Y-%m-%d %H:%M:%S")
-    user = checkSession()
-    if user:
-        windmill = manager.getNode(user.name)
-        data,nextTimestamp = windmill.getNext(timestamp)
+def stream_data(sessionData):
+    timestamp = datetime.strptime(sessionData["timestamp"],"%Y-%m-%d %H:%M:%S")
 
-
-#        d = getHistoricalData(user.name)
-#        old_data = json.loads(d[0].decode("utf-8"))
-#        print("old data", d[0], "   ", type(old_data))
-#        old_data['history'].append(data)
-
-#        old_data_string = str(old_data)
-#        old_data_string = str.replace(old_data_string,"'","\"")
-#        print("Old data:", old_data_string)
-#        setHistoricalData(user.name,old_data_string)
+    if sessionData["user"]:
+        # sessionData["sid"] = request.sid
+        sessionData["valid"] = False
+        windmill = manager.getNode(sessionData["user"])
+        data,nextTimestamp = windmill.getNext(timestamp,stream_callback,sessionData, sessionData["sid"])
 
         if data:
-            print("Streaming data for user ", user.name, "at timestamp", nextTimestamp, " and length", len(data))
+            sessionData["timestamp"] = str(nextTimestamp)
+            print("Streaming data for user ", sessionData["user"], "at timestamp", nextTimestamp, " and length", len(data))
             # Send the newly fetched data to the client.
-            socketio.emit("stream partition", (data,str(nextTimestamp)), callback=stream_data,to=request.sid)
-        else:
-            # There is currently no more data available atm.
-            socketio.emit("stream partition",(None,str(timestamp)),callback=stream_data,to=request.sid)
+            socketio.emit("stream partition", (data,sessionData), callback=stream_data,to=sessionData["sid"])
     else:
-        print("User",user.name,"tried to be sneaky and stream data!")
+        print("Some user tried to be sneaky and stream data!")
 
 
 # Start a data streaming session
@@ -511,7 +504,12 @@ def start_stream():
         manager.startNode(user.name, int(user.postalcode), [-1, 1], [-1, 1])
         startTime = datetime.now()
         print("Starting stream for user", user.name)
-        stream_data(str(startTime-timedelta(seconds=100,microseconds=startTime.microsecond))) ## timedelta lets us fetch previous windmill updates
+        sessionData = user.toJSON()
+        # sessionData["sid"] = request.sid
+        sessionData["valid"] = False
+        sessionData["sid"] = request.sid
+        sessionData["timestamp"] = str(str(startTime-timedelta(seconds=100,microseconds=startTime.microsecond)))
+        stream_data(sessionData) ## timedelta lets us fetch previous windmill updates
 
 
 @socketio.on('connect')
@@ -539,7 +537,7 @@ def serverStartup():
                 #print("Started simulation windmill for user:", user[0])
     except:
         print("Running without database! Are you connected?")
-    dataHistory.start()
+    dataHistory.start(socketio)
     socketio.run(app, host=host)  # , ssl_context='adhoc')
 
 if __name__ == "__main__":

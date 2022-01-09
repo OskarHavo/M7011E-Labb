@@ -29,13 +29,13 @@ class Windmillhistory():
         self.delta =timeDelta
         return
 
-    def run(self):
+    def run(self,socketio):
         while True:
             with self.mtx:
                 if not self.running:
                     return
                 timestamp = datetime.datetime.now() - datetime.timedelta(seconds=10)
-                print ("Iterating through", len(self.sim.productionNodes), "nodes")
+                #print ("Iterating through", len(self.sim.productionNodes), "nodes")
                 for username in self.sim.productionNodes:
                     data = self.sim.productionNodes[username].client.getNext(timestamp)[0][0]
                     oldData = databaseFunctions.getHistoricalData(username)
@@ -52,7 +52,7 @@ class Windmillhistory():
 
                     old_data_string = str(oldData)
                     old_data_string = str.replace(old_data_string,"'","\"")
-                    print("Old data:", old_data_string)
+                    #print("Old data:", old_data_string)
                     databaseFunctions.setHistoricalData(username,old_data_string)
 
 
@@ -60,18 +60,19 @@ class Windmillhistory():
                 rounded = roundTime(now,self.delta)
                 nextTime = rounded+datetime.timedelta(seconds=self.delta)
 
-                print("next update will be at", str(nextTime), "current time:", now)
+                print("next history update will be at", str(nextTime), "current time:", now)
                 delta = (nextTime-now)
-                print("Sleeping for ", delta.seconds)
-            time.sleep(delta.seconds)
+                #print("Sleeping for ", delta.seconds)
+            socketio.sleep(delta.seconds)
 
     def stop(self):
         with self.mtx:
             self.running = False
 
-    def start(self):
+    def start(self,socketio):
         print("Starting windmill history")
         self.running = True
-        thread = threading.Thread(target=Windmillhistory.run, args=(self,))
-        thread.start()
+        socketio.start_background_task(Windmillhistory.run,self,socketio)
+        #thread = threading.Thread(target=Windmillhistory.run, args=(self,))
+        #thread.start()
         return

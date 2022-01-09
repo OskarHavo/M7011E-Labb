@@ -68,6 +68,7 @@ class ProductionNode:
         self.currentProduction = 0
         self.currentPrice = 15.0
         self.timeData = WindmillQueue()
+        self.callbackBuffer= []
 
         productionProducer = dataGeneration.DataProducer(
             dataGeneration.RandomState(postalCode+random.random(), productionRandomRange),
@@ -115,8 +116,12 @@ class ProductionNode:
         with self.syncMutex:
             return self.chain.sellRatio.blocked > 0
 
-    def getNext(self,timestamp):
-        return self.timeData.getNext(timestamp)
+    def getNext(self,timestamp,callback = None,*callbackargs):
+        with self.syncMutex:
+            data,timestamp =  self.timeData.getNext(timestamp)
+            if not data:
+                self.callbackBuffer.append((callback,callbackargs))
+            return data,timestamp
 
     def updateTime(self):
         date = datetime.datetime.now()
@@ -151,4 +156,7 @@ class ProductionNode:
                 "electricityPrice": str(self.powerplant.getEnergyPrice()),
                 "blocked": str(self.chain.sellRatio.blocked > 0)}
             self.timeData.put(data)
+            for callback in self.callbackBuffer:
+                callback[0]([data],self.date, *callback[1])
+            self.callbackBuffer = []
             return data

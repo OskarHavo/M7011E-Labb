@@ -74,7 +74,7 @@ class NodeManager:
         with self.mutex:
             self.running = False
 
-    def run(self):
+    def run(self,socketio):
         with self.mutex:
             self.running = True
         while True:
@@ -82,19 +82,21 @@ class NodeManager:
                 if not self.running:
                     break
             data = self.client.tick()
-            sleep(self.delta)
+            socketio.sleep(self.delta)
 
 
 
 class SimulationManager:
-    def __init__(self,globalDelta,availableEnergy = 100):
+    def __init__(self,globalDelta,socketio,availableEnergy = 100):
         self.productionNodes = {}   # Username, thread
         self.delta = globalDelta
         self.bus = MessageBus("http://localhost:4242")
         self.mutex = threading.Lock()
         self.powerplant = EnergyCentral(availableEnergy,self.delta)
-        thread = threading.Thread(target=EnergyCentral.run,args=(self.powerplant,))
-        thread.start()
+        socketio.start_background_task(EnergyCentral.run,self.powerplant,socketio)
+        self.socketio = socketio
+        #thread = threading.Thread(target=EnergyCentral.run,args=(self.powerplant,))
+        #thread.start()
 
     def __del__(self, instance):
         self.powerplant.stop()
@@ -104,8 +106,9 @@ class SimulationManager:
         with self.mutex:
             if not ID in self.productionNodes:
                 self.productionNodes[ID] = NodeManager(self.bus,self.delta,ID,var,self.powerplant)
-                thread = threading.Thread(target=NodeManager.run,args=(self.productionNodes[ID],))
-                thread.start()
+                self.socketio.start_background_task(NodeManager.run,self.productionNodes[ID],self.socketio)
+                #thread = threading.Thread(target=NodeManager.run,args=(self.productionNodes[ID],))
+                #thread.start()
     def alterNode(self,username,valueName,data):
         with self.mutex:
             self.productionNodes[username].client.setValue(valueName,data)
