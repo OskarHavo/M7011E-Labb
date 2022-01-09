@@ -22,12 +22,12 @@ class PowerProduction:
 
     def updateOutOfOrder(self, rand):
         if self.outOfOrder:
-            # Turn back on with a 20% chance
-            if rand < 0.2:
+            # Turn back on with a 5% chance
+            if rand < 0.05:
                 self.outOfOrder = False
         else:
-            # Turn off with a 10% chance
-            if rand < 0.1:
+            # Turn off with a 1% chance
+            if rand < 0.01:
                 self.outOfOrder = True
         return self.outOfOrder
 
