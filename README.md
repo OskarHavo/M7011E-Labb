@@ -1,7 +1,7 @@
 # M7011E Lab
 Robin Danielsson and Oskar Havo
 
-http://130.240.200.37:5000/user_dashboard
+http://130.240.200.37:5000/user_dashboard <br>
 http://130.240.200.37:5000/admin_dashboard
 
 # Instruction for Audit
@@ -28,7 +28,13 @@ text och bild
 
 
 # Features and Design Choices.
-bild på alla kort
+In the images below you can see every task we have completed. All of the Logic ones and most of the user/admin ones. We chose not to do the "social" tasks, such as the chat, since we wanted to focus on the simulation part of this course. Below the images we go more into detail about our approach where necessary.
+![bild](https://user-images.githubusercontent.com/32604330/148690627-4f3eaf3f-546e-4995-a6ff-1c52a69aa02f.png)
+
+![bild](https://user-images.githubusercontent.com/32604330/148690558-35636270-bf09-47f2-832e-12e006488c65.png)
+
+![bild](https://user-images.githubusercontent.com/32604330/148690660-c6c5da81-8295-4ae7-85d9-1b359f585e67.png)
+
 
 ## Logic
 ### Basic
@@ -64,7 +70,7 @@ To simulate realistic weather patterns we also have a function determining the h
 
 ***Realistic Wind Turbines*** <br>
 **Oskar** <br>
-The windmills can also get broken down for a random number of days. During this time the household only recieves energy from the Power Plant and from its energy buffer.
+The windmills can also get broken down. During this time the household only recieves energy from the Power Plant and from its energy buffer.
 
 
 
@@ -131,7 +137,7 @@ We have a settings menu where you can change password and delete your user. Usin
 The Coal Plant Energy Production is displayed in one of our gauges.
 
 
-***Coal Plant Status** <br>
+***Coal Plant Status*** <br>
 **Oskar & Robin** <br>
 The Coal Plant Status is displayed in one of our gauges. When the simulation starts it will be "Starting" for 10 timesteps and then go to "Running".
 
@@ -210,6 +216,6 @@ To combat unauthorized users we have introduced a status cookie which aims to ch
 We also serialize each user object in user cookies which are used for providing secure user data. Such as the user's name, IP and port.
 
 # Time Log
-Robin Danielsson: n Hours Total
+Robin Danielsson: ~101 Hours Total
 <br>
-Oskar Havo: n+1 Hours Total
+Oskar Havo: ~98 Hours Total
