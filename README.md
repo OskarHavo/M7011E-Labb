@@ -1,6 +1,9 @@
 # M7011E Lab
 Robin Danielsson and Oskar Havo
 
+http://130.240.200.37:5000/user_dashboard
+http://130.240.200.37:5000/admin_dashboard
+
 # Instruction for Audit
 text
 
