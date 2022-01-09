@@ -21,7 +21,15 @@ class PowerProduction:
         deltaDate = date - self.startDate  # Calculate where in the sinewave you are.
         i = deltaDate.days
 
-        if EnergyCentral.getBlackoutStatus() == False:
+        # Placeholder
+        if True:
+
+
+        # Det här går inte och du vet varför. Fixa utan att ändra i EnergyCentral
+        #if EnergyCentral.getBlackoutStatus() == False:
+
+
+
             # These ranges create a healthy range of the total NetEnergyProduction. (Kan inte randomiza för varje call, man får nog randomiza 1 gång per hus och föra in det som inparameter)
             A = 10  # random.randint(10, 12)  # Amplitude (Max/Min Value)
             f = 0.01  # Frequency
