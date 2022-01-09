@@ -214,28 +214,12 @@ function historicalDataRetriever(chart){
         var output = ""
 		for (var i = 0, size = data.history.length; i < size; i++) {
 			var currentData = data.history[i];
-			//chart.data.labels = []
 			chart.data.labels.push(currentData["timestamp"]);
-			//chart.data.datasets[0] = []
 			chart.data.datasets[0].data.push(currentData["consumption"]);
-			//chart.data.datasets[1] = []
 			chart.data.datasets[1].data.push(currentData["production"]);
 			chart.data.datasets[2].data.push(currentData["electricityPrice"]);
-
-
-
-
-			//chart.options.scales.yAxes = [{ticks: {min: 0, max: maximum}}];
-
-			//output += "Timestamp: " + data.history[i].timestamp + " Consumption: " + data.history[i].consumption + " Production: " + data.history[i].production + " Price: " + data.history[i].electricityPrice + "\n"
 		}
-		//var maximum = Math.max.apply(null, chart.data.datasets[0].data);
-		//var prodMax = Math.max.apply(null, chart.data.datasets[1].data);
-		//if (prodMax > maximum) {
-	//		maximum = prodMax;
-	//	}
 		chart.update();
-		div.innerHTML = output;
 	});
 }
 

@@ -381,7 +381,7 @@ def fetch():
         function = request.values.json["function"]
         if function == "create":
             if user.name != "" and user.postalcode != "":
-                manager.startNode(user.name,int(user.postalcode),[-5,5],[-5,5])
+                manager.startNode(user.name,int(user.postalcode),[0,2],[0,2])
         elif function == "delete":
             if user:
                 manager.stopNode(user.name)
@@ -501,7 +501,7 @@ def start_stream():
     if user:
         #if not temporaryDatabase.get(user.name):
             #temporaryDatabase.new(user.name)
-        manager.startNode(user.name, int(user.postalcode), [-1, 1], [-1, 1])
+        manager.startNode(user.name, int(user.postalcode), [0, 2], [0, 2])
         startTime = datetime.now()
         print("Starting stream for user", user.name)
         sessionData = user.toJSON()
@@ -533,7 +533,7 @@ def serverStartup():
 
         for user in users:
             if user[4] == 0:
-                manager.startNode(user[0], int(user[2]), [-5, 5], [-5, 5])
+                manager.startNode(user[0], int(user[2]), [0, 2], [0, 2])
                 #print("Started simulation windmill for user:", user[0])
     except:
         print("Running without database! Are you connected?")
