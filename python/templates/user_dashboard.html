@@ -195,13 +195,7 @@
 
                 // Signal the server that we're ready for more!
                 callback(callback_arg);
-            } //else {
-                // We didn't get any data :(
-                // Wait a couple seconds before pinging the server for more data.
-                // The time is not relevant, since we will always resume the data stream
-                // from the most recent data sample we received ;)
-                setTimeout(callback, 5000,callback_arg);
-            //}
+            }
         });
 
         <!-- Start streaming data from our windmill -->
