@@ -175,6 +175,7 @@ class ConsumptionChain:
 
     def tick(self, date):
         bruttoProd = self.prod.tick(date)
+        self.con.tick(date)
         buySurplus = self.buyCalc.tick()
         sellValue = self.sellRatio.tick()
         buffer = self.buffer.tick()

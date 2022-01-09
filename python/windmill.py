@@ -65,7 +65,7 @@ class ProductionNode:
         )
         self.chain = dataGeneration.ConsumptionChain(consumptionProducer, productionProducer, self.powerplant, 0.5, 0.5,
                                                      user)
-        powerplant.attach(user)
+        powerplant.attach(self)
 
     def setValue(self, valueName, value=None):
         with self.syncMutex:

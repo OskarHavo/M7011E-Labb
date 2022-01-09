@@ -39,7 +39,7 @@ class EnergyCentral:
 
     def attach(self, client):
         with self.mutex:
-            self.clients[client] = {"powerOutage": False}
+            self.clients[client.user] = {"windmill":client,"powerOutage": False}
 
     def detach(self, client):
         with self.mutex:
@@ -96,14 +96,14 @@ class EnergyCentral:
     def updatePowerOutage(self):
         for client in self.clients:
             rn = self.blackoutRandState.tick()
-            if self.clients["powerOutage"]:
+            if self.clients[client]["powerOutage"]:
                 # Turn back on with a 20% chance
                 if rn < 0.2:
-                    self.clients["powerOutage"] = False
+                    self.clients[client]["powerOutage"] = False
             else:
                 # Turn off with a 10% chance
                 if rn < 0.1:
-                    self.clients["powerOutage"] = True
+                    self.clients[client]["powerOutage"] = True
 
     def tick(self):
         self.updateTime()
@@ -111,7 +111,7 @@ class EnergyCentral:
         self.currentConsumption = 0
         for client in self.clients:
             if not self.clients[client]["powerOutage"]:
-                self.currentConsumption = self.currentConsumption + client.getPurchaseVolume()
+                self.currentConsumption = self.currentConsumption + self.clients[client]["windmill"].getPurchaseVolume()
 
         cap = self.capacityModifier * self.maxCapacity
 
