@@ -33,8 +33,6 @@ global adminDashboardDir
 adminDashboardDir = "/admin_dashboard"
 global logoutDir
 logoutDir = "/logout"
-global errorDir
-errorDir = "/error"
 global createUserDir
 createUserDir = "/create_user"
 global settingsDir
@@ -140,12 +138,6 @@ def checkSession():
     else:
         return None
 
-@app.route(errorDir)
-def error():
-    global current_error
-    return "<p>" + str(current_error) + "</p>"
-
-
 @app.route(indexDir)
 def index():
     if checkSession():
@@ -163,7 +155,6 @@ def login():
     if checkSession():
         return redirect(userDashboardDir)
 
-    global current_error
     if request.method == 'POST':
         try:
             username = request.form.get("username")
@@ -177,9 +168,8 @@ def login():
                     return redirect(userDashboardDir)
             else:
                 return render_template("login.html", error="Invalid username or password")
-        except Exception as e:
-            current_error.append(str(e))
-            return redirect(errorDir)
+        except:
+            return render_template("login.html", error="Server Error")
     else:
         return render_template("login.html")
 
@@ -250,14 +240,6 @@ def userDash2(username):
     else:
         return redirect(indexDir)
 
-@app.route("/demopage")
-def userDash3():
-    user = User("Demo","",postalcode=1234)
-    user.validated = True
-    session["user"] = user.toJSON()
-    return render_template("user_dashboard.html",user=user.name,postalcode=user.postalcode)
-
-
 @app.route(adminDashboardDir)
 def adminDash():
     user = checkSession()
@@ -265,19 +247,6 @@ def adminDash():
         return render_template("admin_dashboard.html",user=user.name)
     else:
         return redirect(indexDir)
-
-@app.route("/admin_dashboard/<username>")
-def adminDash2(username):
-    user = User(username, "")
-    user.postalcode = "97753"
-    user.validated = True
-    session["user"] = user.toJSON()
-    if user:
-        return render_template("admin_dashboard.html",user=user.name)
-    else:
-        return redirect(indexDir)
-
-
 
 @app.route(logoutDir)
 def logout():
@@ -393,10 +362,6 @@ def fetch():
                 return jsonify(json.loads(data[0].decode("utf-8")))
             else:
                 return "{}"
-            #if not temporaryDatabase.get(user.name):
-            #    temporaryDatabase.new(user.name)
-            #    manager.startNode(user.name, int(user.postalcode), [-1, 1], [-1, 1])
-            #return jsonify(temporaryDatabase.get(user.name)[-1])
         else:
             print("Invalid user!!!")
             return "{}"
@@ -420,13 +385,12 @@ def block_user(username):
 
 @app.route("/fetch_admin",methods = ['GET','PUT'])
 def fetch_admin():
+    user = checkSession()
+    if not user or not user.root:
+        return "{}"
     if request.method == "GET":
-        user = checkSession()   ## TODO set to admin user instead
-        if user:
-            return jsonify(manager.powerplant.getCurrentData())
+        return jsonify(manager.powerplant.getCurrentData())
     elif request.method == "PUT":
-        user = checkSession()   ## TODO set to admin user instead
-        #username = request.values.get("username")
         valueName = request.json["valueName"]
         data = request.json["data"]
         manager.powerplant.setValue(valueName,data)
@@ -437,7 +401,7 @@ def fetch_admin():
 @app.route("/fetch_all_users_for_admin",methods = ['GET'])
 def fetch_all_users():
     if True:  # request.method == "GET":
-        user = checkSession()   ## TODO set to admin user instead
+        user = checkSession()
         if user and user.root:
             users = readAllUserFromDatabase()
             #print(users)

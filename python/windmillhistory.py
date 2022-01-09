@@ -1,10 +1,5 @@
-import time
-
 import databaseFunctions
-from windmill import *
-from simulator import *
 from threading import  Lock
-import threading
 import datetime
 import json
 
@@ -73,6 +68,4 @@ class Windmillhistory():
         print("Starting windmill history")
         self.running = True
         socketio.start_background_task(Windmillhistory.run,self,socketio)
-        #thread = threading.Thread(target=Windmillhistory.run, args=(self,))
-        #thread.start()
         return

@@ -3,25 +3,15 @@ import random
 import threading
 import dataGeneration
 
-from EnergyCentral import EnergyCentral
 
 class WindmillQueue:
     def __init__(self, maxLen = 10):
         self.queue = [] # FIFO queue of datapoints
 
         self.condition = threading.Condition()
-        #self.conditionMutex = threading.RLock()
         self.queueMutex = threading.Lock()
         self.maxLen = maxLen
     def getNext(self,timestamp):
-
-        # Check if the timestamp is older than all datapoints in the queue
-        #with self.queueMutex:
-        #    # 2022-01-07 10:59:56
-        #    newTime = datetime.datetime.strptime(self.queue[0]["timestamp"],"%Y-%m-%d %H:%M:%S")
-            # If timestamp is older than all samples in queue
-        #    if newTime > timestamp:
-        #        return [self.queue[0]],newTime
 
         # Check if the timestamp is newer then all datapoints in the queue
         # There is no point in iterating through all data samples if we don't want to return any of them
@@ -40,10 +30,6 @@ class WindmillQueue:
                     # Return all samples that are newer than the given timestamp
                     return self.queue[i:],self.queue[-1]["timestamp"]
 
-            #for d in self.queue:
-            #    newtime = datetime.datetime.strptime(d["timestamp"],"%Y-%m-%d %H:%M:%S")
-            #    if newtime  > timestamp:
-            #        return d,newtime
 
     def put(self,data):
         with self.queueMutex:

@@ -1,6 +1,4 @@
-import os.path
 import unittest
-import random
 from dataGeneration import *
 from windmill import *
 
@@ -11,7 +9,7 @@ class TestDataGeneration(unittest.TestCase):
         consumption = PowerConsumption()
 
 
-        # Test one year of power production
+        # Test one year of power consumption
         max = 0
         min = 9999
         for i in range(1,13):
@@ -25,8 +23,21 @@ class TestDataGeneration(unittest.TestCase):
         self.assertLess(max,24,"Should be less than 24")
 
     def test_PowerProduction(self):
-        # TODO Den här måste fixas
-        return
+        random.seed(2039812)
+        production = PowerProduction(startDate=datetime.date(2021, 1, 1), areaCode=1)
+
+        # Test one year of power production
+        max = 0
+        min = 9999
+        for i in range(1, 13):
+            result = production.tick(datetime.date(2021, i, 15))
+            if result > max:
+                max = result
+            if result < min:
+                min = result
+
+        self.assertGreater(min, 5, "Should be more than 5")
+        self.assertLess(max, 25, "Should be less than 25")
 
     def test_BuyCalc(self):
         class ConsumptionProducer():

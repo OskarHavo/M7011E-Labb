@@ -23,8 +23,7 @@ class UserTable(Table):
     online = Col('Status')
     goto = ScriptButtonCol("Go to User")
     block = ScriptButtonCol("Block User")
-    #update = ScriptButtonCol("Update Credentials")
-    #delete = ScriptButtonCol("Delete")
+
     ip = Col('IP Address')
     port = Col('Port')
 

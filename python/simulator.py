@@ -1,12 +1,7 @@
 import windmill
-from time import sleep
 import threading
 import requests
 from EnergyCentral import EnergyCentral
-#from flask import Flask, jsonify, request
-#global app
-
-
 
 class Database:
     def __init__(self):
@@ -30,8 +25,6 @@ class Database:
                 return self.database[username]
             else:
                 return None
-
-
 
 def formatGet(data):
     result = "?"
@@ -125,41 +118,3 @@ class SimulationManager:
         with self.mutex:
             for key in self.productionNodes:
                 self.productionNodes[key].stop()
-
-#host = "0.0.0.0"
-#app = Flask(__name__)
-
-"""
-def run():
-    app.run(port=4242)
-
-#global manager
-#manager = SimulationManager(4)
-
-if __name__ == "__main__":
-
-
-    thread = threading.Thread(target=run)
-    thread.start()
-    sleep(1)
-    print("hello")
-
-    manager.bus.POST({"username":"robyn","postalCode":97753,"function":"create"})
-    #manager.alterNode("robyn","sellRatio","1")
-    #manager.bus.POST({"username":"Oskar","postalCode":97755})
-
-    i = 0
-    while True:
-        print(manager.bus.GET(formatGet({"username":"robyn"})))
-        sleep(4)
-        i = i +1
-        if i == 10:
-            break;
-
-
-    print("Stopping")
-    del manager
-    sleep(1)
-    print("Stopped all")
-    #thread.join()
-"""
