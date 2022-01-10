@@ -2,8 +2,9 @@ import random
 import math
 import numpy as np
 
-
+"""Class for the power consumption"""
 class PowerConsumption:
+    """Tick function which returns the power consumption based on the calender month to simulate seasons/realistic weather"""
     def tick(self, date):
         min = [20.0, 19.5, 17.0, 16.0, 14.5, 11.0, 11.0, 12.5, 14.0, 16.0, 18.5, 20.5]
         max = [24.0, 23.5, 20.0, 18.0, 16.0, 13.5, 13.5, 14.5, 15.5, 18.5, 19.5, 23.5]
@@ -12,14 +13,16 @@ class PowerConsumption:
         powerConsumption = (min[currentMonth] + random.random() * (max[currentMonth] - min[currentMonth]))
         return powerConsumption
 
-
+"""Class for the power production"""
 class PowerProduction:
+    """Init"""
     def __init__(self, startDate, areaCode):
         self.startDate = startDate
         self.areaCode = areaCode
         self.outOfOrder = False
         self.outOfOrderState = RandomState(areaCode, [0, 1])
 
+    """"Function which simulates the windmills breaking down"""
     def updateOutOfOrder(self, rand):
         if self.outOfOrder:
             # Turn back on with a 5% chance
@@ -31,6 +34,7 @@ class PowerProduction:
                 self.outOfOrder = True
         return self.outOfOrder
 
+    """Tick function which returns the power production of the windmill based on a sine wave which considers the locaiton of the user to provide locational weather"""
     def tick(self, date):
         deltaDate = date - self.startDate  ## Calculate where in the sinewave you are.
         i = deltaDate.days
@@ -56,8 +60,6 @@ This just calculates how much we would like to buy vs how much we want to store.
 If the production is higher than our consumption, the result will be negative to show how much we can either sell or store.
 Requires updates from consumption provider, production provider, available electricity
 Requires previous update from buffer """
-
-
 class BuyCalc:
     def __init__(self, consumptionProducer, productionProducer, electricity, buffer, buyRatio, clientID):
         self.prod = productionProducer
@@ -68,18 +70,20 @@ class BuyCalc:
         self.buffer = buffer
         self.client = clientID
 
+    """Set Ratio"""
     def setRatio(self, ratio):
         self.ratio = ratio
 
+    """Get Ratio"""
     def getRatio(self):
         return self.ratio
 
+    """Get current value"""
     def currentValue(self):
         return self.result
 
     """ Uses stored electricity in the buffer to calculate how much we need to buy from the power grid.
         Negative values represent a surplus of production energy. """
-
     def tick(self):
         electricity = self.el.getAvailableEnergy(self.client)
         wantedConsumption = self.con.currentValue()
@@ -105,7 +109,6 @@ class BuyCalc:
     Excess energy is represented by a negative number.
     Requires updates from the buy calculator """
 
-
 class SellRatioCalc:
     def __init__(self, buyCalculator, sellRatio):
         self.sellRatio = sellRatio
@@ -113,24 +116,27 @@ class SellRatioCalc:
         self.result = 0
         self.blocked = 0
 
+    """Set Ratio"""
     def setRatio(self, ratio):
         if self.blocked > 0:
             ## Can't change value until we are unblocked, then the value will be restored.
             return
         self.sellRatio = ratio
 
+    """Get Ratio"""
     def getRatio(self):
         return self.sellRatio
 
+    """Get current value"""
     def currentValue(self):
         return self.result
-
+    """Blocks the user from selling for an amount of time"""
     def block(self):
         self.blocked = 10
         self.sellRatio = 1
 
-    ## Calculate how much electricity we can sell back to the power grid.
-    ## No electricity will be sold if the consumption is larger than the consumption.
+    """ Calculate how much electricity we can sell back to the power grid.
+    No electricity will be sold if the consumption is larger than the consumption."""
     def tick(self):
         if self.blocked > 0:
             self.blocked = self.blocked - 1
@@ -141,20 +147,24 @@ class SellRatioCalc:
         return quota
 
 
-## Calculate how much electricity we can add to the buffer as a function of how much energy we want to sell.
-## Requires updates from buy and sell calculator
+""" Calculate how much electricity we can add to the buffer as a function of how much energy we want to sell.
+    Requires updates from buy and sell calculator """
 class BufferCalc:
+    """init"""
     def __init__(self, buyCalc, sellRatioCalc):
         self.buyCalc = buyCalc
         self.buffer = 0
         self.sellRatio = sellRatioCalc
 
+    """Subtract a value from the buffer"""
     def subtract(self, value):
         self.buffer = np.clip(self.buffer - value, 0, self.buffer)
 
+    """Get current value of the buffer"""
     def currentValue(self):
         return self.buffer
 
+    """Updates the buffer"""
     def tick(self):
         buyValue = self.buyCalc.currentValue()
         sellValue = self.sellRatio.currentValue()
@@ -162,7 +172,7 @@ class BufferCalc:
             self.buffer = np.clip(self.buffer + (-buyValue) - sellValue, 0, 100)
         return self.buffer
 
-
+"""?"""
 class ConsumptionChain:
     def __init__(self, consumptionProducer, productionProducer, powergrid, buyRatio, sellRatio, clientID):
         self.buyCalc = BuyCalc(consumptionProducer, productionProducer, powergrid, None, buyRatio, clientID)
@@ -172,7 +182,7 @@ class ConsumptionChain:
         self.buffer.sellRatio = self.sellRatio
         self.prod = productionProducer
         self.con = consumptionProducer
-
+    """?"""
     def tick(self, date):
         bruttoProd = self.prod.tick(date)
         self.con.tick(date)
@@ -181,30 +191,31 @@ class ConsumptionChain:
         buffer = self.buffer.tick()
         return bruttoProd, bruttoProd + buySurplus, np.clip(buySurplus, 0, None), sellValue, buffer
 
-
+"""?"""
 class RandomState:
+    """Init"""
     def __init__(self, seed, randomRange):
         self.randomState = None
         self.initRandomState(seed)
         self.currentStateResult = 0
         self.range = randomRange
 
-    ## Initialize the instance random state
+    """Initialize the instance random state"""
     def initRandomState(self, seed):
         state = random.getstate()
         random.seed(seed)
         self.randomState = random.getstate()
         random.setstate(state)
 
-    ## Activate the instance random state
+    """Activate the instance random state"""
     def setRandomState(self):
         random.setstate(self.randomState)
 
-    ## Save the random state
+    """Saves the random state"""
     def saveRandomState(self):
         self.randomState = random.getstate()
 
-    ## Produce a random number that is unique to this instance. Also save the result locally
+    """Produce a random number that is unique to this instance. Also save the result locally"""
     def tick(self):
         state = random.getstate()
         self.setRandomState()
@@ -213,21 +224,22 @@ class RandomState:
         random.setstate(state)
         return self.currentStateResult
 
-    ## Warp a sample based on the current state result
+    """Warp a sample based on the current state result"""
     def warpSample(self, sample):
         return sample + lerp(self.range[0], self.range[1], self.currentStateResult)
 
-
+"""?"""
 class DataProducer:
+    """init"""
     def __init__(self, randState, curveFunction):
         self.random = randState
         self.func = curveFunction
         self.result = 0
-
+    """Get Current Value"""
     def currentValue(self):
         return self.result
 
-    # Produce a new data point based on the set date and time
+    """Produce a new data point based on the set date and time"""
     def tick(self, currentDateTime):
         self.random.tick()
         result = self.func.tick(currentDateTime)
@@ -236,17 +248,17 @@ class DataProducer:
         return result
 
 
+"""Linear interpolation"""
 def lerp(a, b, v):
     return a + v * (b - a)
 
 
 """ Create a daily Energy Price based on the demand(consumed energy) and supply(produced energy)
-    Returns the price, surplus status and netenergyproduction """
-
-
-def calculateDailyEnergyPrice(producedEnergy, consumedEnergy):
+    Returns the price, surplus status and netenergyproduction 
     ## High Consumption & Low Producing -> Low Price
     ## Low Consumption & High Producing -> High Price
+    """
+def calculateDailyEnergyPrice(producedEnergy, consumedEnergy):
 
     basePrice = 10.0
     maxPrice = 50.0

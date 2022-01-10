@@ -2,8 +2,9 @@ import unittest
 from dataGeneration import *
 from windmill import *
 
-
+""" Our tests for the logic part of the task."""
 class TestDataGeneration(unittest.TestCase):
+    """Testing that the PowerConsumption() produces reasonable values"""
     def test_PowerConsumption(self):
         random.seed(2039812)
         consumption = PowerConsumption()
@@ -21,6 +22,7 @@ class TestDataGeneration(unittest.TestCase):
         self.assertGreater(min, 11, "Should be more than 11")
         self.assertLess(max, 24, "Should be less than 24")
 
+    """Testing that the PowerProduction() produces reasonable values"""
     def test_PowerProduction(self):
         random.seed(2039812)
         production = PowerProduction(startDate=datetime.date(2021, 1, 1), areaCode=1)
@@ -38,20 +40,29 @@ class TestDataGeneration(unittest.TestCase):
         self.assertGreater(min, 5, "Should be more than 5")
         self.assertLess(max, 25, "Should be less than 25")
 
+    """Testing that buying calculations are correct"""
     def test_BuyCalc(self):
+        """Internal test class"""
         class ConsumptionProducer():
+            """Internal dummy function"""
             def currentValue(self):
                 return 1
 
+        """Internal test class"""
         class ProductionProducer():
+            """Internal dummy function"""
             def currentValue(self):
                 return 10
 
+        """Internal test class"""
         class PowerGrid():
+            """Internal dummy function"""
             def getAvailableEnergy(self, user):
                 return 100
 
+        """Internal test class"""
         class Buffer():
+            """Internal dummy function"""
             def currentValue(self):
                 return 10
 
@@ -64,8 +75,11 @@ class TestDataGeneration(unittest.TestCase):
         expected = -9
         self.assertEqual(quota, expected, "Should be " + str(expected))
 
+    """Testing that selling ratio calculations are correct"""
     def test_SellRatioCalc(self):
+        """Internal test class"""
         class BuyCalc():
+            """Internal dummy function"""
             def currentValue(self):
                 return -100
 
@@ -88,12 +102,17 @@ class TestDataGeneration(unittest.TestCase):
         expected = 100
         self.assertEqual(result, expected, "Should be " + str(expected))
 
+    """Testing that buffer calculations are correct"""
     def test_BufferCalc(self):
+        """Internal test class"""
         class BuyCalc():
+            """Internal dummy function"""
             def currentValue(self):
                 return -100
 
+        """Internal test class"""
         class SellCalc():
+            """Internal dummy function"""
             def currentValue(self):
                 return 75
 
@@ -105,43 +124,61 @@ class TestDataGeneration(unittest.TestCase):
         buffer.subtract(100)
         self.assertEqual(buffer.currentValue(), 0, "Should be 0")
 
+    """Testing that consumption chain works as intended"""
     def test_ConsumptionChain(self):
+        """Internal test class"""
         class ConsumptionProducer():
+            """Internal dummy function"""
             def currentValue(self):
                 return 1
 
+            """Internal dummy function"""
             def tick(self, date):
                 return 1
 
+        """Internal test class"""
         class ProductionProducer():
+            """Internal dummy function"""
             def currentValue(self):
                 return 10
 
+            """Internal dummy function"""
             def tick(self, date):
                 return 10
 
+        """Internal test class"""
         class PowerGrid():
+            """Internal dummy function"""
             def getAvailableEnergy(self, user):
                 return 100
 
+        """Internal test class"""
         class Buffer():
+            """Internal dummy function"""
             def currentValue(self):
                 return 10
 
+            """Internal dummy function"""
             def tick(self):
                 return 32
 
+        """Internal test class"""
         class BuyCalc():
+            """Internal dummy function"""
             def currentValue(self):
                 return -100
 
+            """Internal dummy function"""
             def tick(self):
                 return -100
 
+        """Internal test class"""
         class SellCalc():
+            """Internal dummy function"""
             def currentValue(self):
                 return 75
 
+            """Internal dummy function"""
             def tick(self):
                 return 75
 
@@ -154,6 +191,10 @@ class TestDataGeneration(unittest.TestCase):
         self.assertEqual(powerToSell, 6.75, "Should be 6.75")
         self.assertEqual(buffer, 2.25, "Should be")
 
+
+
+
+    """Testing if our random warp of samples works"""
     def test_RandomState(self):
         random.seed(1111)
         # Get an initial random value
@@ -178,8 +219,11 @@ class TestDataGeneration(unittest.TestCase):
         # Check if the normal random state has been disrupted or not
         self.assertEqual(startvalue, endvalue, "Should be" + str(startvalue))
 
+    """Testing if the DataProducer works as intended"""
     def test_DataProducer(self):
+        """Internal test class"""
         class CurveFunction():
+            """Internal dummy function"""
             def tick(self, datetime):
                 return 1
 
@@ -187,50 +231,56 @@ class TestDataGeneration(unittest.TestCase):
         result = data.tick(datetime.datetime(2021, 12, 10, 10, 2, 9))
         self.assertEqual(result, 94.29070713842776, "Should be 94.29")
 
+    """Testing if our linear interpolation works"""
     def test_lerp(self):
         self.assertEqual(lerp(0, 1, 0.5), 0.5, "Should be 0.5")
 
+    """Testing if the calculation of energy price works."""
     def test_calculateDailyEnergyPrice(self):
         basePrice = 10.0
         maxPrice = 50
 
-        # Check that the price will be equal to the base price if the netenergyproduction = 0
+        ## Check that the price will be equal to the base price if the netenergyproduction = 0
         producedEnergy = 10.0
         consumedEnergy = 10.0
         resultPrice = calculateDailyEnergyPrice(producedEnergy, consumedEnergy)
         expectedResultPrice = basePrice
         self.assertEqual(resultPrice, expectedResultPrice, "Should be " + str(expectedResultPrice))
 
-        # Check that the price will be lower than the base price if the netenergyproduction > 0
+        ## Check that the price will be lower than the base price if the netenergyproduction > 0
         producedEnergy = 15.0
         consumedEnergy = 10.0
         resultPrice = calculateDailyEnergyPrice(producedEnergy, consumedEnergy)
         expectedResultPrice = 6.666666666666666
         self.assertEqual(resultPrice, expectedResultPrice, "Should be " + str(expectedResultPrice))
 
-        # Check that the price will be larger than the base price if the netenergyproduction < 0
+        ## Check that the price will be larger than the base price if the netenergyproduction < 0
         producedEnergy = 10.0
         consumedEnergy = 15.0
         resultPrice = calculateDailyEnergyPrice(producedEnergy, consumedEnergy)
         expectedResultPrice = 15.0
         self.assertEqual(resultPrice, expectedResultPrice, "Should be " + str(expectedResultPrice))
 
-        # Check that the price will be equal to the max price if the producedenergy = 0
+        ## Check that the price will be equal to the max price if the producedenergy = 0
         producedEnergy = 0.0
         consumedEnergy = 25.0
         resultPrice = calculateDailyEnergyPrice(producedEnergy, consumedEnergy)
         expectedResultPrice = maxPrice
         self.assertEqual(resultPrice, expectedResultPrice, "Should be " + str(expectedResultPrice))
 
-
+"""Testing if the windmill works as intended during different actions."""
 class TestModel(unittest.TestCase):
+    """Internal test class"""
     class Demopower():
+        """Internal dummy function"""
         def getAvailableEnergy(self):
             return 1000
 
+        """Internal dummy function"""
         def attach(self, user):
             return
 
+        """Internal dummy function"""
         def detach(self, user):
             return
 

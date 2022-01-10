@@ -45,7 +45,9 @@ manager = SimulationManager(10, socketio)
 dataHistory = Windmillhistory(manager)
 
 
+"""The structure of a user"""
 class User:
+    """Init"""
     def __init__(self, username, password=None, postalcode=97753, root=False):
         if password == None:
             try:
@@ -73,9 +75,10 @@ class User:
         self.ip = request.environ['REMOTE_ADDR']
         self.port = request.environ['REMOTE_PORT']
 
+    """Check if the user is validated by the server"""
     def isValid(self):
         return self.validated
-
+    """Validate the user in the database from the server, to prevent fraudulent users"""
     def validate(self):
         if self.validated:
             session["user"] = self.toJSON()
@@ -89,13 +92,13 @@ class User:
             return True
         else:
             return False
-
+    """Output as JSON"""
     def toJSON(self):
         return {"user": self.name, "password": self.password, "valid": self.validated, "postalcode": self.postalcode,
                 "root": self.root, "ip": self.ip, "root": self.root}
 
 
-## Check if the postal code is valid or not
+"""Check if the postal code is valid or not"""
 def allowedPostalcode(code):
     code = code.replace(" ", "")
     if code and code != "":
@@ -106,13 +109,13 @@ def allowedPostalcode(code):
         return code
     return None
 
-
+"""Check if the password is valid or not"""
 def allowedPassword(password):
     if password and len(password) > 3:
         return password
     return None
 
-
+"""Get the user from a session"""
 def getUser():
     try:
         if "user" in session:
@@ -121,7 +124,7 @@ def getUser():
         current_error.append(str(e))
         return None
 
-
+"""Check if the user is valid or not"""
 def checkSession():
     user = getUser()
     if user != None and user.isValid():
@@ -130,14 +133,14 @@ def checkSession():
     else:
         return None
 
-
+"""Flask function for showing the index"""
 @app.route(indexDir)
 def index():
     if checkSession():
         return redirect(userDashboardDir)
     return render_template("index.html")
 
-
+"""Flask function for log in page"""
 @app.route(loginDir, methods=['POST', 'GET'])
 def login():
     if checkSession():
@@ -161,7 +164,7 @@ def login():
     else:
         return render_template("login.html")
 
-
+"""Flask function for database"""
 @app.route("/data")
 def data():
     mydb = mysql.connector.connect(
@@ -176,7 +179,7 @@ def data():
     cursor.close()
     return s + "</p>"
 
-
+"""Flask function for signing up a user"""
 @app.route(createUserDir, methods=['POST', 'GET'])
 def signup():
     if checkSession():
@@ -199,7 +202,7 @@ def signup():
 
     return render_template("create_user.html", error=err)
 
-
+"""Flask function for showing the user dashboard"""
 @app.route(userDashboardDir)
 def userDash():
     user = checkSession()
@@ -210,7 +213,7 @@ def userDash():
     else:
         return redirect(indexDir)
 
-
+"""Flask function for showing the user dashboard"""
 @app.route("/user_dashboard/<username>")
 def userDash2(username):
     user = checkSession()
@@ -228,7 +231,7 @@ def userDash2(username):
     else:
         return redirect(indexDir)
 
-
+"""Flask function for showing the admin dashboard"""
 @app.route(adminDashboardDir)
 def adminDash():
     user = checkSession()
@@ -237,7 +240,7 @@ def adminDash():
     else:
         return redirect(indexDir)
 
-
+"""Flask function for logging out"""
 @app.route(logoutDir)
 def logout():
     global current_error
@@ -252,7 +255,7 @@ def logout():
         current_error.append(str(e))
     return redirect(indexDir)
 
-
+"""Flask function for changing your settings"""
 @app.route(settingsDir, methods=['POST', 'GET'])
 def settings():
     user = checkSession()
@@ -288,7 +291,7 @@ def settings():
     else:
         return redirect(indexDir)
 
-
+"""Flask function for deleting users"""
 @app.route(settingsDir + "/delete", methods=["POST"])
 def delete_user():
     user = checkSession()
@@ -301,7 +304,7 @@ def delete_user():
     else:
         return redirect(indexDir)
 
-
+"""Flask adding/getting images """
 @app.route("/image/<usertype>", methods=["POST", "GET"])
 def image(usertype):
     user = checkSession()
@@ -333,7 +336,7 @@ def image(usertype):
                 return response
 
 
-# TODO User verification
+"""?"""
 @app.route("/fetch", methods=['POST', 'GET', 'PUT'])
 def fetch():
     user = checkSession()
@@ -367,7 +370,7 @@ def fetch():
             return "{}"
     return "{}"
 
-
+"""Flask function for blocking users """
 @app.route("/block_user/<username>")
 def block_user(username):
     user = checkSession()
@@ -377,7 +380,7 @@ def block_user(username):
     else:
         return redirect(indexDir)
 
-
+"""?"""
 @app.route("/fetch_admin", methods=['GET', 'PUT'])
 def fetch_admin():
     user = checkSession()
@@ -393,7 +396,7 @@ def fetch_admin():
     else:
         return "{}"
 
-
+"""?"""
 @app.route("/fetch_all_users_for_admin", methods=['GET'])
 def fetch_all_users():
     if True:
@@ -429,7 +432,7 @@ def fetch_all_users():
                 return jsonify({"table": str(table.__html__())})
     return "{}"
 
-
+"""?"""
 def stream_callback(data, timestamp, sessiondata, sid):
     sessiondata["timestamp"] = str(timestamp)
     socketio.emit("stream partition", (data, sessiondata), callback=stream_data, to=sid)
@@ -437,7 +440,6 @@ def stream_callback(data, timestamp, sessiondata, sid):
 
 """ This function can only be called if the client has received a callback from the server.
     The client must first ask the server to start a streaming session. """
-
 
 def stream_data(sessionData):
     timestamp = datetime.strptime(sessionData["timestamp"], "%Y-%m-%d %H:%M:%S")
@@ -458,7 +460,7 @@ def stream_data(sessionData):
         print("Some user tried to be sneaky and stream data!")
 
 
-# Start a data streaming session
+"""Start a data streaming session"""
 @socketio.on("start stream")
 def start_stream():
     user = checkSession()
@@ -473,21 +475,21 @@ def start_stream():
         sessionData["timestamp"] = str(str(startTime - timedelta(seconds=100, microseconds=startTime.microsecond)))
         stream_data(sessionData)  ## timedelta lets us fetch previous windmill updates
 
-
+"""Connect to the stream"""
 @socketio.on('connect')
 def socket_connect():
     user = checkSession()
     if user:
         print("client", user.name, "with sid", request.sid, "connected :)")
 
-
+"""Disconnect to the stream"""
 @socketio.on('disconnect')
 def socket_disconnect():
     user = checkSession()
     if user:
         print("client", user.name, "with sid", request.sid, "disconnected :(")
 
-
+"""Start the server"""
 def serverStartup():
     try:
         users = readAllUserFromDatabase()

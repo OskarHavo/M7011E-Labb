@@ -3,8 +3,9 @@ import threading
 import dataGeneration
 import datetime
 
-
+"""Class for handling our power plant"""
 class EnergyCentral:
+    """Init"""
     def __init__(self, maxCapacity, delta):
         self.capacityModifier = 1
         self.maxCapacity = maxCapacity
@@ -22,6 +23,9 @@ class EnergyCentral:
         self.mutex = threading.Lock()
         self.delta = delta
 
+    """Get the energy available to a singular user connected to the power plant
+        The total energy is balanced over each of the users, providing equal power plant power to all.
+    """
     def getAvailableEnergy(self, user):
         if self.clients[user]["powerOutage"]:
             return 0
@@ -33,27 +37,33 @@ class EnergyCentral:
             return self.currentCapacity
         return self.currentCapacity / float(len(self.clients))
 
+    """Get the number of users connected to the power plant"""
     def nUsers(self):
         with self.mutex:
             return len(self.clients)
 
+    """?"""
     def attach(self, client):
         with self.mutex:
             self.clients[client.user] = {"windmill":client,"powerOutage": False}
 
+    """?"""
     def detach(self, client):
         with self.mutex:
             if client in self.clients:
                 del self.clients[client]
 
+    """Get energy price from the power plant"""
     def getEnergyPrice(self):
         with self.mutex:
             return self.electricityPrice
 
+    """Get blackout status from the power plant"""
     def getBlackoutStatus(self):
         with self.mutex:
             return self.blackout
 
+    """Set value to the power plant"""
     def setValue(self, valueName, value):
         with self.mutex:
             if valueName == "sellRatio":
@@ -73,11 +83,13 @@ class EnergyCentral:
             elif valueName == "currentelectricityprice":
                 self.electricityPrice = value
 
+    """Update the timestamp"""
     def updateTime(self):
         date = datetime.datetime.now()
         formattedDate = date - datetime.timedelta(microseconds=date.microsecond)  # Ensures only 2 digits for seconds
         self.date = formattedDate
 
+    """Get the current data from the power plant"""
     def getCurrentData(self):
         with self.mutex:
             return {
@@ -93,6 +105,8 @@ class EnergyCentral:
                 "maxCapacityPercentage": str(self.capacityModifier),
                 "maxCapacity": str(self.maxCapacity)}
 
+    """The implementation of our power outage function, where the users randomly can experience blackouts and thus
+        only recieve power from its local windmill and not the central powerplant."""
     def updatePowerOutage(self):
         for client in self.clients:
             rn = self.blackoutRandState.tick()
@@ -105,6 +119,7 @@ class EnergyCentral:
                 if rn < 0.1:
                     self.clients[client]["powerOutage"] = True
 
+    """long text?"""
     def tick(self):
         self.updateTime()
         self.updatePowerOutage()
@@ -132,10 +147,12 @@ class EnergyCentral:
         self.modeledElectricityPrice = dataGeneration.calculateDailyEnergyPrice(self.currentCapacity,
                                                                                 self.currentConsumption)
 
+    """Stop the power plant"""
     def stop(self):
         with self.mutex:
             self.running = 0
 
+    """Running the power plant"""
     def run(self, socketio):
         with self.mutex:
             self.running = 1

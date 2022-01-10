@@ -1,6 +1,7 @@
 import mysql.connector
 
 
+""""Fetches the secret key from the database"""
 def fetchKey():
     global current_error
     try:
@@ -16,7 +17,7 @@ def fetchKey():
     except Exception as e:
         return "supersecretpassword"
 
-
+""""Fetches data surrounding a singular user from the database"""
 def readUserFromDatabase(user):
     global current_error
     try:
@@ -35,7 +36,7 @@ def readUserFromDatabase(user):
     except Exception as e:
         return None
 
-
+""""Fetches data surrounding all users from the database"""
 def readAllUserFromDatabase():
     global current_error
     try:
@@ -52,7 +53,7 @@ def readAllUserFromDatabase():
     except Exception as e:
         return None
 
-
+""""Fetches a user's chosen image from the database"""
 def fetchUserImage(username):
     global current_error
     try:
@@ -72,7 +73,7 @@ def fetchUserImage(username):
     except Exception as e:
         return None
 
-
+""""Inserts a user's chosen image to the database"""
 def setUserImage(username, blob):
     global current_error
     try:
@@ -90,7 +91,7 @@ def setUserImage(username, blob):
     except Exception as e:
         return False
 
-
+""""Adds a user to the database"""
 def writeUserToDatabase(user, password, postalcode):
     global current_error
     try:
@@ -111,7 +112,7 @@ def writeUserToDatabase(user, password, postalcode):
         return False
     return True
 
-
+""""Alters information surrounding a user in the database"""
 def alterUserInDatabase(username, newPassword=None, newPostalCode=None):
     global current_error
     try:
@@ -135,7 +136,7 @@ def alterUserInDatabase(username, newPassword=None, newPostalCode=None):
         return False
     return True
 
-
+""""Deletes a user from the database"""
 def removeUserFromDatabase(username):
     global current_error
     try:
@@ -154,8 +155,6 @@ def removeUserFromDatabase(username):
 
 
 """Update the user login date, IP number and port on the database. Call this whenever a uer logs in or updates their login info"""
-
-
 def updateUserLastLogin(username, date, ip="255.255.255.255", port="1234"):
     global current_error
     try:
@@ -175,7 +174,7 @@ def updateUserLastLogin(username, date, ip="255.255.255.255", port="1234"):
         return False
     return True
 
-
+""""Add historical data to a selected user"""
 def setHistoricalData(username, data):
     global current_error
     try:
@@ -193,7 +192,7 @@ def setHistoricalData(username, data):
         return False
     return True
 
-
+""""Retrieve historical data from a selected user"""
 def getHistoricalData(user):
     global current_error
     try:

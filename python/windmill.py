@@ -4,7 +4,9 @@ import threading
 import dataGeneration
 
 
+"""?"""
 class WindmillQueue:
+    """?"""
     def __init__(self, maxLen=10):
         self.queue = []  # FIFO queue of datapoints
 
@@ -12,6 +14,7 @@ class WindmillQueue:
         self.queueMutex = threading.Lock()
         self.maxLen = maxLen
 
+    """Retrieve the next windmill in the FIFO queue"""
     def getNext(self, timestamp):
 
         ## Check if the timestamp is newer then all datapoints in the queue
@@ -30,7 +33,7 @@ class WindmillQueue:
                 if newtime > timestamp:
                     ## Return all samples that are newer than the given timestamp
                     return self.queue[i:], self.queue[-1]["timestamp"]
-
+    """?"""
     def put(self, data):
         with self.queueMutex:
             self.queue.append(data)
@@ -39,7 +42,7 @@ class WindmillQueue:
             with self.condition:
                 self.condition.notify_all()  ## Notify any thread that is waiting for a new value
 
-
+""""?"""
 class ProductionNode:
     def __init__(self, user, postalCode, productionRandomRange, consumptionRandomRange, powerplant):
         self.postalCode = postalCode
@@ -67,6 +70,7 @@ class ProductionNode:
                                                      user)
         powerplant.attach(self)
 
+    """Set value to Production Node"""
     def setValue(self, valueName, value=None):
         with self.syncMutex:
             if valueName == "buyRatio":
@@ -81,29 +85,36 @@ class ProductionNode:
             else:
                 print("Received some weird value ", valueName, value)
 
+    """Delete Production Node"""
     def __del__(self):
         self.powerplant.detach(self)
 
+    """Get name from Production Node"""
     def getName(self):
         with self.syncMutex:
             return self.user
 
+    """Get buffer from Production Node"""
     def getBuffer(self):
         with self.syncMutex:
             return self.energyBuffer
 
+    """Get current production from Production Node"""
     def getProduction(self):
         with self.syncMutex:
             return self.currentProduction
 
+    """Get current purchase volume from Production Node"""
     def getPurchaseVolume(self):
         with self.syncMutex:
             return self.currentPurchase
 
+    """Get block status from Production Node"""
     def getBlockStatus(self):
         with self.syncMutex:
             return self.chain.sellRatio.blocked > 0
 
+    """?"""
     def getNext(self, timestamp, callback=None, *callbackargs):
         with self.syncMutex:
             data, timestamp = self.timeData.getNext(timestamp)
@@ -111,11 +122,13 @@ class ProductionNode:
                 self.callbackBuffer.append((callback, callbackargs))
             return data, timestamp
 
+    """Update the timestamp"""
     def updateTime(self):
         date = datetime.datetime.now()
         formattedDate = date - datetime.timedelta(microseconds=date.microsecond)  # Ensures only 2 digits for seconds
         self.date = formattedDate
 
+    """?"""
     def tick(self):
         with self.syncMutex:
             self.updateTime()
