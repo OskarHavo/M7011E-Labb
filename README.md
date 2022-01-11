@@ -1,22 +1,48 @@
 # M7011E Lab
 Robin Danielsson and Oskar Havo
 
-http://130.240.200.37:5000/user_dashboard <br>
-http://130.240.200.37:5000/admin_dashboard
-
 # Instruction for Audit
-We have added the public ssh key as requested. On our server, we have placed usernames 
-and passwords for audit in **/home/robdan-7/AUDIT_INSTRUCTIONS.md**. You should have access to this file 
-with too privileges
+We have added the public ssh key as requested. On our server, we have placed usernames and passwords for audit in:
+```
+/home/robdan-7/AUDIT_INSTRUCTIONS.md
+```
+You should have access to this file with any user, otherwise please contact us.
 
-# Deployment Protocol
-text
+## Deployment Protocol
+To restart Server 
+```
+sudo su jenkins
+export XDG_RUNTIME_DIR=/run/user/$(id -u)
+systemctl --user restart flask
+```
 
-# Design documentation
+Alternatively, the server can be started by executing:
+```
+python3 /var/lib/jenkins/workspace/M7011E-web/python/index.py
+```
+Note that the flask service must be turned off first. 
+
+# Introduction
+The purpose of this course was to create a simulator simulating a power grid. <br>
+Where we have three main entities: Households, Windmills and Coal plants:
+* Households are owned by users; they consume energy and gain energy from the windmills and powerplant. Houses in close by area codes also have similar wind patterns thus making their production levels similar.
+* The Windmills simply produces energy and can break down randomly.
+* The powerplant produces energy and is controlled by the admins. They serve all area codes, and its production is balanced over all users.
+
+
+# Method
+We have used Python Flask for our back-end. The web interface consists of html,css and javascript. We have used the server automation tool jenkins to easily build our application on each commit. We wanted to try Jenkns as it is an industry standard and it was recommended in class.
+
+We have worked in an agile manner and divided work as equallly as possible.
+
+
+# Result
+
+## Design documentation
 We have generated interactive documentation with doxygen. The index.html file can be found here [documentation](documentation/index.html).
 Download the repository and take a look!
 
-## Windmill
+### Windmill
 The windmill class is structured as an independent object and provides a tick function that updates the windmill 
 state and stores the most recent data in a local FIFO queue. It also has and API access point for setting the sell and 
 buy ratio, as well as blocking the sell ratio from being changed below 100%. Fetching data from a windmill is done by 
@@ -34,7 +60,7 @@ clients will receive windmill reparations during the second quarter of 2022.
 Note that the windmill itself does not contain any code for maintaining an update cycle. This functionality left to be provided by 
 the rest of the application/simulator.
 
-### Windmill update sequence
+#### Windmill update sequence
 ![bild](napkin_sketch.png)
 
 Each windmill maintains a consumption chain, which is a set of smaller components that together form a feedback loop where 
@@ -45,7 +71,7 @@ that takes the required inputs anc calculates a new output that can then be used
 All updates are then executed from left to right, which means that we user the buffer output from the previous iteration and 
 then use the new information to update the buffer.
 
-## Energy central
+### Energy central
 The energy central class is more closely related to the simulator and does have a **run** function that updates the state at a fixed interval.
 Here, the **tick** function is not meant to be called if the provided update function is running. 
 
@@ -61,7 +87,7 @@ The energy central stores a dictionary of all clients and the power delivery sta
 
 Data can be retrieved from the energy central at any moment by calling **getCurrentData()** and values can be set by calling **setValue(valueName, value)**. 
 
-## Simulator
+### Simulator
 The simulator class maintains the energy central and all windmills. Upon starting a windmill, the simulator dispatches 
 a new thread through the SocketIO API (using SocketIO through multiple threads requires this) that calls the update function 
 of a windmill object and waits 10 seconds. The thread can then be shut down through the simulator.
@@ -70,12 +96,12 @@ The windmill implementation is therefore not dependent on the simulator once a t
 can operate asynchronously to each other and the energy central. It is also possible to deploy the simulator as 
 a distributed system if a messaging protocol is added.
 
-## Web server
+### Web server
 The web server is made with Python Flask and provides request functions for html pages, as well as RESTful API calls. To invoke a specific 
 REST function, one must first specify a website URL and then choose a REST function that is provided at that URL. We have 
 done this in order to separate functionality between users and admins.
 
-### SocketIO streaming
+#### SocketIO streaming
 Together with Flask, we have also set up SocketIO that provides bidirectional and low-latency communication between the server 
 and it's clients. When a server-client connection is made, the client can only initiate a stream and determine if the stream 
 should continue. Web clients do not determine the rate of the stream or when to receive data packets.
@@ -87,14 +113,14 @@ by how frequently a windmill is updating its state.
 
 
 
-# Design Diagram
-## UML diagram for the main classes
+## Design Diagram
+### UML diagram for the main classes
 ![bild](classes.png)
-## Package diagram that shows ownership/include paths
+### Package diagram that shows ownership/include paths
 ![bild](packages.png)
 
 
-# Data Model Specification
+## Data Model Specification
 We store user data in an SQL database that provides a table with username, hashed password, postal code, user image, 
 root status, online status, login IP, login port and historical data. We have implemented a set of functions for interacting
 with the database from python code, but there is no user authentication provided by these functions. 
@@ -106,7 +132,7 @@ as the rest of the server. Flask provides the user with a few entry points for f
 
 
 
-# Features and Design Choices.
+## Features and Design Choices.
 In the images below you can see every task we have completed. All of the Logic ones and most of the user/admin ones. We 
 chose not to do the "social" tasks, such as the chat, since we wanted to focus on the simulation part of this course. 
 Below the images we go more into detail about our approach where necessary.
@@ -116,8 +142,8 @@ Below the images we go more into detail about our approach where necessary.
 
 ![bild](https://user-images.githubusercontent.com/32604330/148690660-c6c5da81-8295-4ae7-85d9-1b359f585e67.png)
 
-## Logic
-### Basic
+### Logic
+#### Basic
 ***Automated Tests*** <br>
 **Oskar & Robin** <br>
 Every relevant backend function pertaining to the Mathematical Model is tested using Python Testing. We have focused on testing for every case in the mathematical model rather than testing every network component due to time constraints. 
@@ -135,7 +161,7 @@ The price is calculated through having a base price and then adding/subtracting 
 API functions are divided into different URLs for different functions, e.g. clients have a separate URL compared to administrators.
 We use POST,PUT and GET commands in HTML and javascript, which communicate with flask's integrated requests solution.
 
-### Advanced
+#### Advanced
 
 ***Historical Data*** <br>
 **Robin** <br>
@@ -160,8 +186,8 @@ The windmills can also get broken down. During this time the household only rece
 
 
 
-## User
-### Basic
+### User
+#### Basic
 
 ***Coal Powerplant Graphical Tools*** <br>
 **Oskar** <br>
@@ -189,7 +215,7 @@ The user selects a photo from their device and uploads it, which POSTs the image
 **Oskar** <br>
 All the required data is displayed in raw form, graph form and most extensively in our gauges.
 
-### Advanced
+#### Advanced
 ***Account Deletion / Change Info*** <br>
 **Oskar & Robin** <br>
 We have a settings menu where you can change password and delete your user.
@@ -209,8 +235,8 @@ We have implemented draggable gauges based on an example in order to easily visu
 We have implemented draggable gauges based on an example in order to easily visualize the data and to allow the user to change the order as it deems fit.
 
 
-## Admin
-### Basic
+### Admin
+#### Basic
 
 ***Account Deletion / Change Info of Other Users*** <br>
 **Oskar & Robin** <br>
@@ -260,7 +286,7 @@ By using using the sliders in the web interface you can control the ratio.
 The admin can see in its prosumer table the blackout status of each user.
 
 
-### Advanced
+#### Advanced
 
 ***Coal Powerplant Graphical Tools*** <br>
 **Oskar** <br>
@@ -302,7 +328,7 @@ stored in a buffer until the next windmill update. Upon the next update sequence
 
 
 
-# Authentication Design
+## Authentication Design
 This is done via sessions directly in flask. Flask provides a cookie which is encrypted with a secret password stored in our 
 database. We could generate a random value during runtime, but that would invalidate all our active sessions during testing 
 when the flask server is restarted frequently. For a final production deployment, we would turn off this feature and use secure 
@@ -312,7 +338,11 @@ To combat unauthorized access, we deserialize the session cookie into a Python o
 This prevents normal users to access administrative content or spoofing invalid user logins. The object is then returned to the user 
 in it's serialized form.
 
-# Time Log
-Robin Danielsson: ~101 Hours Total
+## Time Log
+Robin Danielsson: ~107 Hours Total
 <br>
-Oskar Havo: ~98 Hours Total
+Oskar Havo: ~101 Hours Total
+
+# Conclusion
+
+We have learned alot during this course. For instance how to create a substantial API which interacts with a database, server and users. We have also learned more about industry standards and how large scale deployment can be done.
