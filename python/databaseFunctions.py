@@ -1,8 +1,10 @@
 import mysql.connector
 
 
-""""Fetches the secret key from the database"""
 def fetchKey():
+    """! Fetches the secret key from the database.
+    @return A secret key to use for Flask session encryption
+    """
     global current_error
     try:
         mydb = mysql.connector.connect(
@@ -17,8 +19,11 @@ def fetchKey():
     except Exception as e:
         return "supersecretpassword"
 
-""""Fetches data surrounding a singular user from the database"""
 def readUserFromDatabase(user):
+    """! Fetches data surrounding a singular user from the database.
+    @param user Client user name
+    @return User information of None
+    """
     global current_error
     try:
         mydb = mysql.connector.connect(
@@ -36,8 +41,10 @@ def readUserFromDatabase(user):
     except Exception as e:
         return None
 
-""""Fetches data surrounding all users from the database"""
 def readAllUserFromDatabase():
+    """! Fetches data surrounding all users from the database.
+    @return Info for all users ro None.
+    """
     global current_error
     try:
         mydb = mysql.connector.connect(
@@ -53,8 +60,11 @@ def readAllUserFromDatabase():
     except Exception as e:
         return None
 
-""""Fetches a user's chosen image from the database"""
 def fetchUserImage(username):
+    """! Fetches a user's chosen image from the database.
+    @param username Client user name.
+    @return User image or None
+    """
     global current_error
     try:
         mydb = mysql.connector.connect(
@@ -73,15 +83,20 @@ def fetchUserImage(username):
     except Exception as e:
         return None
 
-""""Inserts a user's chosen image to the database"""
 def setUserImage(username, blob):
+    """! Inserts a user's chosen image to the database.
+    @param username Client user name.
+    @param blob Photo blob.
+    @return True if the image was set. False otherwise.
+    """
     global current_error
     try:
         mydb = mysql.connector.connect(
             host="localhost",
             user="Client",
             password="",
-            database="M7011E")
+            database="M7011E",
+            autocommit=False)
         cursor = mydb.cursor(buffered=True)
         cursor.execute(
             "UPDATE M7011E.User SET Image=%s WHERE User='%s'" % (blob, username))
@@ -91,8 +106,12 @@ def setUserImage(username, blob):
     except Exception as e:
         return False
 
-""""Adds a user to the database"""
 def writeUserToDatabase(user, password, postalcode):
+    """! Adds a user to the database.
+    @param user User name.
+    @param password Hashed password.
+    @return True if the user was written to the database. False otherwise.
+    """
     global current_error
     try:
         if user == "" or password == "":
@@ -101,7 +120,8 @@ def writeUserToDatabase(user, password, postalcode):
             host="localhost",
             user="Client",
             password="",
-            database="M7011E")
+            database="M7011E",
+            autocommit=False)
         cursor = mydb.cursor(buffered=True)
         sql = "INSERT INTO User(User,Password,Postalcode) VALUES(%s,%s,%s)"
         val = (user, password, postalcode)
@@ -112,15 +132,21 @@ def writeUserToDatabase(user, password, postalcode):
         return False
     return True
 
-""""Alters information surrounding a user in the database"""
 def alterUserInDatabase(username, newPassword=None, newPostalCode=None):
+    """! Alters information surrounding a user in the database.
+    @param username Client user name.
+    @param newPassword New password for the user.
+    @param newPostalCode New postal code for the user.
+    @return True if the user was updated in the database. False otherwise.
+    """
     global current_error
     try:
         mydb = mysql.connector.connect(
             host="localhost",
             user="Client",
             password="",
-            database="M7011E")
+            database="M7011E",
+            autocommit=False)
         cursor = mydb.cursor(buffered=True)
         sql = "UPDATE M7011E.User SET "
         if newPassword:
@@ -136,15 +162,19 @@ def alterUserInDatabase(username, newPassword=None, newPostalCode=None):
         return False
     return True
 
-""""Deletes a user from the database"""
 def removeUserFromDatabase(username):
+    """! Deletes a user from the database.
+    @param username Client user name
+    @return True if the user was deleted from the database. False otherwise.
+    """
     global current_error
     try:
         mydb = mysql.connector.connect(
             host="localhost",
             user="Client",
             password="",
-            database="M7011E")
+            database="M7011E",
+            autocommit=False)
         cursor = mydb.cursor(buffered=True)
         cursor.execute("DELETE FROM M7011E.User WHERE User='%s'" % (username))
         mydb.commit()
@@ -154,15 +184,22 @@ def removeUserFromDatabase(username):
         return False
 
 
-"""Update the user login date, IP number and port on the database. Call this whenever a uer logs in or updates their login info"""
 def updateUserLastLogin(username, date, ip="255.255.255.255", port="1234"):
+    """! Update the user login date, IP number and port on the database. Call this whenever a uer logs in or updates their login info.
+    @param username Client user name.
+    @param date Current cate.
+    @param ip Login IP.
+    @param port Login port.
+    @return True if the user login was updated. False otherwise.
+    """
     global current_error
     try:
         mydb = mysql.connector.connect(
             host="localhost",
             user="Client",
             password="",
-            database="M7011E")
+            database="M7011E",
+            autocommit=False)
         cursor = mydb.cursor(buffered=True)
         sql = "UPDATE M7011E.User SET LastOnline='{}', LoginIP='{}',LoginPort='{}' WHERE User='{}'".format(date, ip,
                                                                                                            port,
@@ -174,15 +211,20 @@ def updateUserLastLogin(username, date, ip="255.255.255.255", port="1234"):
         return False
     return True
 
-""""Add historical data to a selected user"""
 def setHistoricalData(username, data):
+    """! Add historical data to a selected user.
+    @param username Client user name.
+    @data JSON data object as a string.
+    @return True if the historical data was set. False otherwise.
+    """
     global current_error
     try:
         mydb = mysql.connector.connect(
             host="localhost",
             user="Client",
             password="",
-            database="M7011E")
+            database="M7011E",
+            autocommit=False)
         cursor = mydb.cursor(buffered=True)
         sql = "UPDATE M7011E.User SET HistoricalData='{}' WHERE User='{}'".format(data, username)
         cursor.execute(sql)
@@ -192,8 +234,11 @@ def setHistoricalData(username, data):
         return False
     return True
 
-""""Retrieve historical data from a selected user"""
 def getHistoricalData(user):
+    """! Retrieve historical data from a selected user.
+    @param Client user name.
+    @return Historical data as it is stored in the database or None
+    """
     global current_error
     try:
         mydb = mysql.connector.connect(

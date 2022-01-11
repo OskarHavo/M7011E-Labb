@@ -2,10 +2,14 @@ import random
 import math
 import numpy as np
 
-"""Class for the power consumption"""
 class PowerConsumption:
-    """Tick function which returns the power consumption based on the calender month to simulate seasons/realistic weather"""
+    """! Class for the power consumption"""
+
     def tick(self, date):
+        """! Tick function which returns the power consumption based on the calender month to simulate seasons/realistic weather.
+        @param date Current date
+        @return Current power consumption
+        """
         min = [20.0, 19.5, 17.0, 16.0, 14.5, 11.0, 11.0, 12.5, 14.0, 16.0, 18.5, 20.5]
         max = [24.0, 23.5, 20.0, 18.0, 16.0, 13.5, 13.5, 14.5, 15.5, 18.5, 19.5, 23.5]
 
@@ -13,17 +17,22 @@ class PowerConsumption:
         powerConsumption = (min[currentMonth] + random.random() * (max[currentMonth] - min[currentMonth]))
         return powerConsumption
 
-"""Class for the power production"""
 class PowerProduction:
-    """Init"""
+    """! Class for the power production."""
     def __init__(self, startDate, areaCode):
+        """! Init.
+        @param startDate The start date to refer to.
+        @param areaCode The client area code
+        """
         self.startDate = startDate
         self.areaCode = areaCode
         self.outOfOrder = False
         self.outOfOrderState = RandomState(areaCode, [0, 1])
 
-    """"Function which simulates the windmills breaking down"""
     def updateOutOfOrder(self, rand):
+        """! Function which simulates the windmills breaking down.
+        @param rand A random value.
+         """
         if self.outOfOrder:
             # Turn back on with a 5% chance
             if rand < 0.05:
@@ -34,8 +43,12 @@ class PowerProduction:
                 self.outOfOrder = True
         return self.outOfOrder
 
-    """Tick function which returns the power production of the windmill based on a sine wave which considers the locaiton of the user to provide locational weather"""
     def tick(self, date):
+        """! Tick function which returns the power production of the windmill based on a sine wave which considers
+        the locaiton of the user to provide locational weather.
+        @param date Current date.
+        @return Current power production
+        """
         deltaDate = date - self.startDate  ## Calculate where in the sinewave you are.
         i = deltaDate.days
 
@@ -54,14 +67,23 @@ class PowerProduction:
         return powerProduction
 
 
-"""Calculates how much we need to buy based on the current consumption, production and buy ratio
-If the buffer is empty, the value could be higher than anticipated since we need to buy more to achieve the consumption goal.
-This just calculates how much we would like to buy vs how much we want to store.
-If the production is higher than our consumption, the result will be negative to show how much we can either sell or store.
-Requires updates from consumption provider, production provider, available electricity
-Requires previous update from buffer """
 class BuyCalc:
+    """! Calculates how much we need to buy based on the current consumption, production and buy ratio
+        If the buffer is empty, the value could be higher than anticipated since we need to buy more to achieve the consumption goal.
+        This just calculates how much we would like to buy vs how much we want to store.
+        If the production is higher than our consumption, the result will be negative to show how much we can either sell or store.
+        Requires updates from consumption provider, production provider, available electricity
+        Requires previous update from buffer.
+    """
     def __init__(self, consumptionProducer, productionProducer, electricity, buffer, buyRatio, clientID):
+        """! Init function.
+        @param consumptionProducer DataProducer for consumption.
+        @param productionProducer DataProducer for production.
+        @param electricity EnergyCentral reference.
+        @param buffer BufferCalc object.
+        @param buyRatio Float number between 0 and 1.
+        @param clientID Client user name.
+        """
         self.prod = productionProducer
         self.con = consumptionProducer
         self.el = electricity
@@ -70,21 +92,29 @@ class BuyCalc:
         self.buffer = buffer
         self.client = clientID
 
-    """Set Ratio"""
     def setRatio(self, ratio):
+        """! Set Ratio.
+        @param ratio Float value between 0 and 1
+        """
         self.ratio = ratio
 
-    """Get Ratio"""
     def getRatio(self):
+        """! Get Ratio.
+        @return Buy ratio.
+        """
         return self.ratio
 
-    """Get current value"""
     def currentValue(self):
+        """! Get current value.
+        @return current Buy value
+        """
         return self.result
 
-    """ Uses stored electricity in the buffer to calculate how much we need to buy from the power grid.
-        Negative values represent a surplus of production energy. """
     def tick(self):
+        """! Uses stored electricity in the buffer to calculate how much we need to buy from the power grid.
+        Negative values represent a surplus of production energy.
+        @return The calculated quota. Same as currentValue()
+        """
         electricity = self.el.getAvailableEnergy(self.client)
         wantedConsumption = self.con.currentValue()
         production = self.prod.currentValue()
@@ -105,39 +135,51 @@ class BuyCalc:
         return quota
 
 
-""" Calculate how much of the extra energy we can sell to the market.
-    Excess energy is represented by a negative number.
-    Requires updates from the buy calculator """
 
 class SellRatioCalc:
+    """! Calculate how much of the extra energy we can sell to the market.
+    Excess energy is represented by a negative number.
+    Requires updates from the buy calculator. """
     def __init__(self, buyCalculator, sellRatio):
+        """!
+        @param buyCalculator BuyCalc
+        @param sellRatio Float value between 0 and 1.
+        """
         self.sellRatio = sellRatio
         self.buy = buyCalculator
         self.result = 0
         self.blocked = 0
 
-    """Set Ratio"""
     def setRatio(self, ratio):
+        """! Set Ratio.
+        @param ratio Float value between 0 and 1.
+        """
         if self.blocked > 0:
             ## Can't change value until we are unblocked, then the value will be restored.
             return
         self.sellRatio = ratio
 
-    """Get Ratio"""
     def getRatio(self):
+        """! Get Ratio.
+        @return Sell ratio.
+        """
         return self.sellRatio
 
-    """Get current value"""
     def currentValue(self):
+        """! Get current value.
+        @return current sell value.
+        """
         return self.result
-    """Blocks the user from selling for an amount of time"""
     def block(self):
+        """! Blocks the user from selling for an amount of time."""
         self.blocked = 10
         self.sellRatio = 1
 
-    """ Calculate how much electricity we can sell back to the power grid.
-    No electricity will be sold if the consumption is larger than the consumption."""
     def tick(self):
+        """! Calculate how much electricity we can sell back to the power grid.
+        No electricity will be sold if the consumption is larger than the consumption.
+        @return The calculated electricity to sell.
+        """
         if self.blocked > 0:
             self.blocked = self.blocked - 1
         quota = np.clip(self.buy.currentValue(), self.buy.currentValue(), 0)
@@ -147,34 +189,51 @@ class SellRatioCalc:
         return quota
 
 
-""" Calculate how much electricity we can add to the buffer as a function of how much energy we want to sell.
-    Requires updates from buy and sell calculator """
 class BufferCalc:
-    """init"""
+    """! Calculate how much electricity we can add to the buffer as a function of how much energy we want to sell.
+    Requires updates from buy and sell calculator. """
+
     def __init__(self, buyCalc, sellRatioCalc):
+        """! init.
+        @param buyCalc BuyCalc
+        @param sellRatioCalc SellRatioCalc
+        """
         self.buyCalc = buyCalc
         self.buffer = 0
         self.sellRatio = sellRatioCalc
 
-    """Subtract a value from the buffer"""
     def subtract(self, value):
+        """! Subtract a value from the buffer. """
         self.buffer = np.clip(self.buffer - value, 0, self.buffer)
 
-    """Get current value of the buffer"""
     def currentValue(self):
+        """! Get current value of the buffer. """
         return self.buffer
 
-    """Updates the buffer"""
     def tick(self):
+        """! Updates the buffer.
+        @return The buffer value
+        """
         buyValue = self.buyCalc.currentValue()
         sellValue = self.sellRatio.currentValue()
         if buyValue < 0:
             self.buffer = np.clip(self.buffer + (-buyValue) - sellValue, 0, 100)
         return self.buffer
 
-"""?"""
 class ConsumptionChain:
+    """!
+    This object combines all of the different generator components and puts them in an easy-to-user update cycle.
+    We user this in the Windmill class in order to update the state of the windmill.
+    """
     def __init__(self, consumptionProducer, productionProducer, powergrid, buyRatio, sellRatio, clientID):
+        """!
+        @param consumptionProducer  DataProducer for consumption
+        @param productionProducer DataProducer for production
+        @param powergrid EnergyCentral reference
+        @param buyRatio Float value for buy ratio
+        @param sellRatio Float value for sell ratio
+        @param clientID Client user name
+        """
         self.buyCalc = BuyCalc(consumptionProducer, productionProducer, powergrid, None, buyRatio, clientID)
         self.buffer = BufferCalc(self.buyCalc, None)
         self.buyCalc.buffer = self.buffer
@@ -182,8 +241,11 @@ class ConsumptionChain:
         self.buffer.sellRatio = self.sellRatio
         self.prod = productionProducer
         self.con = consumptionProducer
-    """?"""
     def tick(self, date):
+        """! ?
+        @param date The current date.
+        @return Production, Consumption, Purchased electricity, Sold electricity and buffer value.
+        """
         bruttoProd = self.prod.tick(date)
         self.con.tick(date)
         buySurplus = self.buyCalc.tick()
@@ -191,32 +253,42 @@ class ConsumptionChain:
         buffer = self.buffer.tick()
         return bruttoProd, bruttoProd + buySurplus, np.clip(buySurplus, 0, None), sellValue, buffer
 
-"""?"""
 class RandomState:
-    """Init"""
+    """! Utility class for maintaining a deterministic random number generator. We use this to create
+    random numbers without disturbing other data structures that also use random numbers. It is also possible
+    to warp an input value by some amount, specified by a range.
+    """
     def __init__(self, seed, randomRange):
+        """! Init.
+        @param seed Initial random seed.
+        @param randomRange List with range for the randomness.
+        """
         self.randomState = None
         self.initRandomState(seed)
         self.currentStateResult = 0
         self.range = randomRange
 
-    """Initialize the instance random state"""
     def initRandomState(self, seed):
+        """! Initialize the instance random state.
+        @param seed Initial random seed.
+        """
         state = random.getstate()
         random.seed(seed)
         self.randomState = random.getstate()
         random.setstate(state)
 
-    """Activate the instance random state"""
     def setRandomState(self):
+        """! Activate the instance random state."""
         random.setstate(self.randomState)
 
-    """Saves the random state"""
     def saveRandomState(self):
+        """! Saves the random state. """
         self.randomState = random.getstate()
 
-    """Produce a random number that is unique to this instance. Also save the result locally"""
     def tick(self):
+        """! Produce a random number that is unique to this instance. Also save the result locally.
+        @return The current state result.
+        """
         state = random.getstate()
         self.setRandomState()
         self.currentStateResult = random.random()
@@ -224,23 +296,34 @@ class RandomState:
         random.setstate(state)
         return self.currentStateResult
 
-    """Warp a sample based on the current state result"""
     def warpSample(self, sample):
+        """! Warp a sample based on the current state result.
+        @param The sample plus lerped random value
+        """
         return sample + lerp(self.range[0], self.range[1], self.currentStateResult)
 
-"""?"""
 class DataProducer:
-    """init"""
+    """! Generic data producer that is user together with PowerConsumption and PowerProduction.
+    Could we have user inheritance instead? Yeah, probably, but I don't wanna.
+
+    This also utilized a RandomState object to warp the generated data a little bit before returning it.
+    """
     def __init__(self, randState, curveFunction):
+        """! Init.
+        @param randState RandomState object
+        @param curveFunction An object with a tick(date) function
+        """
         self.random = randState
         self.func = curveFunction
         self.result = 0
-    """Get Current Value"""
     def currentValue(self):
+        """! Get Current Value."""
         return self.result
 
-    """Produce a new data point based on the set date and time"""
     def tick(self, currentDateTime):
+        """! Produce a new data point based on the set date and time.
+        @return the generated output.
+        """
         self.random.tick()
         result = self.func.tick(currentDateTime)
         result = self.random.warpSample(result)
@@ -248,18 +331,25 @@ class DataProducer:
         return result
 
 
-"""Linear interpolation"""
 def lerp(a, b, v):
+    """! Linear interpolation, super simple to make buuut I couldn't find one in the standard python libs.
+    @param a Start value
+    @param b End value
+    @paramd v Float value for interpolation
+    """
     return a + v * (b - a)
 
 
-""" Create a daily Energy Price based on the demand(consumed energy) and supply(produced energy)
-    Returns the price, surplus status and netenergyproduction 
-    ## High Consumption & Low Producing -> Low Price
-    ## Low Consumption & High Producing -> High Price
-    """
 def calculateDailyEnergyPrice(producedEnergy, consumedEnergy):
+    """! Create a daily Energy Price based on the demand(consumed energy) and supply(produced energy)
 
+    - High Consumption & Low Producing -> Low Price.
+    - Low Consumption & High Producing -> High Price.
+
+    @param producedEnergy Produced energy
+    @param consumedEnergy Consumed energy
+    @return Calculated energy price between 10 and 50.
+    """
     basePrice = 10.0
     maxPrice = 50.0
 

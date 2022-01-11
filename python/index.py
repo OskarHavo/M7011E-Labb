@@ -45,10 +45,16 @@ manager = SimulationManager(10, socketio)
 dataHistory = Windmillhistory(manager)
 
 
-"""The structure of a user"""
+
 class User:
-    """Init"""
+    """! The structure of a user."""
     def __init__(self, username, password=None, postalcode=97753, root=False):
+        """! Init.
+        @param username User name.
+        @param password User password in clear text.
+        @param postalcode User postal code.
+        @param root Admin status for the user.
+        """
         if password == None:
             try:
                 self.name = username["user"]
@@ -75,11 +81,15 @@ class User:
         self.ip = request.environ['REMOTE_ADDR']
         self.port = request.environ['REMOTE_PORT']
 
-    """Check if the user is validated by the server"""
     def isValid(self):
+        """! Check if the user is validated by the server.
+        @return True if the user has been validated.
+        """
         return self.validated
-    """Validate the user in the database from the server, to prevent fraudulent users"""
     def validate(self):
+        """! Validate the user in the database from the server, to prevent fraudulent users.
+        @return True if the user is valid.
+        """
         if self.validated:
             session["user"] = self.toJSON()
             return True
@@ -87,19 +97,23 @@ class User:
         if user and check_password_hash(user[1], self.password):
             self.validated = True
             self.postalcode = user[2]
-            self.root = user[3] == 1
+            self.root = user[3] == 1    # This is where we grant root status to a user.
             session["user"] = self.toJSON()
             return True
         else:
             return False
-    """Output as JSON"""
     def toJSON(self):
+        """! Output as JSON.
+        @return The user in a JSON format.
+        """
         return {"user": self.name, "password": self.password, "valid": self.validated, "postalcode": self.postalcode,
                 "root": self.root, "ip": self.ip, "root": self.root}
 
 
-"""Check if the postal code is valid or not"""
 def allowedPostalcode(code):
+    """! Check if the postal code is valid or not.
+    @return An integer representation of the postal code or None
+    """
     code = code.replace(" ", "")
     if code and code != "":
         try:
@@ -109,14 +123,19 @@ def allowedPostalcode(code):
         return code
     return None
 
-"""Check if the password is valid or not"""
 def allowedPassword(password):
+    """! Check if the password is valid or not. All passwords must be of length 4 or more. There is a max
+    value in the database, but I forgot what I set it to.
+    @return The password or None
+    """
     if password and len(password) > 3:
         return password
     return None
 
-"""Get the user from a session"""
 def getUser():
+    """! Get the user from a session.
+    @return A user object or None
+    """
     try:
         if "user" in session:
             return User(session["user"])
@@ -124,8 +143,10 @@ def getUser():
         current_error.append(str(e))
         return None
 
-"""Check if the user is valid or not"""
 def checkSession():
+    """! Check if the user is valid or not.
+    @return A user object or None.
+    """
     user = getUser()
     if user != None and user.isValid():
         updateUserLastLogin(user.name, datetime.now().strftime("%Y-%m-%d %H:%M:%S"), user.ip, user.port)
@@ -133,16 +154,20 @@ def checkSession():
     else:
         return None
 
-"""Flask function for showing the index"""
 @app.route(indexDir)
 def index():
+    """"! Flask function for showing the index.
+    @return The index page
+    """
     if checkSession():
         return redirect(userDashboardDir)
     return render_template("index.html")
 
-"""Flask function for log in page"""
-@app.route(loginDir, methods=['POST', 'GET'])
+@app.route(loginDir, methods=['POST'])
 def login():
+    """! Flask function for log in page.
+    @return On valid POST: the admin or user home page\n Otherwise: The login page.
+    """
     if checkSession():
         return redirect(userDashboardDir)
 
@@ -164,24 +189,12 @@ def login():
     else:
         return render_template("login.html")
 
-"""Flask function for database"""
-@app.route("/data")
-def data():
-    mydb = mysql.connector.connect(
-        host="localhost",
-        user="Client",
-        password="")
-    cursor = mydb.cursor(buffered=True)
-    cursor.execute("SELECT * FROM M7011E.User")
-    s = "<h>Stuff in the database</h><br><p>"
-    for x in cursor:
-        s = s + str(x)
-    cursor.close()
-    return s + "</p>"
 
-"""Flask function for signing up a user"""
-@app.route(createUserDir, methods=['POST', 'GET'])
+@app.route(createUserDir, methods=['POST'])
 def signup():
+    """! Flask function for signing up a user.
+    @return On valid POST: Redirect to the user home page\n Otherwise: Return to signup with an error.
+    """
     if checkSession():
         return redirect(userDashboardDir)
     err = ""
@@ -202,9 +215,11 @@ def signup():
 
     return render_template("create_user.html", error=err)
 
-"""Flask function for showing the user dashboard"""
 @app.route(userDashboardDir)
 def userDash():
+    """! Flask function for showing the user dashboard.
+    @return For valid user: The user home page. \n Otherwise: Redirect to index directory.
+    """
     user = checkSession()
     if user:
         if user.root:
@@ -213,14 +228,17 @@ def userDash():
     else:
         return redirect(indexDir)
 
-"""Flask function for showing the user dashboard"""
 @app.route("/user_dashboard/<username>")
 def userDash2(username):
+    """! Flask function for switching to a user's dashboard from a root user.
+    @param username The user name you want to access.
+    @return For valid root user and other user: The user home page. \n Otherwise: Redirect to index page.
+    """
     user = checkSession()
 
     if user and user.root:
         userdata = readUserFromDatabase(username)
-        if userdata:
+        if userdata and userdata[3] == 0:
             session["user-backup"] = user.toJSON()
             user = User(userdata[0], userdata[1])
             user.validated = True
@@ -231,33 +249,36 @@ def userDash2(username):
     else:
         return redirect(indexDir)
 
-"""Flask function for showing the admin dashboard"""
 @app.route(adminDashboardDir)
 def adminDash():
+    """! Flask function for showing the admin dashboard.
+    @return For valid root user: The admin home page.
+    """
     user = checkSession()
     if user and user.root:
         return render_template("admin_dashboard.html", user=user.name)
     else:
         return redirect(indexDir)
 
-"""Flask function for logging out"""
 @app.route(logoutDir)
 def logout():
-    global current_error
-    try:
-        if "user-backup" in session:
-            session["user"] = session["user-backup"]
-            session.pop("user-backup")
-            return redirect(adminDashboardDir)
-        else:
-            session.pop("user")
-    except Exception as e:
-        current_error.append(str(e))
+    """! Flask function for logging out.
+    @return For Root user logged in as another user: Return to root home page. \n Otherwise: The index page.
+    """
+    if "user-backup" in session:
+        session["user"] = session["user-backup"]
+        session.pop("user-backup")
+        return redirect(adminDashboardDir)
+    elif "user" in session:
+        session.pop("user")
+
     return redirect(indexDir)
 
-"""Flask function for changing your settings"""
-@app.route(settingsDir, methods=['POST', 'GET'])
+@app.route(settingsDir, methods=['POST'])
 def settings():
+    """! Flask function for changing your settings.
+    @return On valid POST: Change user settings. \n Otherwise: Return to index page.
+    """
     user = checkSession()
     if user:
         if request.method == "POST":
@@ -291,9 +312,11 @@ def settings():
     else:
         return redirect(indexDir)
 
-"""Flask function for deleting users"""
 @app.route(settingsDir + "/delete", methods=["POST"])
 def delete_user():
+    """! Flask function for deleting users.
+    @return On valid POST: Delete the user and redirect to logout page.
+    """
     user = checkSession()
     if user and request.method == "POST":
         if removeUserFromDatabase(user.name):
@@ -302,11 +325,13 @@ def delete_user():
         else:
             render_template("settings.html", user=user.name, error="Could not delete user")
     else:
-        return redirect(indexDir)
+        return redirect(logoutDir)
 
-"""Flask adding/getting images """
 @app.route("/image/<usertype>", methods=["POST", "GET"])
 def image(usertype):
+    """! Flask adding/getting images.
+    @return On valid POST: Set the user image.\n On valid GET: Fetch the user image if there is one.
+    """
     user = checkSession()
     if user:
         if request.method == "POST":
@@ -334,9 +359,13 @@ def image(usertype):
                 response.headers.set('Content-Type', 'image/jpg')
                 response.headers.set('Content-Disposition', 'attachment', filename='house.jpg')
                 return response
+            else:
+                return ""
 
+"""
 
-"""?"""
+This is our old version for fetching windmill information. As you can see, there is no streaming going on here.
+
 @app.route("/fetch", methods=['POST', 'GET', 'PUT'])
 def fetch():
     user = checkSession()
@@ -369,10 +398,13 @@ def fetch():
             manager.alterNode(user.name, valueName, data)
             return "{}"
     return "{}"
+"""
 
-"""Flask function for blocking users """
 @app.route("/block_user/<username>")
 def block_user(username):
+    """! Flask function for blocking users.
+    @return Redirect to the index page if current user is not root. Otherwise go to root home page.
+    """
     user = checkSession()
     if user and user.root:
         manager.alterNode(username, "block", "")
@@ -380,9 +412,16 @@ def block_user(username):
     else:
         return redirect(indexDir)
 
-"""?"""
 @app.route("/fetch_admin", methods=['GET', 'PUT'])
 def fetch_admin():
+    """!
+    This function fetches information from the EnergyCentral object and returns it to the user. We have not
+    stream-ified data from the energy central, but we could if we wanted to.
+
+    The PUT function is used to change the energy central state.
+
+    @return On valid GET: Current Energy central state and output. \n On valid PUT: Nothing
+    """
     user = checkSession()
     if not user or not user.root:
         return "{}"
@@ -396,9 +435,11 @@ def fetch_admin():
     else:
         return "{}"
 
-"""?"""
 @app.route("/fetch_all_users_for_admin", methods=['GET'])
 def fetch_all_users():
+    """!
+    @return On valid GET: A JSON structure containing all regular users in the database.
+    """
     if True:
         user = checkSession()
         if user and user.root:
@@ -432,16 +473,29 @@ def fetch_all_users():
                 return jsonify({"table": str(table.__html__())})
     return "{}"
 
-"""?"""
 def stream_callback(data, timestamp, sessiondata, sid):
+    """!
+    This function is used as callback for when a windmill has no information to send. The windmill will
+    call this functions which sends the newly generated data to the client.
+    """
     sessiondata["timestamp"] = str(timestamp)
     socketio.emit("stream partition", (data, sessiondata), callback=stream_data, to=sid)
 
 
-""" This function can only be called if the client has received a callback from the server.
-    The client must first ask the server to start a streaming session. """
 
 def stream_data(sessionData):
+    """! This function is used to stream data from the server to the clients.
+    The client must first ask the server to start a streaming session.
+
+    Warning: Due to some SocketIO and Flask shenanigans, this function is not running inside the safety of flask,
+    so we don't have any encrypted cookies etc. If this text is still here, it means that I haven't fixed the
+    issue or added our own method of encrypting the session data.
+    This could potentially be used as a backdoor to data streaming.
+
+    @param sessionData User session data.
+    """
+
+
     timestamp = datetime.strptime(sessionData["timestamp"], "%Y-%m-%d %H:%M:%S")
 
     if sessionData["user"]:
@@ -460,9 +514,9 @@ def stream_data(sessionData):
         print("Some user tried to be sneaky and stream data!")
 
 
-"""Start a data streaming session"""
 @socketio.on("start stream")
 def start_stream():
+    """! "Start a data streaming session."""
     user = checkSession()
     if user:
         manager.startNode(user.name, int(user.postalcode), [0, 2], [0, 2])
@@ -475,22 +529,22 @@ def start_stream():
         sessionData["timestamp"] = str(str(startTime - timedelta(seconds=100, microseconds=startTime.microsecond)))
         stream_data(sessionData)  ## timedelta lets us fetch previous windmill updates
 
-"""Connect to the stream"""
 @socketio.on('connect')
 def socket_connect():
+    """! Socket connection feedback function. This just prints some info to the console."""
     user = checkSession()
     if user:
         print("client", user.name, "with sid", request.sid, "connected :)")
 
-"""Disconnect to the stream"""
 @socketio.on('disconnect')
 def socket_disconnect():
+    """! Socket disconnect feedback function. This just prints some info to the console. """
     user = checkSession()
     if user:
         print("client", user.name, "with sid", request.sid, "disconnected :(")
 
-"""Start the server"""
 def serverStartup():
+    """! Start the server. """
     try:
         users = readAllUserFromDatabase()
 

@@ -2,10 +2,10 @@ import unittest
 from dataGeneration import *
 from windmill import *
 
-""" Our tests for the logic part of the task."""
 class TestDataGeneration(unittest.TestCase):
-    """Testing that the PowerConsumption() produces reasonable values"""
+    """!  Our tests for the logic part of the task."""
     def test_PowerConsumption(self):
+        """! Testing that the PowerConsumption() produces reasonable values. """
         random.seed(2039812)
         consumption = PowerConsumption()
 
@@ -22,8 +22,8 @@ class TestDataGeneration(unittest.TestCase):
         self.assertGreater(min, 11, "Should be more than 11")
         self.assertLess(max, 24, "Should be less than 24")
 
-    """Testing that the PowerProduction() produces reasonable values"""
     def test_PowerProduction(self):
+        """! Testing that the PowerProduction() produces reasonable values."""
         random.seed(2039812)
         production = PowerProduction(startDate=datetime.date(2021, 1, 1), areaCode=1)
 
@@ -40,30 +40,30 @@ class TestDataGeneration(unittest.TestCase):
         self.assertGreater(min, 5, "Should be more than 5")
         self.assertLess(max, 25, "Should be less than 25")
 
-    """Testing that buying calculations are correct"""
     def test_BuyCalc(self):
-        """Internal test class"""
+        """! Testing that buying calculations are correct. """
         class ConsumptionProducer():
-            """Internal dummy function"""
+            """! Internal test class. """
             def currentValue(self):
+                """! Internal dummy function. """
                 return 1
 
-        """Internal test class"""
         class ProductionProducer():
-            """Internal dummy function"""
+            """! Internal test class. """
             def currentValue(self):
+                """! Internal dummy function. """
                 return 10
 
-        """Internal test class"""
         class PowerGrid():
-            """Internal dummy function"""
+            """! Internal test class. """
             def getAvailableEnergy(self, user):
+                """! Internal dummy function. """
                 return 100
 
-        """Internal test class"""
         class Buffer():
-            """Internal dummy function"""
+            """! Internal test class"""
             def currentValue(self):
+                """! Internal dummy function. """
                 return 10
 
         calc = BuyCalc(ConsumptionProducer(), ProductionProducer(), PowerGrid(), Buffer(), 1.0, "Demo")
@@ -75,12 +75,12 @@ class TestDataGeneration(unittest.TestCase):
         expected = -9
         self.assertEqual(quota, expected, "Should be " + str(expected))
 
-    """Testing that selling ratio calculations are correct"""
     def test_SellRatioCalc(self):
-        """Internal test class"""
+        """! Testing that selling ratio calculations are correct. """
         class BuyCalc():
-            """Internal dummy function"""
+            """! Internal test class. """
             def currentValue(self):
+                """! Internal dummy function. """
                 return -100
 
         calc = SellRatioCalc(BuyCalc(), 0.5)
@@ -102,18 +102,18 @@ class TestDataGeneration(unittest.TestCase):
         expected = 100
         self.assertEqual(result, expected, "Should be " + str(expected))
 
-    """Testing that buffer calculations are correct"""
     def test_BufferCalc(self):
-        """Internal test class"""
+        """! Testing that buffer calculations are correct. """
         class BuyCalc():
-            """Internal dummy function"""
+            """! Internal test class. """
             def currentValue(self):
+                """! Internal dummy function. """
                 return -100
 
-        """Internal test class"""
         class SellCalc():
-            """Internal dummy function"""
+            """! Internal test class. """
             def currentValue(self):
+                """! Internal dummy function. """
                 return 75
 
         buffer = BufferCalc(BuyCalc(), SellCalc())
@@ -124,62 +124,62 @@ class TestDataGeneration(unittest.TestCase):
         buffer.subtract(100)
         self.assertEqual(buffer.currentValue(), 0, "Should be 0")
 
-    """Testing that consumption chain works as intended"""
     def test_ConsumptionChain(self):
-        """Internal test class"""
+        """! Testing that consumption chain works as intended. """
         class ConsumptionProducer():
-            """Internal dummy function"""
+            """! Internal test class. """
             def currentValue(self):
+                """! Internal dummy function. """
                 return 1
 
-            """Internal dummy function"""
             def tick(self, date):
+                """! Internal dummy function. """
                 return 1
 
-        """Internal test class"""
         class ProductionProducer():
-            """Internal dummy function"""
+            """! Internal test class. """
             def currentValue(self):
+                """! Internal dummy function. """
                 return 10
 
-            """Internal dummy function"""
             def tick(self, date):
+                """! Internal dummy function. """
                 return 10
 
-        """Internal test class"""
         class PowerGrid():
-            """Internal dummy function"""
+            """! Internal test class. """
             def getAvailableEnergy(self, user):
+                """! Internal dummy function. """
                 return 100
 
-        """Internal test class"""
         class Buffer():
-            """Internal dummy function"""
+            """! Internal test class. """
             def currentValue(self):
+                """! Internal dummy function. """
                 return 10
 
-            """Internal dummy function"""
             def tick(self):
+                """! Internal dummy function. """
                 return 32
 
-        """Internal test class"""
         class BuyCalc():
-            """Internal dummy function"""
+            """! Internal test class. """
             def currentValue(self):
+                """! Internal dummy function. """
                 return -100
 
-            """Internal dummy function"""
             def tick(self):
+                """! Internal dummy function. """
                 return -100
 
-        """Internal test class"""
         class SellCalc():
-            """Internal dummy function"""
+            """! Internal test class. """
             def currentValue(self):
+                """! Internal dummy function. """
                 return 75
 
-            """Internal dummy function"""
             def tick(self):
+                """! Internal dummy function. """
                 return 75
 
         chain = ConsumptionChain(ConsumptionProducer(), ProductionProducer(), PowerGrid(), 0.5, 0.75, "Test")
@@ -194,8 +194,8 @@ class TestDataGeneration(unittest.TestCase):
 
 
 
-    """Testing if our random warp of samples works"""
     def test_RandomState(self):
+        """! Testing if our random warp of samples works. """
         random.seed(1111)
         # Get an initial random value
         startvalue = random.random()
@@ -219,24 +219,24 @@ class TestDataGeneration(unittest.TestCase):
         # Check if the normal random state has been disrupted or not
         self.assertEqual(startvalue, endvalue, "Should be" + str(startvalue))
 
-    """Testing if the DataProducer works as intended"""
     def test_DataProducer(self):
-        """Internal test class"""
+        """! Testing if the DataProducer works as intended."""
         class CurveFunction():
-            """Internal dummy function"""
+            """! Internal test class. """
             def tick(self, datetime):
+                """! Internal dummy function. """
                 return 1
 
         data = DataProducer(RandomState(1234, [-100, 100]), CurveFunction())
         result = data.tick(datetime.datetime(2021, 12, 10, 10, 2, 9))
         self.assertEqual(result, 94.29070713842776, "Should be 94.29")
 
-    """Testing if our linear interpolation works"""
     def test_lerp(self):
+        """! Testing if our linear interpolation works. Wait, why do we even test this :P"""
         self.assertEqual(lerp(0, 1, 0.5), 0.5, "Should be 0.5")
 
-    """Testing if the calculation of energy price works."""
     def test_calculateDailyEnergyPrice(self):
+        """! Testing if the calculation of energy price works."""
         basePrice = 10.0
         maxPrice = 50
 
@@ -268,24 +268,25 @@ class TestDataGeneration(unittest.TestCase):
         expectedResultPrice = maxPrice
         self.assertEqual(resultPrice, expectedResultPrice, "Should be " + str(expectedResultPrice))
 
-"""Testing if the windmill works as intended during different actions."""
 class TestModel(unittest.TestCase):
-    """Internal test class"""
+    """! Testing if the windmill works as intended during different actions."""
     class Demopower():
-        """Internal dummy function"""
+        """ !Internal test class. """
         def getAvailableEnergy(self):
+            """! Internal dummy function. """
             return 1000
 
-        """Internal dummy function"""
         def attach(self, user):
+            """! Internal dummy function. """
             return
 
-        """Internal dummy function"""
         def detach(self, user):
+            """! Internal dummy function. """
             return
 
     def test_setValue(self):
-        windmill = ProductionNode("demo", 97753, [-1, 1], [-2, 2], TestModel.Demopower())
+        """! Test to set all values and see if they actually changed or not."""
+        windmill = Windmill("demo", 97753, [-1, 1], [-2, 2], TestModel.Demopower())
         windmill.setValue("buyRatio", 0.6)
         windmill.setValue("sellRatio", 0.8)
         buy = windmill.chain.buyCalc.getRatio()

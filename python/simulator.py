@@ -1,96 +1,29 @@
-import windmill
+from windmill import Windmill
 import threading
-import requests
-from EnergyCentral import EnergyCentral
+from energyCentral import EnergyCentral
 
-"""Class describing the database and its functions"""
-class Database:
-    """Init"""
-    def __init__(self):
-        self.database = {}
-        self.lock = threading.Lock()
-
-    """Append new data"""
-    def put(self, data, username):
-        with self.lock:
-            if len(self.database[username]) >= 10:
-                self.database[username] = self.database[username][1:]
-            self.database[username].append(data)
-
-    """Add new user"""
-    def new(self, username):
-        self.database[username] = []
-
-    """Remove user"""
-    def remove(self, username):
-        with self.lock:
-            if username in self.database:
-                del self.database[username]
-
-    """Get user"""
-    def get(self, username):
-        with self.lock:
-            if username in self.database:
-                return self.database[username]
-            else:
-                return None
-
-"""Get but formatted correctly"""
-def formatGet(data):
-    result = "?"
-    for key in data:
-        result = result + str(key) + "=" + data[key] + "&"
-    return result[:-1]
-
-"""Our Restful API message bus class"""
-class MessageBus:
-    """Init"""
-    def __init__(self, server_url):
-        self.server = server_url
-        self.mutex = threading.Lock()
-        return
-
-    """PUT request"""
-    def PUT(self, data):
-        with self.mutex:
-            response = requests.put(self.server, data=data)
-            if response.status_code == 200:
-                return response.json()
-            else:
-                return None
-
-    """POST request"""
-    def POST(self, data):
-        with self.mutex:
-            response = requests.post(self.server, data=data)
-            if response.status_code == 200:
-                return response.json()
-            else:
-                return None
-
-    """GET request"""
-    def GET(self, subdir):
-        with self.mutex:
-            response = requests.get(self.server + subdir)
-            return response.json()
-
-"""Our nodemanager class"""
 class NodeManager:
-    """Init"""
-    def __init__(self, messageBus, delta, ID, var, powerplant):
-        self.client = windmill.ProductionNode(ID, var[0], var[1], var[2], powerplant)
+    """! Our nodemanager class. This acts as a container for windmills and takes care of starting and stopping them.
+    """
+    def __init__(self, delta, ID, *var):
+        """! Init
+        @param delta Update delta given in seconds.
+        @param var  Windmill init variables. See Windmill for more info.
+        """
+        self.client = Windmill(ID, *var)
         self.delta = delta
         self.mutex = threading.Lock()
         self.running = False
-        self.messageBus = messageBus
 
-    """Stops the node"""
     def stop(self):
+        """! Stops the node. """
         with self.mutex:
             self.running = False
 
-    """Starts the node"""
     def run(self, socketio):
+        """! Starts the node.
+        @param socketio A reference to the global socketIO object.
+        """
         with self.mutex:
             self.running = True
         while True:
@@ -100,48 +33,60 @@ class NodeManager:
             data = self.client.tick()
             socketio.sleep(self.delta)
 
-"""Our simulation manager class, responible for the windmill simulations"""
 class SimulationManager:
-    """Init"""
+    """! Our simulation manager class, responsible for the windmill simulations.
+    """
     def __init__(self, globalDelta, socketio, availableEnergy=100):
+        """! Init.
+        @param globalDelta The energy central update delta given in seconds.
+        @param socketio Reference to the global socketIO object.
+        @param availableEnergy Maximum available energy to give to all clients. Default = 100.
+        """
         self.productionNodes = {}  # Username, thread
         self.delta = globalDelta
-        self.bus = MessageBus("http://localhost:4242")
         self.mutex = threading.Lock()
         self.powerplant = EnergyCentral(availableEnergy, self.delta)
         socketio.start_background_task(EnergyCentral.run, self.powerplant, socketio)
         self.socketio = socketio
 
-    """Stops the windmill"""
-    def __del__(self, instance):
+    def __del__(self):
+        """! Stops the energy central and all active windmills. """
+        with self.mutex:
+            for key in self.productionNodes:
+                self.productionNodes[key].stop()
         self.powerplant.stop()
 
-    """This starts a windmill simulation for a user if one has not been started yet."""
     def startNode(self, ID, *var):
+        """! This starts a windmill simulation for a user if one has not been started yet.
+        @param ID Client user name
+        @param var Windmill init parameters
+        """
         with self.mutex:
             if not ID in self.productionNodes:
-                self.productionNodes[ID] = NodeManager(self.bus, self.delta, ID, var, self.powerplant)
+                self.productionNodes[ID] = NodeManager(self.delta, ID, *var, self.powerplant)
                 self.socketio.start_background_task(NodeManager.run, self.productionNodes[ID], self.socketio)
 
-    """Alters the windmill"""
     def alterNode(self, username, valueName, data):
+        """! Alters the windmill.
+        @param username Client username.
+        @param valueName Name of the value to change.
+        @param data Value to set
+        """
         with self.mutex:
             self.productionNodes[username].client.setValue(valueName, data)
 
-    """Stops the windmill"""
     def stopNode(self, ID):
+        """! Stops the windmill.
+        @param ID Client user name
+        """
         with self.mutex:
             if ID in self.productionNodes:
                 self.productionNodes[ID].stop()
 
-    """Returns the windmill?"""
     def getNode(self, ID):
+        """! Returns a windmill based on a client username.
+        @param ID Client user name
+        """
         with self.mutex:
             if ID in self.productionNodes:
                 return self.productionNodes[ID].client
-
-    """Deletes ? """
-    def __del__(self):
-        with self.mutex:
-            for key in self.productionNodes:
-                self.productionNodes[key].stop()
