@@ -3,6 +3,7 @@ Robin Danielsson and Oskar Havo
 
 # Instruction for Audit
 LUDD WM IP: 130.240.200.37
+
 SSH settings: Default LUDD VPS settings.
 
 
