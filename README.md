@@ -2,7 +2,7 @@
 Robin Danielsson and Oskar Havo
 
 # Instruction for Audit
-We have added the public ssh key as requested. On our server, we have placed usernames and passwords for audit in:
+We have added the public ssh key as requested. On our wm, we have placed usernames and passwords for audit in:
 ```
 /home/robdan-7/AUDIT_INSTRUCTIONS.md
 ```
@@ -16,11 +16,11 @@ export XDG_RUNTIME_DIR=/run/user/$(id -u)
 systemctl --user restart flask
 ```
 
-Alternatively, the server can be started by executing:
+Alternatively, the python server can be started by executing:
 ```
 python3 /var/lib/jenkins/workspace/M7011E-web/python/index.py
 ```
-Note that the flask service must be turned off first. 
+Note that the flask service must be turned off first. Replace **restart** with **stop**.
 
 # Introduction
 The purpose of this course was to create a simulator simulating a power grid. <br>
