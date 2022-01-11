@@ -2,6 +2,10 @@
 Robin Danielsson and Oskar Havo
 
 # Instruction for Audit
+LUDD WM IP: 130.240.200.37
+SSH settings: Default LUDD VPS settings.
+
+
 We have added the public ssh key as requested. On our wm, we have placed usernames and passwords for audit in:
 ```
 /home/robdan-7/AUDIT_INSTRUCTIONS.md
