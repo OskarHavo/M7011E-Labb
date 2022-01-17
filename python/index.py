@@ -163,7 +163,7 @@ def index():
         return redirect(userDashboardDir)
     return render_template("index.html")
 
-@app.route(loginDir, methods=['POST'])
+@app.route(loginDir, methods=['POST','GET'])
 def login():
     """! Flask function for log in page.
     @return On valid POST: the admin or user home page\n Otherwise: The login page.
@@ -190,7 +190,7 @@ def login():
         return render_template("login.html")
 
 
-@app.route(createUserDir, methods=['POST'])
+@app.route(createUserDir, methods=['POST','GET'])
 def signup():
     """! Flask function for signing up a user.
     @return On valid POST: Redirect to the user home page\n Otherwise: Return to signup with an error.
@@ -274,7 +274,7 @@ def logout():
 
     return redirect(indexDir)
 
-@app.route(settingsDir, methods=['POST'])
+@app.route(settingsDir, methods=['POST','GET'])
 def settings():
     """! Flask function for changing your settings.
     @return On valid POST: Change user settings. \n Otherwise: Return to index page.
@@ -362,13 +362,16 @@ def image(usertype):
             else:
                 return ""
 
-"""
 
-This is our old version for fetching windmill information. As you can see, there is no streaming going on here.
+
+
 
 @app.route("/fetch", methods=['POST', 'GET', 'PUT'])
 def fetch():
+    """! This is our old version for fetching windmill information. As you can see, there is no streaming going on here.
+    """
     user = checkSession()
+    """
     if request.method == "POST":
         if not user:
             return "{}"
@@ -381,7 +384,8 @@ def fetch():
             if user:
                 manager.stopNode(user.name)
         return jsonify({"data": request.args.get("username")})
-    elif request.method == "GET":
+        """
+    if request.method == "GET":
         if user:
             data = getHistoricalData(user.name)
             if data:
@@ -398,7 +402,7 @@ def fetch():
             manager.alterNode(user.name, valueName, data)
             return "{}"
     return "{}"
-"""
+
 
 @app.route("/block_user/<username>")
 def block_user(username):
