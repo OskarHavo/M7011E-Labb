@@ -124,6 +124,49 @@ by how frequently a windmill is updating its state.
 ### Package diagram that shows ownership/include paths
 ![bild](packages.png)
 
+## API Specification
+### Login ("/login")
+Flask function for login page. On valid POST: Returns the admin or user home page, otherwise returns to the home page.
+
+### Signup ("/signup") 
+Flask function for signing up a user. On valid POST: Redirects to the user home page, otherwise returns to the signup page with an error.
+
+### Settings ("/settings")
+Flask function for changing user settings. On valid POST: Changes the requested user settings, otherwise redirects to the index page.
+
+### Delete User ("/settings/delete")
+Flask function for deleting a user. On valid POST: Deletes the logged in user and redirects to logout page, otherwise redirects to logout page.
+
+### Image ("/image/\<usertype\>")
+Flask function for fetching a user image. On valid POST: Sets the user image. On valid GET: Returns the user image if there is one.
+
+usertype: Either "houseimage" or "admin".
+
+### Fetch ("/fetch")
+Legacy function. On valid GET: Fetches historical data for the logged in user. On valid PUT: Alters the user's windmill simulation instance with provided settings.
+
+Valid windmill settings:
+ - ValueName: "buyRatio", "sellRatio", "block".
+ - data: Floating number 0-1 or None.
+
+### Block User ("/block_user/\<username\>")
+Flask function for blocking users. Will only work for verified admins. 
+
+username: Name of the user to delete.
+
+### Fetch Admin ("/fetch_admin")
+Flask function for fetching information from the energy central object. Energy central data cannot be streamed and must be fetched on a per-package basis.
+On valid GET: Returns central powerplant data. On valid PUT: Changes energy central settings.
+
+Valid settings:
+ - valueName: "sellRatio", "stop", "start", "powerplantproduction", "marketRatio", "currentelectricityprice"
+ - data: Floating number 0-1 for sell and market ratio, integer for current electricity price or None for start and stop.
+
+### Fetch All Users ("/fetch_all_users_for_admin") 
+Flask function for retrieving information about all users in a html friendly format. On valid GET: Returns a Json structure containing all information of all users in the database.
+
+### Start Stream (SocketIO "start stream")
+SocketIO function for starting a windmill streaming session. Only works for valid regular users. A javascript function must be set up that handles "stream partition" events from SocketIO.
 
 ## Data Model Specification
 We store user data in an SQL database that provides a table with username, hashed password, postal code, user image, 
