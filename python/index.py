@@ -149,7 +149,8 @@ def checkSession():
     """
     user = getUser()
     if user != None and user.isValid():
-        updateUserLastLogin(user.name, datetime.now().strftime("%Y-%m-%d %H:%M:%S"), user.ip, user.port)
+        if "user-backup" not in session:
+            updateUserLastLogin(user.name, datetime.now().strftime("%Y-%m-%d %H:%M:%S"), user.ip, user.port)
         return user
     else:
         return None
@@ -244,7 +245,7 @@ def userDash2(username):
             user.validated = True
             user.postalcode = userdata[2]
             session["user"] = user.toJSON()
-            return render_template("user_dashboard.html", user=user.name)
+            return redirect(userDashboardDir)
         return redirect(adminDash)
     else:
         return redirect(indexDir)
@@ -451,7 +452,9 @@ def fetch_all_users():
 
             if users:
                 items = []
-                delta = timedelta(minutes=10)
+                delta = timedelta(seconds=30)   # Very quick update time for logged in/out
+                # We only store the last login time and date. Online/offline info is determined by the delta.
+
                 now = datetime.now()
                 for user in users:
                     if user[4] == 1:
