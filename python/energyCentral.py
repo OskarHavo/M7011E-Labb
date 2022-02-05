@@ -2,6 +2,7 @@ import random
 import threading
 import dataGeneration
 import datetime
+import numpy as np
 
 class EnergyCentral:
     """! Class for handling our power plant."""
@@ -164,7 +165,7 @@ class EnergyCentral:
 
             cap = self.capacityModifier * self.maxCapacity
 
-            self.currentCapacity = self.sellRatio * cap
+            self.currentCapacity = np.clip(self.sellRatio * cap,0,self.maxCapacity)
             if self.running < 10:
                 self.currentCapacity = self.buffer
                 if self.running > 0:
