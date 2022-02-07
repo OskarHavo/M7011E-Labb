@@ -1,6 +1,9 @@
 # M7011E Lab
 Robin Danielsson and Oskar Havo
 
+# Known bugs
+- Issue [#57](https://github.com/OskarHavo/M7011E-Labb/issues/57) - Energy central power output
+
 # Instruction for Audit
 LUDD VM IP: 130.240.200.37
 
